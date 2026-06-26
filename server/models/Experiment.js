@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const sampleSchema = new mongoose.Schema(
   {
@@ -54,6 +54,22 @@ const subExperimentSchema = new mongoose.Schema(
   }
 );
 
+const vivaQuestionSchema = new mongoose.Schema(
+  {
+    question: {
+      type: String,
+      required: true,
+    },
+    answer: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    _id: false,
+  }
+);
+
 const experimentSchema = new mongoose.Schema(
   {
     subjectId: {
@@ -70,13 +86,23 @@ const experimentSchema = new mongoose.Schema(
     title: {
       type: String,
       trim: true,
+      required: true,
     },
 
-    problemStatement: String,
+    problemStatement: {
+      type: String,
+      required: true,
+    },
 
-    theory: String,
+    theory: {
+      type: String,
+      default: "",
+    },
 
-    algorithm: String,
+    algorithm: {
+      type: String,
+      default: "",
+    },
 
     samples: {
       type: [sampleSchema],
@@ -86,6 +112,37 @@ const experimentSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       enum: ["Easy", "Medium", "Hard"],
+      default: "Easy",
+    },
+
+    concepts: {
+      type: [String],
+      default: [],
+    },
+
+    hints: {
+      type: [String],
+      default: [],
+    },
+
+    starterCode: {
+      type: String,
+      default: "",
+    },
+
+    sampleInput: {
+      type: String,
+      default: "",
+    },
+
+    sampleOutput: {
+      type: String,
+      default: "",
+    },
+
+    vivaQuestions: {
+      type: [vivaQuestionSchema],
+      default: [],
     },
 
     subExperiments: {
@@ -104,4 +161,5 @@ experimentSchema.index(
   { unique: true }
 );
 
-module.exports = mongoose.model("Experiment", experimentSchema);
+const Experiment = mongoose.model("Experiment", experimentSchema);
+export default Experiment;

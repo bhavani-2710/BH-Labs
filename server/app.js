@@ -1,16 +1,12 @@
-require("dotenv").config();
-
-const express = require("express");
-const cors = require("cors");
-const morgan = require("morgan");
-const connectDB = require("./config/db");
-
-// Rputes
-const subjectRoutes = require("./routes/subjectRoutes");
-const experimentRoutes = require("./routes/experimentRoutes");
-
-// Connect Database
-connectDB();
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import connectDB from "./config/db.js";
+import subjectRoutes from "./routes/subjectRoutes.js";
+import experimentRoutes from "./routes/experimentRoutes.js";
+import Subject from "./models/Subject.js";
+import { seedDB } from "./seed.js";
 
 const app = express();
 
@@ -28,6 +24,27 @@ app.use("/api/experiments", experimentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Connect Database & Start Server
+const startServer = async () => {
+  try {
+    await connectDB();
+    
+    // Seed DB if empty
+    const subjectCount = await Subject.countDocuments();
+    if (subjectCount === 0) {
+      console.log("No subjects found in database. Running seed script...");
+      await seedDB();
+    } else {
+      console.log("Database already has records, skipping seed.");
+    }
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err);
+    process.exit(1);
+  }
+};
+
+startServer();

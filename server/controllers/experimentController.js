@@ -1,7 +1,7 @@
-const Experiment = require("../models/Experiment");
+import Experiment from "../models/Experiment.js";
 
 // GET all experiments
-const getExperiments = async (req, res) => {
+export const getExperiments = async (req, res) => {
   try {
     const experiments = await Experiment.find()
       .populate("subjectId")
@@ -16,7 +16,7 @@ const getExperiments = async (req, res) => {
 };
 
 // GET experiment by id
-const getExperimentById = async (req, res) => {
+export const getExperimentById = async (req, res) => {
   try {
     const experiment = await Experiment.findById(req.params.id).populate(
       "subjectId",
@@ -37,7 +37,7 @@ const getExperimentById = async (req, res) => {
 };
 
 // GET experiments by subject
-const getExperimentsBySubject = async (req, res) => {
+export const getExperimentsBySubject = async (req, res) => {
   try {
     const experiments = await Experiment.find({
       subjectId: req.params.subjectId,
@@ -54,7 +54,7 @@ const getExperimentsBySubject = async (req, res) => {
 };
 
 // CREATE many or single experiments
-const createExperiment = async (req, res) => {
+export const createExperiment = async (req, res) => {
   try {
     let created;
 
@@ -81,7 +81,7 @@ const createExperiment = async (req, res) => {
 };
 
 // UPDATE experiment
-const updateExperiment = async (req, res) => {
+export const updateExperiment = async (req, res) => {
   try {
     const experiment = await Experiment.findByIdAndUpdate(
       req.params.id,
@@ -107,7 +107,7 @@ const updateExperiment = async (req, res) => {
 };
 
 // DELETE experiment
-const deleteExperiment = async (req, res) => {
+export const deleteExperiment = async (req, res) => {
   try {
     const experiment = await Experiment.findByIdAndDelete(req.params.id);
 
@@ -125,13 +125,4 @@ const deleteExperiment = async (req, res) => {
       message: error.message,
     });
   }
-};
-
-module.exports = {
-  getExperiments,
-  getExperimentById,
-  getExperimentsBySubject,
-  createExperiment,
-  updateExperiment,
-  deleteExperiment,
 };
