@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 
 // Rputes
 const subjectRoutes = require("./routes/subjectRoutes");
+const experimentRoutes = require("./routes/experimentRoutes");
 
 // Connect Database
 connectDB();
@@ -23,6 +24,7 @@ app.get("/api/health", (req, res) => {
 
 // Routes
 app.use("/api/subjects", subjectRoutes);
+app.use("/api/experiments", experimentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
