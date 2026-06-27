@@ -29,15 +29,6 @@ const startServer = async () => {
   try {
     await connectDB();
     
-    // Seed DB if empty
-    const subjectCount = await Subject.countDocuments();
-    if (subjectCount === 0) {
-      console.log("No subjects found in database. Running seed script...");
-      await seedDB();
-    } else {
-      console.log("Database already has records, skipping seed.");
-    }
-
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });

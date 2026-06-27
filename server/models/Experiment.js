@@ -2,25 +2,18 @@ import mongoose from "mongoose";
 
 const sampleSchema = new mongoose.Schema(
   {
-    input: {
-      type: String,
-      required: true,
-    },
-    output: {
-      type: String,
-      required: true,
-    },
+    input: { type: String, default: "" },
+    output: { type: String, default: "" },
   },
   {
     _id: false,
-  }
+  },
 );
 
 const subExperimentSchema = new mongoose.Schema(
   {
     part: {
       type: String,
-      required: true,
     },
     title: {
       type: String,
@@ -39,6 +32,32 @@ const subExperimentSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    flowchart: {
+      nodes: [
+        {
+          id: { type: String, required: true },
+          type: { type: String },
+          label: { type: String, required: true },
+        },
+      ],
+      edges: [
+        {
+          source: { type: String, required: true },
+          target: { type: String, required: true },
+        },
+      ],
+    },
+    starterCode: {
+      supportedLanguages: {
+        type: [String],
+        default: [],
+      },
+      templates: {
+        type: Map,
+        of: String,
+        default: {},
+      },
+    },
     samples: {
       type: [sampleSchema],
       default: [],
@@ -51,23 +70,7 @@ const subExperimentSchema = new mongoose.Schema(
   },
   {
     _id: false,
-  }
-);
-
-const vivaQuestionSchema = new mongoose.Schema(
-  {
-    question: {
-      type: String,
-      required: true,
-    },
-    answer: {
-      type: String,
-      required: true,
-    },
   },
-  {
-    _id: false,
-  }
 );
 
 const experimentSchema = new mongoose.Schema(
@@ -86,63 +89,17 @@ const experimentSchema = new mongoose.Schema(
     title: {
       type: String,
       trim: true,
-      required: true,
     },
 
-    problemStatement: {
-      type: String,
-      required: true,
-    },
+    problemStatement: String,
 
-    theory: {
-      type: String,
-      default: "",
-    },
+    theory: String,
 
-    algorithm: {
-      type: String,
-      default: "",
-    },
-
-    samples: {
-      type: [sampleSchema],
-      default: [],
-    },
+    algorithm: String,
 
     difficulty: {
       type: String,
       enum: ["Easy", "Medium", "Hard"],
-      default: "Easy",
-    },
-
-    concepts: {
-      type: [String],
-      default: [],
-    },
-
-    hints: {
-      type: [String],
-      default: [],
-    },
-
-    starterCode: {
-      type: String,
-      default: "",
-    },
-
-    sampleInput: {
-      type: String,
-      default: "",
-    },
-
-    sampleOutput: {
-      type: String,
-      default: "",
-    },
-
-    vivaQuestions: {
-      type: [vivaQuestionSchema],
-      default: [],
     },
 
     subExperiments: {
@@ -152,14 +109,11 @@ const experimentSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Prevent duplicate experiment number for same subject
-experimentSchema.index(
-  { subjectId: 1, experimentNumber: 1 },
-  { unique: true }
-);
+experimentSchema.index({ subjectId: 1, experimentNumber: 1 }, { unique: true });
 
 const Experiment = mongoose.model("Experiment", experimentSchema);
 export default Experiment;
