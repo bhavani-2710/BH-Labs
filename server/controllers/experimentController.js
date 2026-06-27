@@ -1,60 +1,36 @@
-import Experiment from "../models/Experiment.js";
+const Experiment = require("../models/Experiment");
 
-// GET all experiments
-export const getExperiments = async (req, res) => {
+const getExperiments = async (req, res) => {
   try {
     const experiments = await Experiment.find()
-      .populate("subjectId")
-      .sort({ experimentNumber: 1 });
-
+      .sort({ experimentNumber: 1 }); // ← removed .populate()
     res.status(200).json(experiments);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// GET experiment by id
-export const getExperimentById = async (req, res) => {
+const getExperimentById = async (req, res) => {
   try {
-    const experiment = await Experiment.findById(req.params.id).populate(
-      "subjectId",
-    );
-
-    if (!experiment) {
-      return res.status(404).json({
-        message: "Experiment not found",
-      });
-    }
-
+    const experiment = await Experiment.findById(req.params.id); // ← removed .populate()
+    if (!experiment) return res.status(404).json({ message: "Experiment not found" });
     res.status(200).json(experiment);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// GET experiments by subject
-export const getExperimentsBySubject = async (req, res) => {
+const getExperimentsBySubject = async (req, res) => {
   try {
-    const experiments = await Experiment.find({
-      subjectId: req.params.subjectId,
-    })
-      .populate("subjectId")
-      .sort({ experimentNumber: 1 });
-
+    const experiments = await Experiment.find({ subjectId: req.params.subjectId })
+      .sort({ experimentNumber: 1 }); // ← removed .populate()
     res.status(200).json(experiments);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
-
 // CREATE many or single experiments
-export const createExperiment = async (req, res) => {
+const createExperiment = async (req, res) => {
   try {
     let created;
 
@@ -81,7 +57,7 @@ export const createExperiment = async (req, res) => {
 };
 
 // UPDATE experiment
-export const updateExperiment = async (req, res) => {
+const updateExperiment = async (req, res) => {
   try {
     const experiment = await Experiment.findByIdAndUpdate(
       req.params.id,
@@ -107,7 +83,7 @@ export const updateExperiment = async (req, res) => {
 };
 
 // DELETE experiment
-export const deleteExperiment = async (req, res) => {
+const deleteExperiment = async (req, res) => {
   try {
     const experiment = await Experiment.findByIdAndDelete(req.params.id);
 
@@ -125,4 +101,13 @@ export const deleteExperiment = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+module.exports = {
+  getExperiments,
+  getExperimentById,
+  getExperimentsBySubject,
+  createExperiment,
+  updateExperiment,
+  deleteExperiment,
 };

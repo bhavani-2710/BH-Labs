@@ -1,13 +1,13 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const sampleSchema = new mongoose.Schema(
   {
     input: { type: String, default: "" },
-    output: { type: String, default: "" },
+    output: { type: String, default: "" }
   },
   {
     _id: false,
-  },
+  }
 );
 
 const subExperimentSchema = new mongoose.Schema(
@@ -70,7 +70,7 @@ const subExperimentSchema = new mongoose.Schema(
   },
   {
     _id: false,
-  },
+  }
 );
 
 const experimentSchema = new mongoose.Schema(
@@ -97,6 +97,7 @@ const experimentSchema = new mongoose.Schema(
 
     algorithm: String,
 
+
     difficulty: {
       type: String,
       enum: ["Easy", "Medium", "Hard"],
@@ -109,11 +110,13 @@ const experimentSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 // Prevent duplicate experiment number for same subject
-experimentSchema.index({ subjectId: 1, experimentNumber: 1 }, { unique: true });
+experimentSchema.index(
+  { subjectId: 1, experimentNumber: 1 },
+  { unique: true }
+);
 
-const Experiment = mongoose.model("Experiment", experimentSchema);
-export default Experiment;
+module.exports = mongoose.model("Experiment", experimentSchema);

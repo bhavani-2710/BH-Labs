@@ -1,11 +1,12 @@
-import express from "express";
-import {
+const express = require("express");
+
+const {
   getSubjects,
   getSubjectById,
   createSubject,
   updateSubject,
   deleteSubject,
-} from "../controllers/subjectController.js";
+} = require("../controllers/subjectController");
 
 const router = express.Router();
 
@@ -24,4 +25,4 @@ router.put("/:id", updateSubject);
 // DELETE subject
 router.delete("/:id", deleteSubject);
 
-export default router;
+module.exports = router;

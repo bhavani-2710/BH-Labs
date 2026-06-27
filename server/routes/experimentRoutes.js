@@ -1,12 +1,13 @@
-import express from "express";
-import {
+const express = require("express");
+
+const {
   getExperiments,
   getExperimentById,
   getExperimentsBySubject,
   createExperiment,
   updateExperiment,
   deleteExperiment,
-} from "../controllers/experimentController.js";
+} = require("../controllers/experimentController");
 
 const router = express.Router();
 
@@ -28,4 +29,4 @@ router.put("/:id", updateExperiment);
 // DELETE experiment
 router.delete("/:id", deleteExperiment);
 
-export default router;
+module.exports = router;

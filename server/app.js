@@ -1,12 +1,14 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import morgan from "morgan";
-import connectDB from "./config/db.js";
-import subjectRoutes from "./routes/subjectRoutes.js";
-import experimentRoutes from "./routes/experimentRoutes.js";
-import Subject from "./models/Subject.js";
-import { seedDB } from "./seed.js";
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const connectDB = require("./config/db");
+
+const subjectRoutes = require("./routes/subjectRoutes");
+const experimentRoutes = require("./routes/experimentRoutes");
+
+connectDB();
 
 const app = express();
 
@@ -18,24 +20,64 @@ app.get("/api/health", (req, res) => {
   res.json({ message: "BH Labs running!" });
 });
 
-// Routes
+// Wandbox proxy — runs code via remote compiler
+app.post("/api/run", async (req, res) => {
+  try {
+    const { compiler, code } = req.body;
+    if (!compiler || !code) {
+      return res.status(400).json({ error: "compiler and code are required" });
+    }
+    const response = await fetch("https://wandbox.org/api/compile.json", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ compiler, code }),
+    });
+    if (!response.ok) {
+      return res.status(502).json({ error: "Wandbox failed", status: response.status });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error("Wandbox proxy error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// In-memory stores (replace with MongoDB models later if needed)
+const codeStore = {};
+const vivaStore = {};
+
+// Code storage routes
+app.get("/api/codes", (req, res) => {
+  const entries = Object.entries(codeStore).map(([key, code]) => ({ key, code }));
+  res.json(entries);
+});
+
+app.post("/api/codes", (req, res) => {
+  const { key, code } = req.body;
+  if (!key) return res.status(400).json({ error: "key is required" });
+  codeStore[key] = code;
+  res.json({ key, code });
+});
+
+// Viva score routes
+app.get("/api/vivas", (req, res) => {
+  const entries = Object.entries(vivaStore).map(([key, score]) => ({ key, score }));
+  res.json(entries);
+});
+
+app.post("/api/vivas", (req, res) => {
+  const { key, score } = req.body;
+  if (!key) return res.status(400).json({ error: "key is required" });
+  vivaStore[key] = score;
+  res.json({ key, score });
+});
+
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/experiments", experimentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-// Connect Database & Start Server
-const startServer = async () => {
-  try {
-    await connectDB();
-    
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error("Failed to start server:", err);
-    process.exit(1);
-  }
-};
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

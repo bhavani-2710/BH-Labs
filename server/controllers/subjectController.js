@@ -1,9 +1,10 @@
-import Subject from "../models/Subject.js";
+const Subject = require("../models/Subject");
 
 // GET /api/subjects
-export const getSubjects = async (req, res) => {
+const getSubjects = async (req, res) => {
   try {
     const subjects = await Subject.find();
+
     res.status(200).json(subjects);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -11,7 +12,7 @@ export const getSubjects = async (req, res) => {
 };
 
 // GET /api/subjects/:id
-export const getSubjectById = async (req, res) => {
+const getSubjectById = async (req, res) => {
   try {
     const subject = await Subject.findById(req.params.id);
 
@@ -26,9 +27,10 @@ export const getSubjectById = async (req, res) => {
 };
 
 // POST /api/subjects
-export const createSubject = async (req, res) => {
+const createSubject = async (req, res) => {
   try {
     const subject = await Subject.create(req.body);
+
     res.status(201).json(subject);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -36,7 +38,7 @@ export const createSubject = async (req, res) => {
 };
 
 // PUT /api/subjects/:id
-export const updateSubject = async (req, res) => {
+const updateSubject = async (req, res) => {
   try {
     const subject = await Subject.findByIdAndUpdate(
       req.params.id,
@@ -58,7 +60,7 @@ export const updateSubject = async (req, res) => {
 };
 
 // DELETE /api/subjects/:id
-export const deleteSubject = async (req, res) => {
+const deleteSubject = async (req, res) => {
   try {
     const subject = await Subject.findByIdAndDelete(req.params.id);
 
@@ -72,4 +74,12 @@ export const deleteSubject = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+module.exports = {
+  getSubjects,
+  getSubjectById,
+  createSubject,
+  updateSubject,
+  deleteSubject,
 };
