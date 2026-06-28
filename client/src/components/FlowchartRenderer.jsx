@@ -48,10 +48,6 @@ export default function FlowchartRenderer({ nodes = [], edges = [] }) {
         };
     }
   };
-
-  // We can render nodes in a sequence or structured grid.
-  // For most experiments, the flowchart is linear or has minor loops.
-  // A vertical stack layout with neat line transitions represents standard workflows beautifully.
   return (
     <div className="flex flex-col items-center justify-center p-6 space-y-4 max-w-full overflow-x-auto">
       {nodes.map((node, index) => {

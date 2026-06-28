@@ -9,7 +9,7 @@ import LabWorkspace from "./pages/LabWorkspace";
 import VivaPractice from "./pages/VivaPractice";
 import PracticalJournal from "./pages/PracticalJournal";
 
-const API = "/api";
+const API = import.meta.env.VITE_API_URL 
 
 // ====================== WRAPPERS ======================
 

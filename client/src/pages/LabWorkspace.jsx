@@ -356,7 +356,7 @@ export default function LabWorkspace({
   onNavigate,
   onSaveCode,
   savedCode,
-  apiBase = "http://localhost:5000/api"
+  apiBase = "http://localhost:5050/api"
 }) {
   const subExp = experiment?.subExperiments?.find(s => s.part === subPart) || experiment?.subExperiments?.[0];
 

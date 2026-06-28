@@ -9,7 +9,8 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const res = await fetch("/api/subjects");
+        const API = import.meta.env.VITE_API_URL
+        const res = await fetch(`${API}/subjects`);
         if (res.ok) {
           const data = await res.json();
           setSubjects(data);
