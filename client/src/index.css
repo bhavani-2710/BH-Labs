@@ -1,9 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libertinus+Serif+Display&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=Outfit:wght@100..900&family=Ovo&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Outfit", sans-serif;
+  --font-sans: "Inter", sans-serif;
   
   --color-primary: #7c3aed;
   --color-secondary: #6d28d9;
