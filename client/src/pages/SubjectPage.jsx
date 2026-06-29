@@ -1,188 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { 
-  LayoutDashboard, BookOpen, Mic2, FileSpreadsheet, Settings, LogOut, 
-  Share2, Play, Download, ArrowRight, ChevronRight, Terminal, AlertCircle, ChevronDown 
+  LayoutDashboard, BookOpen, PenTool, FileText, Settings, LogOut, 
+  Share2, Download, ArrowRight, ChevronRight, Terminal, AlertCircle, ChevronDown,
+  GraduationCap, ExternalLink, CheckCircle2
 } from "lucide-react";
-
-const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@450&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    background: #FAFAFA;
-    color: #09090B;
-    overflow-x: hidden;
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: #FAFAFA; }
-  ::-webkit-scrollbar-thumb { background: #E4E4E7; border-radius: 10px; }
-
-  /* Sidebar */
-  .sidebar {
-    position: fixed; left: 0; top: 0; height: 100%; width: 256px;
-    display: flex; flex-direction: column; padding: 24px 16px;
-    background: #fff; border-right: 1px solid #E4E4E7; z-index: 40;
-  }
-  @media (max-width: 768px) { .sidebar { display: none; } }
-
-  .sidebar-logo-title { font-weight: 700; font-size: 24px; color: #7C3AED; letter-spacing: -0.02em; }
-  .sidebar-logo-sub { font-size: 11px; font-weight: 600; color: #52525B; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
-
-  .nav-link {
-    display: flex; align-items: center; gap: 16px;
-    padding: 8px 16px; border-radius: 8px;
-    font-size: 14px; font-weight: 500; color: #52525B;
-    text-decoration: none; cursor: pointer; border: none; background: none;
-    width: 100%; text-align: left; transition: background 0.15s, color 0.15s;
-  }
-  .nav-link:hover { background: #FAFAFA; color: #09090B; }
-  .nav-link.active { background: #F5F3FF; color: #7C3AED; font-weight: 600; }
-  .nav-link svg { width: 20px; height: 20px; flex-shrink: 0; }
-
-  .sidebar-divider { border-top: 1px solid #E4E4E7; margin-top: auto; padding-top: 24px; }
-
-  /* Main shell */
-  .main-shell { margin-left: 256px; min-height: 100vh; display: flex; flex-direction: column; }
-  @media (max-width: 768px) { .main-shell { margin-left: 0; } }
-
-  .top-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 24px; background: #fff; border-bottom: 1px solid #E4E4E7;
-    position: sticky; top: 0; z-index: 30;
-    flex-wrap: wrap; gap: 12px;
-  }
-
-  .breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #52525B; }
-  .breadcrumb-active { color: #09090B; font-weight: 600; }
-
-  .header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-
-  .btn-primary, .btn-start {
-    padding: 8px 24px; background: #7C3AED; color: #fff;
-    font-weight: 700; border-radius: 999px; font-size: 14px;
-    border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-    transition: box-shadow 0.2s, background 0.15s;
-  }
-  .btn-primary:hover, .btn-start:hover { background: rgba(124,58,237,0.9); box-shadow: 0 4px 12px rgba(124,58,237,0.25); }
-
-  .btn-outline, .btn-view {
-    padding: 8px 24px; background: #fff; color: #09090B;
-    font-weight: 700; border-radius: 999px; font-size: 14px;
-    border: 1px solid #E4E4E7; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-  }
-  .btn-outline:hover, .btn-view:hover { background: #FAFAFA; }
-
-  .btn-icon {
-    width: 36px; height: 36px; background: #fff; border: 1px solid #E4E4E7;
-    border-radius: 999px; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; color: #52525B;
-  }
-  .btn-icon:hover { color: #7C3AED; }
-
-  .content-area { flex: 1; padding: 24px; max-width: 1260px; margin: 0 auto; width: 100%; }
-
-  .content-grid {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 24px;
-    align-items: start;
-  }
-  @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
-
-  .page-identity {
-    display: flex; justify-content: space-between; align-items: flex-end;
-    margin-bottom: 32px; gap: 16px; flex-wrap: wrap;
-  }
-  .page-title { font-size: 30px; font-weight: 700; color: #09090B; margin-bottom: 2px; }
-  .page-meta { font-size: 13px; font-weight: 500; color: #52525B; }
-
-  .filter-group {
-    display: flex; gap: 2px; padding: 4px;
-    background: #F4F4F5; border-radius: 999px; width: fit-content;
-  }
-  .filter-pill {
-    padding: 6px 16px; border-radius: 999px; font-size: 12px; font-weight: 600;
-    border: none; cursor: pointer; color: #52525B; background: transparent;
-  }
-  .filter-pill:hover { color: #09090B; }
-  .filter-pill.active { background: #fff; color: #09090B; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-
-  .main-exp-card {
-    background: #fff; border-radius: 12px; padding: 20px 24px;
-    border: 1px solid #E4E4E7;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  .main-exp-header {
-    display: flex; align-items: center; gap: 20px; cursor: pointer;
-  }
-
-  .main-exp-number {
-    flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 20px; background: #F5F3FF; color: #7C3AED;
-  }
-
-  .main-exp-info { flex: 1; min-width: 0; }
-  .main-exp-title { font-size: 18px; font-weight: 700; color: #09090B; margin-bottom: 6px; }
-
-  .toggle-icon {
-    transition: transform 0.2s ease;
-  }
-  .toggle-icon.expanded { transform: rotate(180deg); }
-
-  .sub-exp-card {
-    background: #FAFAFA; border-radius: 10px; padding: 16px 20px;
-    border: 1px solid #E4E4E7; margin-top: 12px;
-    display: flex; align-items: center; gap: 16px;
-  }
-
-  .sub-exp-part {
-    font-size: 13px; font-weight: 700; color: #7C3AED; 
-    background: #F5F3FF; padding: 2px 10px; border-radius: 999px;
-  }
-
-  .sub-exp-title { font-size: 15px; font-weight: 600; color: #09090B; flex: 1; }
-
-  .exp-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-
-  .analytics-card {
-    background: #fff; border-radius: 12px; padding: 24px;
-    border: 1px solid #E4E4E7;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
-    position: sticky; top: 88px;
-  }
-  .analytics-title { font-size: 17px; font-weight: 700; color: #09090B; margin-bottom: 16px; }
-
-  .progress-ring-wrap { display: flex; justify-content: center; padding: 16px 0; position: relative; }
-  .progress-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-  .progress-pct { font-size: 24px; font-weight: 700; color: #09090B; }
-  .progress-sub { font-size: 10px; font-weight: 700; color: #52525B; text-transform: uppercase; letter-spacing: 0.08em; }
-
-  .stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; color: #52525B; margin-bottom: 6px; }
-  .stat-val-green { color: #059669; font-weight: 700; }
-  .stat-val-amber { color: #D97706; font-weight: 700; }
-
-  .progress-bar-wrap { width: 100%; height: 6px; background: #F4F4F5; border-radius: 999px; overflow: hidden; margin-bottom: 16px; }
-  .progress-bar-fill { height: 100%; border-radius: 999px; }
-
-  .analytics-hint {
-    font-size: 12px; color: #52525B; font-style: italic; line-height: 1.6;
-    border-top: 1px solid #E4E4E7; padding-top: 16px; margin-top: 4px;
-  }
-
-  .btn-export {
-    width: 100%; padding: 12px; background: #FAFAFA; border: 1px solid #E4E4E7;
-    color: #09090B; font-weight: 700; font-size: 13px; border-radius: 10px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-top: 16px;
-  }
-`;
 
 export default function SubjectPage({
   onNavigate,
@@ -207,9 +28,6 @@ export default function SubjectPage({
     });
   }, [experiments, subjectId]);
 
-  // Simplified status - everything is accessible
-  const getExperimentStatus = () => "PENDING";
-
   const toggleExpand = (expId) => {
     setExpandedExperiments(prev => {
       const newSet = new Set(prev);
@@ -222,104 +40,116 @@ export default function SubjectPage({
     });
   };
 
+  // Completion tracking via localStorage
+  const completionKey = `bhlabs_completed_${subjectId}`;
+  const [completedSet, setCompletedSet] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`bhlabs_completed_${subjectId}`);
+      return new Set(saved ? JSON.parse(saved) : []);
+    } catch { return new Set(); }
+  });
+
+  const toggleCompleted = (expId, subPart, e) => {
+    e.stopPropagation();
+    const key = `${expId}__${subPart}`;
+    setCompletedSet(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      localStorage.setItem(completionKey, JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  const isCompleted = (expId, subPart) => completedSet.has(`${expId}__${subPart}`);
+
+  const completedExperimentsCount = useMemo(() => {
+    return subjectExperiments.filter((exp) => {
+      const subExperiments = exp.subExperiments || [];
+      if (subExperiments.length === 0) return false;
+      return subExperiments.every((sub) => isCompleted(exp._id, sub.part));
+    }).length;
+  }, [subjectExperiments, completedSet]);
+
   const filteredMainExperiments = useMemo(() => {
     return subjectExperiments.filter(() => true); // Show all
   }, [subjectExperiments]);
 
-  const completedCount = 0;
-  const pendingCount = subjectExperiments.length;
   const total = subjectExperiments.length || 0;
-  const pct = 0;
 
-  const R = 58;
+  const R = 56;
   const C = 2 * Math.PI * R;
-  const offset = C;
+  const overallPct = total > 0 ? Math.round((completedExperimentsCount / total) * 100) : 0;
+  const offset = C - (overallPct / 100) * C;
 
   return (
-    <>
-      <style>{styles}</style>
-
+    <div className="bg-[#F8F9FB] flex min-h-screen text-slate-800">
       {/* Sidebar */}
-      <aside className="sidebar">
-        <div style={{ marginBottom: 32, paddingLeft: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-            <div style={{ width: 32, height: 32, background: "#7C3AED", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Terminal size={16} color="#fff" />
+      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0" data-purpose="main-navigation">
+        <div className="p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-sm shrink-0">
+              <img src="/logo.png" alt="BH.Lab Logo" className="w-full h-full object-cover" />
             </div>
-            <span className="sidebar-logo-title">BH.Lab</span>
+            <span className="text-xl font-bold text-[#5521FF]">BH.Lab</span>
           </div>
-          <p className="sidebar-logo-sub">Engineering Portal</p>
+          <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Engineering Portal</p>
         </div>
-
-        <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-          <button onClick={() => onNavigate?.("dashboard")} className="nav-link">
-            <LayoutDashboard size={20} /><span>Dashboard</span>
+        <nav className="flex-1 px-4 py-4 space-y-1">
+          <button onClick={() => onNavigate?.("dashboard")} className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all w-full text-left">
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="font-medium text-sm">Dashboard</span>
           </button>
-          <button className="nav-link active">
-            <BookOpen size={20} /><span>My Subjects</span>
-          </button>
-          <button onClick={() => onNavigate?.("viva-practice-menu")} className="nav-link">
-            <Mic2 size={20} /><span>Viva Practice</span>
-          </button>
-          <button onClick={() => onNavigate?.("journals")} className="nav-link">
-            <FileSpreadsheet size={20} /><span>My Journals</span>
+          <button className="flex items-center gap-3 px-4 py-3 bg-[#F0ECFF] text-[#5521FF] rounded-xl transition-all w-full text-left">
+            <BookOpen className="w-5 h-5" />
+            <span className="font-medium text-sm">My Subjects</span>
           </button>
         </nav>
-
-        <div className="sidebar-divider" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <button className="nav-link"><Settings size={20} /><span>Settings</span></button>
-          <button onClick={() => onNavigate?.("landing")} className="nav-link" style={{ color: "#E11D48" }}>
-            <LogOut size={20} /><span>Logout</span>
+        <div className="p-4 border-t border-slate-100">
+          <button className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all w-full text-left">
+            <Settings className="w-5 h-5" />
+            <span className="font-medium text-sm">Settings</span>
+          </button>
+          <button onClick={() => onNavigate?.("landing")} className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-all w-full text-left">
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium text-sm">Logout</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="main-shell">
-        <header className="top-header">
-          <div className="breadcrumb">
-            <button 
-              onClick={() => onNavigate?.("dashboard")} 
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#52525B", fontSize: 13 }}
-            >
-              Dashboard
+      {/* Main Content Container */}
+      <main className="flex-1 flex flex-col min-w-0">
+        {/* Top Navbar */}
+        <header className="h-12 px-8 flex items-center justify-between bg-[#F8F9FB]" data-purpose="page-header">
+          <nav className="flex items-center text-xs text-slate-500 gap-2">
+            <button onClick={() => onNavigate?.("dashboard")} className="hover:text-slate-700">Dashboard</button>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-slate-900 font-semibold">{currentSubject?.name || "Subject Name"}</span>
+          </nav>
+          <div className="flex items-center gap-4">
+            <button className="p-2 border border-slate-200 rounded-full hover:bg-white transition-colors bg-white">
+              <Share2 className="w-4 h-4 text-slate-600" />
             </button>
-            <ChevronRight size={14} />
-            <span className="breadcrumb-active">{currentSubject?.name || "C Programming"}</span>
-          </div>
-          <div className="header-actions">
-            <button className="btn-icon"><Share2 size={16} /></button>
-            <div style={{ width: 1, height: 24, background: "#E4E4E7" }} />
-            <button 
-              className="btn-primary" 
-              onClick={() => {
-                const firstExp = subjectExperiments[0];
-                if (firstExp?.subExperiments?.[0]) {
-                  onSelectExperiment?.(firstExp._id, firstExp.subExperiments[0].part);
-                }
-              }}
-            >
-              Run First
+            <button className="px-5 py-2 bg-slate-900 text-white text-xs font-bold rounded-full hover:bg-slate-800 transition-colors shadow-sm" onClick={() => onNavigate?.("journals")}>
+              Generate Journal
             </button>
-            <button className="btn-outline" onClick={() => onNavigate?.("journals")}>Generate Journal</button>
           </div>
         </header>
 
-        <div className="content-area">
-          <div className="page-identity">
+        {/* Scrollable Content */}
+        <div className="px-8 py-4 overflow-y-auto">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="page-title">{currentSubject?.name || "C Programming"}</h2>
-              <p className="page-meta">{total} Experiments · Semester {currentSubject?.semester || 3}</p>
+              <h1 className="text-xl font-bold text-slate-900">{currentSubject?.name || "Subject Name"}</h1>
+              <p className="text-slate-400 font-medium text-[11px] uppercase tracking-wider">{total} Experiments · Semester {currentSubject?.semester || 3}</p>
             </div>
-
-            <div className="filter-group">
-              <button className="filter-pill active">All ({total})</button>
-            </div>
+            <button className="px-4 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 text-xs font-bold shadow-sm hover:border-slate-300">
+              All ({total})
+            </button>
           </div>
-
-          <div className="content-grid">
+          
+          <div className="flex gap-8 items-start">
             {/* Experiments List */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <section className="flex-1 space-y-3" data-purpose="experiments-section">
               {filteredMainExperiments.length > 0 ? (
                 filteredMainExperiments.map((exp) => {
                   const num = String(exp.experimentNumber || exp.number || "??").padStart(2, "0");
@@ -328,129 +158,160 @@ export default function SubjectPage({
                   const hasSubs = subExperiments.length > 0;
 
                   return (
-                    <div key={exp._id} className="main-exp-card">
-                      <div 
-                        className="main-exp-header" 
-                        onClick={() => hasSubs && toggleExpand(exp._id)}
-                      >
-                        <div className="main-exp-number">{num}</div>
-
-                        <div className="main-exp-info">
-                          <div className="main-exp-title">
-                            Experiment {num}
+                    <div key={exp._id} className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden" data-purpose={`experiment-card-${num}`}>
+                      <div className="flex items-center justify-between p-3 cursor-pointer hover:bg-slate-50 transition-colors relative" onClick={() => hasSubs && toggleExpand(exp._id)}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-[#F0ECFF] rounded-lg flex items-center justify-center flex-shrink-0">
+                            <span className="text-[#5521FF] font-bold text-xs">{num}</span>
                           </div>
+                          <div>
+                            <h3 className="font-bold text-slate-800 text-xs">{exp.problemStatement || exp.title || `Experiment ${num}`}</h3>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          {(() => {
+                              const doneCount = subExperiments.filter(s => isCompleted(exp._id, s.part)).length;
+                              const pct = subExperiments.length > 0 ? (doneCount / subExperiments.length) * 100 : 0;
+                              const allDone = doneCount === subExperiments.length && subExperiments.length > 0;
+                              return (
+                                <div className="text-right hidden sm:block">
+                                  <span className={`text-[10px] font-bold block uppercase tracking-tighter ${allDone ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                    {doneCount} / {subExperiments.length} Done
+                                  </span>
+                                  <div className="w-20 bg-slate-100 h-1.5 rounded-full mt-1 overflow-hidden">
+                                    <div className={`h-full transition-all ${allDone ? 'bg-emerald-500' : 'bg-[#5521FF]'}`} style={{ width: `${pct}%` }}></div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
                           {hasSubs && (
-                            <div style={{ fontSize: "13px", color: "#52525B" }}>
-                              {subExperiments.length} Parts
-                            </div>
+                            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                           )}
                         </div>
-
-                        {hasSubs && (
-                          <ChevronDown 
-                            size={20} 
-                            className={`toggle-icon ${isExpanded ? "expanded" : ""}`} 
-                            color="#52525B"
-                          />
-                        )}
                       </div>
-
-                      {/* Sub-experiments - Always accessible */}
+                      
                       {isExpanded && hasSubs && (
-                        <div style={{ marginTop: 16 }}>
-                          {subExperiments.map((sub, index) => (
-                            <div key={index} className="sub-exp-card">
-                              <div className="sub-exp-part">PART {sub.part?.toUpperCase() || (index + 1)}</div>
-                              
-                              <div className="sub-exp-title">
-                                {sub.title || `Sub-experiment ${sub.part}`}
-                              </div>
-
-                              <div className="exp-actions">
-                                <button 
-                                  className="btn-start" 
-                                  onClick={() => onSelectExperiment?.(exp._id, sub.part)}
-                                >
-                                  Start <Play size={12} fill="#fff" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
+                        <div className="bg-slate-50/50 border-t border-slate-100">
+                          <div className="py-2 px-4">
+                            {subExperiments.map((sub, index) => (
+                              <button 
+                                key={index}
+                                onClick={() => onSelectExperiment?.(exp._id, sub.part)}
+                                className={`flex items-center justify-between group py-1 w-full text-left ${index !== 0 ? 'border-t border-slate-100/60 mt-0.5 pt-1.5' : ''}`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  {isCompleted(exp._id, sub.part) ? (
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                                  ) : (
+                                    <div className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-[#5521FF] transition-colors"></div>
+                                  )}
+                                  <span className={`text-[10px] font-medium transition-colors ${
+                                    isCompleted(exp._id, sub.part)
+                                      ? 'text-emerald-600 line-through'
+                                      : 'text-slate-700 group-hover:text-[#5521FF]'
+                                  }`}>
+                                    {sub.title || `Sub-experiment ${sub.part}`}
+                                  </span>
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-[#5521FF] group-hover:translate-x-1 transition-all" />
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
                   );
                 })
               ) : (
-                <div style={{ textAlign: "center", padding: 80, color: "#52525B" }}>
-                  <AlertCircle size={48} style={{ marginBottom: 16, opacity: 0.5 }} />
-                  <h3>No experiments found</h3>
+                <div className="text-center py-20 text-slate-500">
+                  <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-medium">No experiments found</h3>
                 </div>
               )}
-            </div>
-
-            {/* Analytics Sidebar */}
-            <div className="analytics-card">
-              <div className="analytics-title">Lab Analytics</div>
-
-              <div className="progress-ring-wrap">
-                <svg width="128" height="128" style={{ transform: "rotate(-90deg)" }}>
-                  <circle cx="64" cy="64" r={R} fill="transparent" stroke="#F4F4F5" strokeWidth="8" />
-                  <circle 
-                    cx="64" 
-                    cy="64" 
-                    r={R} 
-                    fill="transparent" 
-                    stroke="#7C3AED" 
-                    strokeWidth="8"
-                    strokeDasharray={C} 
-                    strokeDashoffset={offset} 
-                    strokeLinecap="round" 
-                  />
-                </svg>
-                <div className="progress-label">
-                  <div className="progress-pct">0%</div>
-                  <div className="progress-sub">Overall</div>
+            </section>
+            
+            {/* Right Sidebar */}
+            <aside className="w-80 space-y-4 hidden lg:block" data-purpose="dashboard-sidebar">
+              {/* Lab Analytics Card */}
+              <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm" data-purpose="analytics-card">
+                <h3 className="font-bold text-slate-800 mb-5 text-sm">Lab Analytics</h3>
+                <div className="flex justify-center mb-6 relative">
+                  <svg className="w-32 h-32 transform -rotate-90">
+                    <circle cx="64" cy="64" fill="transparent" r={R} stroke="#F1F5F9" strokeWidth="10"></circle>
+                    <circle 
+                      className="transition-all duration-500" 
+                      cx="64" 
+                      cy="64" 
+                      fill="transparent" 
+                      r={R} 
+                      stroke="#5521FF" 
+                      strokeDasharray={C} 
+                      strokeDashoffset={offset} 
+                      strokeLinecap="round" 
+                      strokeWidth="10"
+                    ></circle>
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-xl font-bold text-slate-800">{overallPct}%</span>
+                    <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400">Overall</span>
+                  </div>
                 </div>
+                <div className="space-y-3 mb-5">
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-[11px] text-slate-500 font-bold uppercase">Completed</span>
+                      <span className="text-[11px] font-bold text-emerald-600">{completedExperimentsCount} / {total}</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-emerald-500 h-full transition-all" style={{ width: `${total > 0 ? (completedExperimentsCount / total) * 100 : 0}%` }}></div>
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-[11px] text-slate-500 font-bold uppercase">Pending</span>
+                      <span className="text-[11px] font-bold text-orange-500">{total - completedExperimentsCount} / {total}</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-orange-500 h-full transition-all" style={{ width: `${total > 0 ? ((total - completedExperimentsCount) / total) * 100 : 0}%` }}></div>
+                    </div>
+                  </div>
+                </div>
+                <button className="w-full py-2.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                  <Download className="w-3.5 h-3.5" />
+                  Export Progress
+                </button>
               </div>
 
-              <div style={{ marginTop: 8 }}>
-                <div className="stat-row">
-                  <span>Completed</span>
-                  <span className="stat-val-green">0 / {total}</span>
+              {/* Syllabus Block */}
+              <div className="bg-[#F0ECFF] rounded-2xl border border-[#5521FF]/20 p-8 relative overflow-hidden group" data-purpose="syllabus-card">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <GraduationCap className="w-20 h-20 rotate-12" />
                 </div>
-                <div className="progress-bar-wrap">
-                  <div className="progress-bar-fill" style={{ width: "0%", background: "#10B981" }} />
-                </div>
-
-                <div className="stat-row">
-                  <span>Pending</span>
-                  <span className="stat-val-amber">{total} / {total}</span>
-                </div>
-                <div className="progress-bar-wrap">
-                  <div className="progress-bar-fill" style={{ width: "100%", background: "#F59E0B" }} />
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className="w-12 h-12 bg-[#5521FF] rounded-xl flex items-center justify-center shadow-lg shadow-[#5521FF]/30">
+                      <GraduationCap className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-800 leading-tight">Mumbai University Syllabus</h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-8 leading-relaxed font-medium">
+                    Ensure your coursework aligns with the latest semester guidelines.
+                  </p>
+                  <a 
+                    className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-[#5521FF] text-white rounded-2xl font-bold text-xs shadow-xl shadow-[#5521FF]/30 hover:bg-[#5521FF]/90 hover:scale-[1.02] active:scale-95 transition-all" 
+                    href={currentSubject?.syllabusPdf || "#"} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Verify Syllabus
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
-
-              <p className="analytics-hint">
-                Start working on the experiments to generate your semester journal.
-              </p>
-
-              <button className="btn-export">
-                <Download size={16} /> Export Progress Report
-              </button>
-            </div>
+            </aside>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer style={{ padding: "32px 24px", borderTop: "1px solid #E4E4E7", background: "#fff", marginTop: "auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <span className="footer-brand">BH.Lab</span>
-            <span className="footer-copy">© 2026 BH.Lab Engineering. All rights reserved.</span>
-          </div>
-        </footer>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

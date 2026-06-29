@@ -152,7 +152,7 @@ function SubjectVivaWrapper({ experiments, onCompleteViva }) {
         <p className="text-lg font-medium">No experiments found for this subject.</p>
         <button
           onClick={() => navigate(`/subject/${subjectId}`)}
-          className="px-5 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700"
+          className="px-5 py-2.5 bg-[#5521FF] text-white rounded-xl text-sm font-semibold hover:bg-violet-700"
         >
           Back to Subject
         </button>

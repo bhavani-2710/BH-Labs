@@ -40,7 +40,7 @@ const styles = `
     font-size: 13px;
   }
 
-  ::selection { background: rgba(124,58,237,0.2); }
+  ::selection { background: rgba(85,33,255,0.2); }
 
   .custom-scrollbar::-webkit-scrollbar { width: 3px; }
   .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -79,8 +79,8 @@ const styles = `
     white-space: nowrap; cursor: pointer; outline: none;
     transition: border-color 0.15s;
   }
-  .ws-lang-select:hover { border-color: #7C3AED; color: #7C3AED; }
-  .ws-lang-select:focus { border-color: #7C3AED; box-shadow: 0 0 0 2px rgba(124,58,237,0.15); }
+  .ws-lang-select:hover { border-color: #5521FF; color: #5521FF; }
+  .ws-lang-select:focus { border-color: #5521FF; box-shadow: 0 0 0 2px rgba(85,33,255,0.15); }
 
   @media (max-width: 900px) {
     .ws-lang-pill, .ws-lang-select { display: none; }
@@ -112,14 +112,32 @@ const styles = `
   .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .btn-journal {
-    background: #7C3AED; color: #fff; border: none;
+    background: #5521FF; color: #fff; border: none;
     padding: 5px 14px; border-radius: 6px;
     font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
     cursor: pointer; transition: filter 0.15s;
-    box-shadow: 0 2px 6px rgba(124,58,237,0.2);
+    box-shadow: 0 2px 6px rgba(85,33,255,0.2);
     font-family: 'Inter', sans-serif;
   }
   .btn-journal:hover { filter: brightness(1.1); }
+
+  .btn-mark-completed {
+    background: #F4F4F5; color: #18181B;
+    border: 1px solid #E4E4E7; padding: 5px 14px;
+    border-radius: 6px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s ease;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-mark-completed.completed {
+    background: #10B981; color: #fff; border-color: #10B981;
+  }
+  .btn-mark-completed:hover {
+    background: #E4E4E7;
+  }
+  .btn-mark-completed.completed.hover-red:hover {
+    background: #EF4444 !important; border-color: #EF4444 !important; color: #fff !important;
+  }
 
   /* ── IDE body ── */
   .ws-body { display: flex; flex: 1; overflow: hidden; gap: 5px; padding: 5px; }
@@ -144,37 +162,51 @@ const styles = `
     font-family: 'Inter', sans-serif;
   }
   .tab-btn:hover { background: #EBEBEB; color: #18181B; }
-  .tab-btn.active { background: #7C3AED; color: #fff; }
+  .tab-btn.active { background: #5521FF; color: #fff; }
 
   /* ── Left panel ── */
-  .left-panel { width: 21%; flex-shrink: 0; }
-  @media (max-width: 1100px) { .left-panel { display: none; } }
+  .left-panel { width: calc(25% + 4px); flex-shrink: 0; }
 
-  .panel-content { flex: 1; overflow-y: auto; padding: 12px; }
+  .panel-content { flex: 1; overflow-y: auto; padding: 18px; }
+
+  .theory-tag-easy { background: #DCFCE7; color: #166534; }
+  .theory-tag-medium { background: #FEF3C7; color: #92400E; }
+  .theory-tag-hard { background: #FEE2E2; color: #991B1B; }
+  .theory-tag-concept { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+  .theory-tag { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em; display: inline-block; }
+
+  .theory-section-title { font-size: 12px; font-weight: 800; color: #1E293B; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; margin-top: 18px; }
+  .theory-body { font-size: 11px; color: #475569; line-height: 1.65; }
+
+  .example-box { background: #F8FAFC; border-radius: 14px; padding: 16px; margin-top: 8px; }
+  .example-box-title { font-size: 12px; font-weight: 700; color: #1E293B; margin-bottom: 10px; }
+  .example-row { display: flex; flex-direction: column; gap: 3px; padding: 4px 0; }
+  .example-label { color: #64748B; flex-shrink: 0; }
+  .example-value { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: #0F172A; text-align: left; white-space: pre-wrap; word-break: break-all; font-size: 11px; }
 
   .ai-badge {
     display: inline-block; padding: 1px 7px; border-radius: 3px; margin-bottom: 7px;
     font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-    background: rgba(124,58,237,0.1); color: #7C3AED; border: 1px solid rgba(124,58,237,0.2);
+    background: rgba(85,33,255,0.1); color: #5521FF; border: 1px solid rgba(85,33,255,0.2);
   }
 
   .theory-h2 { font-size: 15px; font-weight: 700; color: #18181B; margin-bottom: 8px; line-height: 1.3; }
   .theory-p  { font-size: 12px; line-height: 1.6; color: #71717A; margin-bottom: 10px; }
   .theory-quote {
-    padding: 8px 12px; background: #F5F3FF; border-radius: 8px;
-    border: 1px solid rgba(124,58,237,0.1); font-style: italic;
+    padding: 8px 12px; background: #F0ECFF; border-radius: 8px;
+    border: 1px solid rgba(85,33,255,0.1); font-style: italic;
     font-size: 12px; color: #5B21B6; margin-bottom: 12px; line-height: 1.5;
   }
 
   .key-concepts-label {
-    font-size: 10px; font-weight: 700; color: #7C3AED;
+    font-size: 10px; font-weight: 700; color: #5521FF;
     text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;
   }
   .concept-item {
     display: flex; gap: 6px; align-items: flex-start;
     font-size: 12px; color: #71717A; margin-bottom: 5px; line-height: 1.4;
   }
-  .concept-check { color: #7C3AED; flex-shrink: 0; font-size: 11px; }
+  .concept-check { color: #5521FF; flex-shrink: 0; font-size: 11px; }
 
   .algo-box {
     background: #F9F9FB; border: 1px solid #E4E4E7; border-radius: 8px;
@@ -195,7 +227,7 @@ const styles = `
     background: #fff; border-right: 1px solid #E4E4E7;
     font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #18181B;
   }
-  .editor-tab-dot { color: #7C3AED; font-size: 12px; }
+  .editor-tab-dot { color: #5521FF; font-size: 12px; }
 
   /* ── Console ── */
   .console-wrap {
@@ -213,7 +245,7 @@ const styles = `
     color: #71717A; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
     font-family: 'Inter', sans-serif;
   }
-  .console-tab.active  { color: #7C3AED; border-bottom-color: #7C3AED; }
+  .console-tab.active  { color: #5521FF; border-bottom-color: #5521FF; }
   .console-tab:hover:not(.active) { color: #18181B; }
 
   .console-body {
@@ -221,10 +253,10 @@ const styles = `
     font-family: 'JetBrains Mono', monospace; font-size: 11px;
     color: #71717A; overflow-y: auto; line-height: 1.6;
   }
-  .console-prompt { color: #7C3AED; font-weight: 700; margin-right: 6px; }
+  .console-prompt { color: #5521FF; font-weight: 700; margin-right: 6px; }
   .console-success { color: #16A34A; margin-top: 3px; }
   .console-output  { color: #18181B; margin-top: 6px; }
-  .console-output span { color: #7C3AED; font-weight: 700; }
+  .console-output span { color: #5521FF; font-weight: 700; }
   .console-exit    { color: rgba(113,113,122,0.45); margin-top: 10px; }
 
   /* ── Right panel ── */
@@ -235,7 +267,7 @@ const styles = `
   .ai-header  { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-shrink: 0; }
   .ai-avatar  {
     width: 26px; height: 26px; border-radius: 6px;
-    background: #7C3AED; display: flex; align-items: center; justify-content: center;
+    background: #5521FF; display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0;
   }
   .ai-name   { font-size: 11px; font-weight: 700; color: #18181B; }
@@ -245,21 +277,21 @@ const styles = `
   .chat-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
 
   .bubble-ai {
-    background: #F5F3FF; border: 1px solid rgba(124,58,237,0.1);
+    background: #F0ECFF; border: 1px solid rgba(85,33,255,0.1);
     border-radius: 10px; border-top-left-radius: 2px;
     padding: 8px 10px; font-size: 11px; line-height: 1.6; color: #3730A3;
     align-self: flex-start; max-width: 92%;
   }
   .bubble-user {
-    background: #7C3AED; color: #fff;
+    background: #5521FF; color: #fff;
     border-radius: 10px; border-top-right-radius: 2px;
     padding: 8px 10px; font-size: 11px; line-height: 1.6;
     align-self: flex-end; max-width: 85%;
-    box-shadow: 0 2px 6px rgba(124,58,237,0.2);
+    box-shadow: 0 2px 6px rgba(85,33,255,0.2);
   }
 
   .typing-bubble {
-    background: #F5F3FF; border: 1px solid rgba(124,58,237,0.1);
+    background: #F0ECFF; border: 1px solid rgba(85,33,255,0.1);
     border-radius: 10px; border-top-left-radius: 2px;
     padding: 8px 12px; display: inline-flex; align-items: center; gap: 3px;
   }
@@ -280,7 +312,7 @@ const styles = `
     border-radius: 4px; font-size: 10px; color: #71717A; cursor: pointer;
     transition: color 0.15s, border-color 0.15s; font-family: 'Inter', sans-serif; font-weight: 600;
   }
-  .chip:hover { color: #7C3AED; border-color: #7C3AED; }
+  .chip:hover { color: #5521FF; border-color: #5521FF; }
 
   .ai-input-wrap { position: relative; }
   .ai-input {
@@ -290,15 +322,15 @@ const styles = `
     font-family: 'Inter', sans-serif;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
-  .ai-input:focus { border-color: #7C3AED; box-shadow: 0 0 0 1px #7C3AED; }
+  .ai-input:focus { border-color: #5521FF; box-shadow: 0 0 0 1px #5521FF; }
   .ai-input::placeholder { color: #A1A1AA; }
   .ai-send {
     position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
     width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
-    background: none; border: none; cursor: pointer; color: #7C3AED;
+    background: none; border: none; cursor: pointer; color: #5521FF;
     border-radius: 50%; font-size: 12px; transition: background 0.15s;
   }
-  .ai-send:hover { background: rgba(124,58,237,0.1); }
+  .ai-send:hover { background: rgba(85,33,255,0.1); }
 
   /* ── Hints ── */
   .hint-card {
@@ -309,11 +341,11 @@ const styles = `
   .hint-card.locked   { background: #FAFAFA; color: #71717A; }
   .hint-num  { font-size: 10px; font-weight: 700; margin-bottom: 4px; }
   .hint-reveal-btn {
-    background: #7C3AED; color: #fff; border: none; border-radius: 5px;
+    background: #5521FF; color: #fff; border: none; border-radius: 5px;
     padding: 4px 10px; font-size: 10px; font-weight: 700; cursor: pointer;
     font-family: 'Inter', sans-serif; margin-top: 4px;
   }
-  .hint-reveal-btn:hover { background: rgba(124,58,237,0.85); }
+  .hint-reveal-btn:hover { background: rgba(85,33,255,0.85); }
 
   /* ── Score / Viva card ── */
   .score-card {
@@ -321,29 +353,29 @@ const styles = `
     box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     transition: box-shadow 0.2s, border-color 0.2s;
   }
-  .score-card:hover { box-shadow: 0 6px 20px rgba(124,58,237,0.08); border-color: #7C3AED; }
+  .score-card:hover { box-shadow: 0 6px 20px rgba(85,33,255,0.08); border-color: #5521FF; }
 
   .score-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .score-label  { font-size: 10px; font-weight: 700; color: #71717A; text-transform: uppercase; letter-spacing: 0.05em; }
-  .score-latest { font-size: 10px; font-weight: 700; color: #7C3AED; }
+  .score-latest { font-size: 10px; font-weight: 700; color: #5521FF; }
 
   .score-row    { display: flex; align-items: center; gap: 10px; }
   .score-pct    { font-size: 28px; font-weight: 900; color: #18181B; letter-spacing: -0.03em; flex-shrink: 0; }
   .score-bar-wrap { flex: 1; height: 6px; background: #F4F4F5; border-radius: 999px; overflow: hidden; }
-  .score-bar-fill { height: 100%; background: #7C3AED; border-radius: 999px; }
+  .score-bar-fill { height: 100%; background: #5521FF; border-radius: 999px; }
 
   .btn-viva {
     width: 100%; margin-top: 10px; padding: 8px 0;
-    background: #7C3AED; color: #fff; border: none; border-radius: 8px;
+    background: #5521FF; color: #fff; border: none; border-radius: 8px;
     font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-    cursor: pointer; box-shadow: 0 3px 10px rgba(124,58,237,0.2);
+    cursor: pointer; box-shadow: 0 3px 10px rgba(85,33,255,0.2);
     transition: transform 0.1s; font-family: 'Inter', sans-serif;
   }
   .btn-viva:hover  { transform: scale(1.02); }
   .btn-viva:active { transform: scale(0.98); }
 
   .viva-why {
-    background: #F5F3FF; border: 1px solid rgba(124,58,237,0.1);
+    background: #F0ECFF; border: 1px solid rgba(85,33,255,0.1);
     border-radius: 8px; padding: 10px; font-size: 11px; color: #52525B; line-height: 1.7;
   }
   .viva-why strong { color: #18181B; font-weight: 700; display: block; margin-bottom: 5px; }
@@ -356,27 +388,31 @@ export default function LabWorkspace({
   onNavigate,
   onSaveCode,
   savedCode,
-  apiBase = "http://localhost:5050/api"
+  apiBase = "/api"
 }) {
   const subExp = experiment?.subExperiments?.find(s => s.part === subPart) || experiment?.subExperiments?.[0];
 
   const [activeLeftTab, setActiveLeftTab] = useState("theory");
   const [activeRightTab, setActiveRightTab] = useState("assistant");
 
-  // Check both top-level and inside starterCode for supportedLanguages
+  // Derive supported languages from: explicit field → starterCode → referenceSolution keys → fallback
+  // NOTE: use .length checks because [] is truthy in JS — `[] || ["c"]` returns [] not ["c"]
+  const refSolKeys = subExp?.referenceSolution ? Object.keys(subExp.referenceSolution) : [];
   const supportedLanguages =
-    subExp?.supportedLanguages ||
-    subExp?.starterCode?.supportedLanguages ||
+    (subExp?.supportedLanguages?.length ? subExp.supportedLanguages : null) ||
+    (subExp?.starterCode?.supportedLanguages?.length ? subExp.starterCode.supportedLanguages : null) ||
+    (refSolKeys.length ? refSolKeys : null) ||
     ["c"];
 
-  const [editorLanguage, setEditorLanguage] = useState(supportedLanguages[0]);
+  const [editorLanguage, setEditorLanguage] = useState(supportedLanguages[0] || "c");
   const [code, setCode] = useState("");
   const [codeByLang, setCodeByLang] = useState({});
 
   const [consoleOutput, setConsoleOutput] = useState("");
   const [consoleErrors, setConsoleErrors] = useState("");
   const [isRunning, setIsRunning] = useState(false);
-  const [consoleTab, setConsoleTab] = useState("output");
+  const [consoleTab, setConsoleTab] = useState("input");
+  const [stdinInput, setStdinInput] = useState("");
   const [chatMessages, setChatMessages] = useState([{
     sender: "ai",
     text: `Hello! I've analyzed your requirements for "${subExp?.title || "this experiment"}". How can I help?`
@@ -385,6 +421,48 @@ export default function LabWorkspace({
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [revealedHints, setRevealedHints] = useState(0);
   const [saveStatus, setSaveStatus] = useState("Saved");
+
+  const subjectId = experiment?.subjectId?._id || experiment?.subjectId || experiment?.subject;
+  const completionKey = subjectId ? `bhlabs_completed_${subjectId}` : null;
+  const [isDone, setIsDone] = useState(false);
+  const [isDoneHovered, setIsDoneHovered] = useState(false);
+
+  useEffect(() => {
+    if (!completionKey || !experiment?._id || !subPart) return;
+    try {
+      const saved = localStorage.getItem(completionKey);
+      const completedList = saved ? JSON.parse(saved) : [];
+      const key = `${experiment._id}__${subPart}`;
+      setIsDone(completedList.includes(key));
+    } catch {
+      setIsDone(false);
+    }
+  }, [completionKey, experiment?._id, subPart]);
+
+  const toggleWorkspaceCompleted = () => {
+    if (!completionKey || !experiment?._id || !subPart) return;
+    const key = `${experiment._id}__${subPart}`;
+    try {
+      const saved = localStorage.getItem(completionKey);
+      let completedList = saved ? JSON.parse(saved) : [];
+      const index = completedList.indexOf(key);
+      let nextState = false;
+      if (index > -1) {
+        completedList.splice(index, 1);
+        nextState = false;
+      } else {
+        completedList.push(key);
+        nextState = true;
+      }
+      setIsDone(nextState);
+      localStorage.setItem(completionKey, JSON.stringify(completedList));
+      if (nextState) {
+        onBack();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const hintsList = [
     "Identify the input variables: for sorting, we need an integer array.",
@@ -403,24 +481,67 @@ export default function LabWorkspace({
     setCodeByLang(initial);
     setConsoleOutput("");
     setConsoleErrors("");
-    setEditorLanguage(supportedLanguages[0]);
+    setEditorLanguage(supportedLanguages[0] || "c");
     setChatMessages([{
       sender: "ai",
       text: `Hello! I've analyzed your requirements for "${subExp?.title || "this experiment"}". How can I help?`
     }]);
   }, [experiment, subPart]);
 
-  // Runs when language changes — loads that language's code
+  // Runs when language changes — loads reference solution, then starter code, then saved code
   useEffect(() => {
-    const perLangSaved = codeByLang[editorLanguage];
+    const refSol = subExp?.referenceSolution?.[editorLanguage];
     const starter = subExp?.starterCode?.templates?.[editorLanguage] || "";
-    setCode(savedCode || perLangSaved || starter);
+    setCode(savedCode || refSol || starter);
   }, [editorLanguage, subPart, experiment]);
 
   const handleLanguageChange = (e) => {
     setEditorLanguage(e.target.value);
     setConsoleOutput("");
     setConsoleErrors("");
+  };
+
+  /**
+   * Interleaves stdin tokens into program output so it reads like a real terminal.
+   * Strategy: a ': ' is a "waiting-for-input" prompt if it's either:
+   *   (a) followed by another capital/word letter on the same line (chained prompts), OR
+   *   (b) at the end of a line (last prompt on that line).
+   * Data lines like "Original array: 64 25" are not matched because they're
+   * followed by digits/already-have-content, so stdin won't corrupt them.
+   */
+  // Unified stdin merge: targets common prompt keywords for C/C++/Java/Python.
+  // Only injects after lines like "Enter a number: ", "Input value: " etc.
+  // Leaves output lines like "You entered: 42" and data lines completely untouched.
+  const mergeOutputWithStdin = (rawOutput, stdin) => {
+    if (!stdin?.trim() || !rawOutput) return rawOutput;
+    const stdinLines = stdin.trim().split('\n').filter(l => l.trim() !== '');
+    let idx = 0;
+    return rawOutput.replace(
+      /\b(Enter |Input |Choose |Select |Type |Please |Provide |Give |Pick )([^:\n]*(?:\([^)]*\))?[^:\n]*)(:\s*)/gi,
+      (match) => {
+        if (idx < stdinLines.length) {
+          return match.trimEnd() + stdinLines[idx++] + '\n';
+        }
+        return match;
+      }
+    );
+  };
+
+  // Python-specific: targets common input() prompt words, injects stdin after each.
+  // Leaves data lines like "Current Task List:" untouched.
+  const mergeForPython = (rawOutput, stdin) => {
+    if (!stdin?.trim() || !rawOutput) return rawOutput;
+    const stdinLines = stdin.trim().split('\n').filter(l => l.trim() !== '');
+    let idx = 0;
+    return rawOutput.replace(
+      /\b(Enter |Input |Choose |Select |Type |Please |Provide |Give |Pick )([^:\n]*(?:\([^)]*\))?[^:\n]*)(:\s*)/gi,
+      (match) => {
+        if (idx < stdinLines.length) {
+          return match.trimEnd() + stdinLines[idx++] + '\n';
+        }
+        return match;
+      }
+    );
   };
 
   const handleRunCode = async () => {
@@ -431,41 +552,99 @@ export default function LabWorkspace({
       return;
     }
 
+
     setIsRunning(true);
     setConsoleTab("output");
     setConsoleErrors("");
-    setConsoleOutput(`$ Running ${editorLanguage.toUpperCase()} code...\nCompiling...\n`);
+    const stdinPreview = stdinInput
+      ? stdinInput.trim().split('\n').filter(l => l.trim()).map((l, i) => `  [${i+1}] ${l}`).join('\n')
+      : '';
+    setConsoleOutput(`$ Running ${editorLanguage.toUpperCase()} code...${stdinPreview ? `\n$ Input provided:\n${stdinPreview}` : ''}\n$ Compiling...\n\n`);
 
     try {
+      const normalizedStdin = stdinInput
+        ? stdinInput
+            .split(/\r?\n/)
+            .map(line => line.trimEnd())
+            .join('\n')
+            .trimEnd() + '\n'
+        : '';
+
+      const isPython = ['python', 'python3', 'py'].includes(editorLanguage);
+      const isCLike = ['c', 'cpp', 'java'].includes(editorLanguage);
+
+      // For Python: detect unsupported third-party packages and show a clear message
+      if (isPython) {
+        const unsupportedPackages = [
+          'pandas', 'numpy', 'matplotlib', 'scipy', 'sklearn', 'sklearn',
+          'tensorflow', 'torch', 'keras', 'seaborn', 'plotly', 'cv2', 'PIL',
+          'flask', 'django', 'fastapi', 'requests', 'bs4', 'beautifulsoup4',
+          'sqlalchemy', 'pymongo', 'boto3', 'pydantic', 'celery', 'aiohttp',
+        ];
+        const importRegex = /^\s*(?:import|from)\s+([\w.]+)/gm;
+        const found = [];
+        let m;
+        while ((m = importRegex.exec(code)) !== null) {
+          const pkg = m[1].split('.')[0];
+          if (unsupportedPackages.includes(pkg)) found.push(pkg);
+        }
+        if (found.length > 0) {
+          const pkgList = [...new Set(found)].join(', ');
+          setIsRunning(false);
+          setConsoleTab('errors');
+          setConsoleErrors(
+            `⚠ Third-party package(s) not supported: ${pkgList}\n\n` +
+            `The online runner only supports Python's standard library.\n` +
+            `Packages like pandas, numpy, etc. require a local environment.\n\n` +
+            `✦ Run locally:\n` +
+            `  pip install ${[...new Set(found)].join(' ')}\n` +
+            `  python your_file.py`
+          );
+          return;
+        }
+      }
+
+      let data;
+
+      // Use Wandbox for all languages via our server
       const res = await fetch(`${apiBase}/run`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          compiler: COMPILER_MAP[editorLanguage] || "gcc-head-c",
+          compiler: COMPILER_MAP[editorLanguage] || 'gcc-head-c',
           code,
-          language: editorLanguage
-        })
+          language: editorLanguage,
+          stdin: normalizedStdin,
+        }),
       });
-
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      data = await res.json();
 
-      const data = await res.json();
+      let out = '';
+      if (data.compiler_message) out += `[compiler]\n${data.compiler_message}\n\n`;
+      const mergedOutput = data.program_output
+        ? isPython
+          ? mergeForPython(data.program_output, normalizedStdin)
+          : isCLike
+            ? mergeOutputWithStdin(data.program_output, normalizedStdin)
+            : data.program_output
+        : null;
+      if (mergedOutput) out += mergedOutput;
+      else if (!data.compiler_error && !data.program_error) out += `(no output)\n`;
 
-      let out = "", err = "";
-      if (data.compiler_message) out += `Compiler:\n${data.compiler_message}\n\n`;
-      if (data.program_output) out += `Output:\n${data.program_output}\n`;
+      let err = '';
       if (data.program_error) err = data.program_error;
-      if (data.compiler_error) err = (err ? err + "\n" : "") + data.compiler_error;
+      if (data.compiler_error) err = (err ? err + '\n' : '') + data.compiler_error;
 
-      out += data.status === "0" ? "\n✔ Process returned 0." : `\n✖ Exit code ${data.status}.`;
+      out += data.status === '0' ? '\n✔ Process returned 0.' : `\n✖ Exit code ${data.status}.`;
 
       setConsoleOutput(p => p + out);
       if (err) {
         setConsoleErrors(err);
-        setConsoleTab("errors");
+        setConsoleTab('errors');
       }
 
-      if (onSaveCode && data.status === "0") {
+      if (onSaveCode && data.status === '0') {
         onSaveCode(experiment._id, subPart, code);
       }
     } catch (e) {
@@ -535,6 +714,16 @@ export default function LabWorkspace({
             <button className="btn-run" onClick={handleRunCode} disabled={isRunning}>
               {isRunning ? "Running..." : "Run"}
             </button>
+            {completionKey && (
+              <button
+                onClick={toggleWorkspaceCompleted}
+                onMouseEnter={() => setIsDoneHovered(true)}
+                onMouseLeave={() => setIsDoneHovered(false)}
+                className={`btn-mark-completed${isDone ? " completed hover-red" : ""}`}
+              >
+                {isDone ? (isDoneHovered ? "✖ Unmark Done" : "✓ Completed") : "Mark Completed"}
+              </button>
+            )}
             <button className="btn-journal" onClick={() => onNavigate?.("journal-view", { experimentId: experiment?._id, subPart })}>
               Generate Journal
             </button>
@@ -555,13 +744,56 @@ export default function LabWorkspace({
             </div>
             <div className="panel-content custom-scrollbar">
               {activeLeftTab === "theory" && <>
-                <span className="ai-badge">Bh.AI Generated</span>
-                <h2 className="theory-h2">{subExp?.title || "Bubble Sort"}</h2>
-                <h2>Problem Statement</h2>
-                <p className="theory-p">{subExp?.problemStatement || "Bubble Sort repeatedly swaps adjacent elements if they are in the wrong order."}</p>
-                <br></br>
-                <h2>Theory</h2>
-                {subExp?.theory && <p className="theory-p" style={{ marginTop: 10 }}>{subExp.theory}</p>}
+                <span className="ai-badge">BH.AI GENERATED</span>
+
+                <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E293B', marginTop: 10, marginBottom: 14, lineHeight: 1.2 }}>
+                  {subExp?.title || "Experiment"}
+                </h2>
+
+                {/* Tags */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 20 }}>
+                  {subExp?.difficulty && (
+                    <span className={`theory-tag ${
+                      subExp.difficulty.toLowerCase() === 'easy' ? 'theory-tag-easy' :
+                      subExp.difficulty.toLowerCase() === 'medium' ? 'theory-tag-medium' :
+                      'theory-tag-hard'
+                    }`}>{subExp.difficulty}</span>
+                  )}
+                  {subExp?.concepts && subExp.concepts.map((concept, idx) => (
+                    <span key={idx} className="theory-tag theory-tag-concept">{concept}</span>
+                  ))}
+                </div>
+
+                <div className="theory-section-title">Problem Statement</div>
+                <p className="theory-body">
+                  {subExp?.problemStatement || "Implement and analyze the algorithm."}
+                </p>
+
+                {subExp?.theory && (
+                  <>
+                    <div className="theory-section-title">Theory</div>
+                    <p className="theory-body">{subExp.theory}</p>
+                  </>
+                )}
+
+                {/* Example Blocks */}
+                {subExp?.samples && subExp.samples.length > 0 && (
+                  <div style={{ marginTop: 24 }}>
+                    {subExp.samples.map((sample, idx) => (
+                      <div key={idx} className="example-box" style={{ marginBottom: 12 }}>
+                        <div className="example-box-title">Example {idx + 1}</div>
+                        <div className="example-row" style={{ marginBottom: 6 }}>
+                          <span className="example-label">Input:</span>
+                          <span className="example-value">{sample.input}</span>
+                        </div>
+                        <div className="example-row">
+                          <span className="example-label">Output:</span>
+                          <span className="example-value">{sample.output}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </>}
               {activeLeftTab === "algorithm" && <>
                 <div className="key-concepts-label" style={{ marginBottom: 8 }}>Step-by-Step Logic</div>
@@ -569,7 +801,7 @@ export default function LabWorkspace({
               </>}
               {activeLeftTab === "flowchart" && <>
                 <div className="key-concepts-label" style={{ marginBottom: 8 }}>Logic Flow</div>
-                <div style={{ background: "#F9F9FB", border: "1px solid #E4E4E7", borderRadius: 8, padding: 6, overflow: "hidden" }}>
+                <div style={{ background: "#F9F9FB", border: "1px solid #E4E4E7", borderRadius: 8, padding: 6, overflow: "auto" }}>
                   <FlowchartRenderer nodes={subExp?.flowchart?.nodes} edges={subExp?.flowchart?.edges} />
                 </div>
               </>}
@@ -615,13 +847,26 @@ export default function LabWorkspace({
             </div>
             <div className="console-wrap">
               <div className="console-tab-bar">
+                <button className={`console-tab${consoleTab === "input" ? " active" : ""}`} onClick={() => setConsoleTab("input")}>Input</button>
                 <button className={`console-tab${consoleTab === "output" ? " active" : ""}`} onClick={() => setConsoleTab("output")}>Output</button>
                 <button className={`console-tab${consoleTab === "errors" ? " active" : ""}`} onClick={() => setConsoleTab("errors")}>
                   Errors{consoleErrors ? " (1)" : ""}
                 </button>
               </div>
               <div className="console-body custom-scrollbar">
-                {consoleTab === "output" ? (
+                {consoleTab === "input" && (
+                  <textarea
+                    value={stdinInput}
+                    onChange={e => setStdinInput(e.target.value)}
+                    placeholder={"Type program input here (one value per line)...\nExample:\n5\n64 25 12 22 11"}
+                    style={{
+                      width: "100%", height: "100%", background: "transparent", border: "none",
+                      resize: "none", outline: "none", fontFamily: "JetBrains Mono, monospace",
+                      fontSize: 12, color: "#18181B", lineHeight: 1.6,
+                    }}
+                  />
+                )}
+                {consoleTab === "output" && (
                   consoleOutput ? (
                     <pre style={{ whiteSpace: "pre-wrap", margin: 0 }}>{consoleOutput}</pre>
                   ) : (
@@ -629,7 +874,8 @@ export default function LabWorkspace({
                       Click "Run" to compile and execute your code.
                     </span>
                   )
-                ) : (
+                )}
+                {consoleTab === "errors" && (
                   consoleErrors ? (
                     <pre style={{ color: "#DC2626", whiteSpace: "pre-wrap", margin: 0 }}>
                       {consoleErrors}
@@ -697,7 +943,7 @@ export default function LabWorkspace({
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 6, borderBottom: "1px solid #E4E4E7", marginBottom: 2 }}>
                       <span style={{ fontSize: 10, fontWeight: 700, color: "#71717A", textTransform: "uppercase", letterSpacing: "0.05em" }}>Available Hints</span>
-                      <span style={{ fontSize: 10, background: "#F5F3FF", border: "1px solid rgba(124,58,237,0.15)", color: "#7C3AED", fontWeight: 700, padding: "1px 7px", borderRadius: 3 }}>100 XP</span>
+                      <span style={{ fontSize: 10, background: "#F0ECFF", border: "1px solid rgba(85,33,255,0.15)", color: "#5521FF", fontWeight: 700, padding: "1px 7px", borderRadius: 3 }}>100 XP</span>
                     </div>
                     {hintsList.map((hint, idx) => {
                       const revealed = idx < revealedHints;

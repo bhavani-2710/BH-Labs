@@ -13,7 +13,7 @@ const styles = `
     overflow-x: hidden;
   }
 
-  ::selection { background: rgba(124, 58, 237, 0.2); }
+  ::selection { background: rgba(85, 33, 255, 0.2); }
 
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
@@ -55,12 +55,12 @@ const styles = `
 
   /* ── Buttons ── */
   .primary-btn {
-    background: #7C3AED; color: #fff; border: none; border-radius: 999px;
+    background: #5521FF; color: #fff; border: none; border-radius: 999px;
     padding: 14px 32px; font-family: 'Inter',sans-serif; font-weight: 700; font-size: 18px;
     cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
     transition: background 0.2s, box-shadow 0.2s;
   }
-  .primary-btn:hover { background: rgba(124,58,237,0.9); box-shadow: 0 8px 24px rgba(124,58,237,0.25); }
+  .primary-btn:hover { background: rgba(85,33,255,0.9); box-shadow: 0 8px 24px rgba(85,33,255,0.25); }
   @media (max-width: 480px) { .primary-btn { font-size: 16px; padding: 12px 24px; } }
 
   .outline-btn {
@@ -73,12 +73,12 @@ const styles = `
   @media (max-width: 480px) { .outline-btn { font-size: 16px; padding: 12px 24px; } }
 
   .nav-btn-primary {
-    background: #7C3AED; color: #fff; border: none; border-radius: 999px;
+    background: #5521FF; color: #fff; border: none; border-radius: 999px;
     padding: 8px 16px; font-family: 'Inter',sans-serif; font-weight: 700; font-size: 14px;
     cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
     transition: background 0.2s, box-shadow 0.2s; white-space: nowrap;
   }
-  .nav-btn-primary:hover { background: rgba(124,58,237,0.9); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+  .nav-btn-primary:hover { background: rgba(85,33,255,0.9); box-shadow: 0 4px 12px rgba(85,33,255,0.3); }
 
   /* ── Badge ── */
   .badge {
@@ -87,8 +87,8 @@ const styles = `
     background: #F4F4F5; font-size: 12px; font-weight: 600; letter-spacing: 0.05em;
     text-transform: uppercase; color: #52525B; margin-bottom: 8px; transition: border-color 0.2s;
   }
-  .badge:hover { border-color: rgba(124,58,237,0.5); }
-  .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #7C3AED; flex-shrink: 0; }
+  .badge:hover { border-color: rgba(85,33,255,0.5); }
+  .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #5521FF; flex-shrink: 0; }
 
   /* ── Mockup content area ── */
   .mockup-content { display: flex; height: 600px; }
@@ -124,22 +124,22 @@ const styles = `
     padding: 32px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);
     transition: box-shadow 0.2s, border-color 0.2s;
   }
-  .feature-card:hover { box-shadow: 0 10px 30px rgba(124,58,237,0.1); border-color: #7C3AED; }
-  .feature-card:hover .icon-box { background: #7C3AED; border-color: #7C3AED; }
+  .feature-card:hover { box-shadow: 0 10px 30px rgba(85,33,255,0.1); border-color: #5521FF; }
+  .feature-card:hover .icon-box { background: #5521FF; border-color: #5521FF; }
   .feature-card:hover .icon-box svg { color: #fff; }
   @media (max-width: 480px) { .feature-card { padding: 24px; } }
 
   .icon-box {
-    width: 48px; height: 48px; background: rgba(124,58,237,0.1);
-    border: 1px solid rgba(124,58,237,0.2); border-radius: 12px;
+    width: 48px; height: 48px; background: rgba(85,33,255,0.1);
+    border: 1px solid rgba(85,33,255,0.2); border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 16px; transition: background 0.2s, border-color 0.2s;
   }
-  .icon-box svg { color: #7C3AED; transition: color 0.2s; }
+  .icon-box svg { color: #5521FF; transition: color 0.2s; }
 
   /* ── AI chat ── */
   .ai-bubble {
-    background: rgba(124,58,237,0.05); border: 1px solid rgba(124,58,237,0.1);
+    background: rgba(85,33,255,0.05); border: 1px solid rgba(85,33,255,0.1);
     border-radius: 8px; padding: 8px 12px; font-size: 14px; color: #52525B; font-style: italic;
   }
   .ai-input {
@@ -148,12 +148,12 @@ const styles = `
     outline: none; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .ai-input:focus { border-color: #7C3AED; box-shadow: 0 0 0 1px #7C3AED; }
+  .ai-input:focus { border-color: #5521FF; box-shadow: 0 0 0 1px #5521FF; }
 
   /* ── Underglow ── */
   .underglow {
     position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);
-    width: 80%; height: 80px; background: rgba(124,58,237,0.1);
+    width: 80%; height: 80px; background: rgba(85,33,255,0.1);
     filter: blur(60px); border-radius: 999px; z-index: -1; pointer-events: none;
   }
 
@@ -210,8 +210,8 @@ export default function LandingPage({ onStart }) {
         borderBottom: "1px solid #E4E4E7",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 32, height: 32, background: "#7C3AED", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Terminal size={18} color="#fff" />
+          <div style={{ width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+            <img src="/logo.png" alt="BH.Lab Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span style={{ fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em" }}>BH.Lab</span>
         </div>
@@ -239,7 +239,7 @@ export default function LandingPage({ onStart }) {
         {/* Ambient glow */}
         <div ref={glowRef} style={{
           position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-          width: 800, height: 600, background: "rgba(124,58,237,0.05)",
+          width: 800, height: 600, background: "rgba(85,33,255,0.05)",
           filter: "blur(120px)", borderRadius: "50%", zIndex: -1, pointerEvents: "none",
         }} />
 
@@ -249,7 +249,7 @@ export default function LandingPage({ onStart }) {
 
           <h1 className="hero-h1">
             Complete Your Practicals <br />
-            <span style={{ background: "linear-gradient(to right, #09090B, #7C3AED)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={{ background: "linear-gradient(to right, #09090B, #5521FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               The Smart Way
             </span>
           </h1>
@@ -275,7 +275,7 @@ export default function LandingPage({ onStart }) {
               ))}
             </div>
             <p style={{ fontSize: 14, color: "#52525B" }}>
-              Joined by <strong style={{ color: "#7C3AED" }}>1,200+</strong> engineering students this week
+              Joined by <strong style={{ color: "#5521FF" }}>1,200+</strong> engineering students this week
             </p>
           </div>
         </section>
@@ -293,7 +293,7 @@ export default function LandingPage({ onStart }) {
                 padding: "0 16px", background: "#FAFAFA", flexShrink: 0,
               }}>
                 <div style={{ display: "flex", gap: 8 }}>
-                  {["rgba(239,68,68,0.6)", "rgba(161,81,0,0.6)", "rgba(124,58,237,0.6)"].map((bg, i) => (
+                  {["rgba(239,68,68,0.6)", "rgba(161,81,0,0.6)", "rgba(85,33,255,0.6)"].map((bg, i) => (
                     <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: bg }} />
                   ))}
                 </div>
@@ -312,7 +312,7 @@ export default function LandingPage({ onStart }) {
                     display: "flex", gap: 16, color: "#52525B", fontSize: 14,
                     borderBottom: "1px solid #E4E4E7", marginBottom: 16,
                   }}>
-                    <span style={{ color: "#7C3AED", borderBottom: "2px solid #7C3AED", fontWeight: 700, padding: "0 8px 8px" }}>main.py</span>
+                    <span style={{ color: "#5521FF", borderBottom: "2px solid #5521FF", fontWeight: 700, padding: "0 8px 8px" }}>main.py</span>
                     <span style={{ padding: "0 8px 8px" }}>logic_gates.vhd</span>
                     <span style={{ padding: "0 8px 8px" }}>report.md</span>
                   </div>
@@ -331,7 +331,7 @@ export default function LandingPage({ onStart }) {
                     <div><span style={{ color: "#6f42c1" }}>print</span>(<span style={{ color: "#032f62" }}>f"Output Vector: {"{results}"}"</span>)</div>
                     <div style={{ marginTop: 16, padding: 16, background: "#F4F4F5", borderRadius: 8, border: "1px solid #E4E4E7" }}>
                       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "#52525B", marginBottom: 4 }}>Terminal Output:</div>
-                      <div style={{ color: "#7C3AED", fontWeight: 600 }}>Running simulation...</div>
+                      <div style={{ color: "#5521FF", fontWeight: 600 }}>Running simulation...</div>
                       <div style={{ color: "#09090B" }}>Output Vector: [1, 0, 0, 0]</div>
                     </div>
                   </div>
@@ -340,7 +340,7 @@ export default function LandingPage({ onStart }) {
                 {/* AI sidebar */}
                 <div className="ai-sidebar">
                   <div style={{ padding: 16, borderBottom: "1px solid #E4E4E7", display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 20, color: "#7C3AED" }}>✨</span>
+                    <span style={{ fontSize: 20, color: "#5521FF" }}>✨</span>
                     <span style={{ fontWeight: 700 }}>BH.AI Assistant</span>
                   </div>
                   <div style={{ flex: 1, padding: 16, display: "flex", flexDirection: "column", gap: 16 }}>
@@ -352,7 +352,7 @@ export default function LandingPage({ onStart }) {
                       <input className="ai-input" type="text" placeholder="Ask AI anything..." />
                       <button style={{
                         position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
-                        background: "none", border: "none", cursor: "pointer", color: "#7C3AED", display: "flex", alignItems: "center",
+                        background: "none", border: "none", cursor: "pointer", color: "#5521FF", display: "flex", alignItems: "center",
                       }}>
                         <Send size={18} />
                       </button>
@@ -385,8 +385,8 @@ export default function LandingPage({ onStart }) {
         <div className="footer-inner">
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 24, height: 24, background: "#7C3AED", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Terminal size={14} color="#fff" />
+              <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                <img src="/logo.png" alt="BH.Lab Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
               <span style={{ fontWeight: 700, fontSize: 16 }}>BH.Lab</span>
             </div>
@@ -395,7 +395,7 @@ export default function LandingPage({ onStart }) {
           <div className="footer-links">
             {["Resources", "Documentation", "Privacy Policy", "Terms"].map(l => (
               <a key={l} href="#" style={{ fontSize: 14, color: "#52525B", textDecoration: "none" }}
-                onMouseEnter={e => e.target.style.color = "#7C3AED"}
+                onMouseEnter={e => e.target.style.color = "#5521FF"}
                 onMouseLeave={e => e.target.style.color = "#52525B"}
               >{l}</a>
             ))}

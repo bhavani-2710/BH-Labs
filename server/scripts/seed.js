@@ -10,14 +10,16 @@ const subjects = [
     "name": "C Programming",
     "code": "VSEC102",
     "semester": 1,
-    "description": "This subject covers practical C programming experiments including operators, control structures, functions, arrays, strings, structures, pointers, and file handling."
+    "description": "This subject covers practical C programming experiments including operators, control structures, functions, arrays, strings, structures, pointers, and file handling.",
+    "syllabusPdf": "/syllabus-c.pdf"
   },
   {
     "_id": new ObjectId("685b2a1f3c4e8d0012a7b001"),
     "name": "Operating System",
     "code": "2114113",
     "semester": 4,
-    "description": "This subject covers practical OS experiments including process management, CPU scheduling, synchronization, memory management, file allocation, and disk scheduling."
+    "description": "This subject covers practical OS experiments including process management, CPU scheduling, synchronization, memory management, file allocation, and disk scheduling.",
+    "syllabusPdf": "/syllabus-os.pdf"
   }
 ];
 
@@ -3898,10 +3900,17 @@ const seedDB = async () => {
     await Experiment.deleteMany({});
     console.log('Deleted all experiments.');
 
+    const experimentsWithRootProps = experiments.map(exp => {
+      if (!exp.problemStatement && exp.subExperiments?.length > 0) {
+        exp.problemStatement = exp.subExperiments[0].problemStatement;
+      }
+      return exp;
+    });
+
     await Subject.insertMany(subjects);
     console.log('Seeded', subjects.length, 'subjects.');
-    await Experiment.insertMany(experiments);
-    console.log('Seeded', experiments.length, 'experiments.');
+    await Experiment.insertMany(experimentsWithRootProps);
+    console.log('Seeded', experimentsWithRootProps.length, 'experiments.');
 
     console.log('Database seeded successfully!');
   } catch (err) {

@@ -77,7 +77,7 @@ ${conclusionText}
           </button>
           <button 
             onClick={handlePrint}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md cursor-pointer"
+            className="bg-[#5521FF] hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md cursor-pointer"
           >
             Export PDF
           </button>
@@ -88,10 +88,10 @@ ${conclusionText}
       <div className="my-8 w-full max-w-[800px] bg-white border border-slate-250 shadow-2xl p-12 space-y-8 print-page relative rounded">
         
         {/* Journal Header */}
-        <div className="border-b-4 border-indigo-650 pb-5 flex items-center justify-between select-none">
+        <div className="border-b-4 border-[#5521FF] pb-5 flex items-center justify-between select-none">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-2xl font-heading shadow-md">
-              BH
+            <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center shadow-md shrink-0">
+              <img src="/logo.png" alt="BH.Lab Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-xl font-black font-heading text-slate-900 tracking-tight leading-none">BH.Lab</h1>

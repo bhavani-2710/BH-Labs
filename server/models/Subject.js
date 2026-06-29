@@ -24,6 +24,11 @@ const subjectSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    syllabusPdf: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   {
     timestamps: true,

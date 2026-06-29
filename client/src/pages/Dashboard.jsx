@@ -18,8 +18,8 @@ export default function Dashboard({
         <div className="space-y-8">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center text-white font-bold text-lg font-heading shadow-md">
-              BH
+            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-md shrink-0">
+              <img src="/logo.png" alt="BH.Lab Logo" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-bold font-heading tracking-tight text-slate-900">
               BH.Lab
@@ -99,7 +99,7 @@ export default function Dashboard({
             </p>
             <button 
               onClick={() => navigate(`/subject/${subjects[0]?._id}`)}
-              className="bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all hover:shadow-lg cursor-pointer"
+              className="bg-[#5521FF] hover:bg-violet-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all hover:shadow-lg cursor-pointer"
             >
               View Lab Schedule
             </button>
@@ -132,14 +132,14 @@ export default function Dashboard({
           </div>
 
           <div className="bg-violet-50/70 border border-violet-100 rounded-2xl p-5 space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-violet-100 text-[#5521FF] flex items-center justify-center">
               <Mic2 className="w-4 h-4" />
             </div>
             <p className="text-2xl font-black text-violet-900 flex items-baseline gap-1.5">
               {vivaScore}%
-              <span className="text-xs font-bold text-violet-600">↑ 4% improvement</span>
+              <span className="text-xs font-bold text-[#5521FF]">↑ 4% improvement</span>
             </p>
-            <p className="text-xs text-violet-600 font-bold uppercase tracking-wider">Avg Viva Score</p>
+            <p className="text-xs text-[#5521FF] font-bold uppercase tracking-wider">Avg Viva Score</p>
           </div>
 
           <div className="bg-amber-50/70 border border-amber-100 rounded-2xl p-5 space-y-2">
@@ -158,7 +158,7 @@ export default function Dashboard({
           </h3>
           <div className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center text-xl shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-violet-50 text-[#5521FF] flex items-center justify-center text-xl shadow-sm">
                 🔗
               </div>
               <div className="space-y-1">
@@ -169,13 +169,13 @@ export default function Dashboard({
             <div className="flex items-center space-x-6 w-full sm:w-auto">
               <div className="flex-1 sm:flex-initial space-y-1 text-right min-w-[120px]">
                 <div className="w-full bg-slate-100 rounded-full h-2">
-                  <div className="bg-violet-600 h-2 rounded-full" style={{ width: "65%" }}></div>
+                  <div className="bg-[#5521FF] h-2 rounded-full" style={{ width: "65%" }}></div>
                 </div>
                 <span className="text-[10px] text-slate-500 font-bold">65% Complete</span>
               </div>
               <button 
                 onClick={() => navigate("/workspace/685b2a1f3c4e8d0012a7b303/a")}
-                className="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-1.5 transition-all hover:translate-x-0.5 shadow-sm hover:shadow cursor-pointer"
+                className="bg-[#5521FF] hover:bg-violet-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-1.5 transition-all hover:translate-x-0.5 shadow-sm hover:shadow cursor-pointer"
               >
                 <span>Continue</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -192,7 +192,7 @@ export default function Dashboard({
               <h3 className="text-base font-bold font-heading text-slate-800 tracking-tight">
                 Upcoming Lab Sessions
               </h3>
-              <button onClick={() => navigate(`/subject/${subjects[0]?._id}`)} className="text-violet-600 hover:text-violet-700 text-xs font-bold">
+              <button onClick={() => navigate(`/subject/${subjects[0]?._id}`)} className="text-[#5521FF] hover:text-violet-700 text-xs font-bold">
                 View All
               </button>
             </div>
@@ -235,8 +235,8 @@ export default function Dashboard({
           </div>
 
           {/* Viva Prep AI Banner Card */}
-          <div className="bg-gradient-to-br from-violet-700 via-violet-600 to-purple-700 rounded-2xl p-6 text-white flex flex-col justify-between shadow-lg relative overflow-hidden">
-            <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+          <div className="bg-gradient-to-br from-[#5521FF] via-[#401bb5] to-[#1e1b4b] rounded-2xl p-6 text-white flex flex-col justify-between shadow-lg relative overflow-hidden">
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
             
             <div className="space-y-3 z-10">
               <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">

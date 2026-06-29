@@ -20,17 +20,20 @@ app.get("/api/health", (req, res) => {
   res.json({ message: "BH Labs running!" });
 });
 
-// Wandbox proxy — runs code via remote compiler
+// Wandbox proxy — runs code via remote compiler (C/C++/Java)
 app.post("/api/run", async (req, res) => {
   try {
-    const { compiler, code } = req.body;
+    const { compiler, code, stdin } = req.body;
     if (!compiler || !code) {
       return res.status(400).json({ error: "compiler and code are required" });
     }
+    const wandboxBody = { compiler, code };
+    if (stdin) wandboxBody.stdin = stdin;
+
     const response = await fetch("https://wandbox.org/api/compile.json", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ compiler, code }),
+      body: JSON.stringify(wandboxBody),
     });
     if (!response.ok) {
       return res.status(502).json({ error: "Wandbox failed", status: response.status });

@@ -3,17 +3,25 @@ import { Book, ArrowRight, TrendingUp, LayoutDashboard, BookOpen, MessageSquare,
 
 export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
   const [subjects, setSubjects] = useState([]);
+  const [experiments, setExperiments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const fetchSubjects = async () => {
+    const fetchData = async () => {
       try {
-        const API = import.meta.env.VITE_API_URL
-        const res = await fetch(`${API}/subjects`);
-        if (res.ok) {
-          const data = await res.json();
-          setSubjects(data);
+        const API = import.meta.env.VITE_API_URL;
+        const [subRes, expRes] = await Promise.all([
+          fetch(`${API}/subjects`),
+          fetch(`${API}/experiments`)
+        ]);
+        if (subRes.ok) {
+          const subData = await subRes.json();
+          setSubjects(subData);
+        }
+        if (expRes.ok) {
+          const expData = await expRes.json();
+          setExperiments(expData);
         }
       } catch (err) {
         console.error(err);
@@ -21,7 +29,7 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
         setLoading(false);
       }
     };
-    fetchSubjects();
+    fetchData();
   }, []);
 
   const filteredSubjects = subjects.filter(s =>
@@ -29,17 +37,12 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
   );
 
   const getProgressColor = (progress) => {
-    if (progress >= 80) return "bg-emerald-500";
-    if (progress >= 50) return "bg-violet-600";
-    if (progress >= 20) return "bg-amber-500";
-    return "bg-gray-300";
+    return "bg-orange-500";
   };
 
   const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, key: "dashboard" },
     { label: "Subjects", icon: BookOpen, key: "subjects", active: true },
-    { label: "Viva Practice", icon: MessageSquare, key: "viva-practice-menu" },
-    { label: "Journals", icon: FileText, key: "journals" },
   ];
 
   if (loading) {
@@ -60,8 +63,8 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
       >
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-5 pt-7 pb-6">
-          <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center shadow-sm">
-            <Book className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-sm shrink-0">
+            <img src="/logo.png" alt="BH.Lab Logo" className="w-full h-full object-cover" />
           </div>
           <span className="font-bold text-lg tracking-tight text-gray-900">BH.Lab</span>
         </div>
@@ -70,7 +73,7 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
 
         {/* User pill */}
         <div className="mx-3 mb-6 px-3 py-3 rounded-xl bg-violet-50 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+          <div className="w-9 h-9 rounded-full bg-[#5521FF] flex items-center justify-center text-white text-sm font-bold shrink-0">
             RS
           </div>
           <div className="min-w-0">
@@ -93,7 +96,7 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
               className={`
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
                 ${active
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-200"
+                  ? "bg-[#5521FF] text-white shadow-md shadow-violet-200"
                   : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"}
               `}
             >
@@ -118,9 +121,9 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
             <nav className="flex gap-2 text-xs text-gray-400 mb-1.5">
               <span>Curriculum</span>
               <span>/</span>
-              <span className="text-violet-600 font-semibold">Academic Subjects</span>
+              <span className="text-[#5521FF] font-semibold">Academic Subjects</span>
             </nav>
-            <h1 className="text-3xl font-bold text-gray-900">Academic Subjects</h1>
+            <h1 className="text-xl font-bold text-slate-900">Academic Subjects</h1>
             <p className="text-gray-500 mt-1 text-sm">Track your progress across all engineering subjects</p>
           </div>
 
@@ -136,7 +139,36 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
         {/* Subjects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredSubjects.map((subject) => {
-            const progress = subject.progress ?? 45;
+            // Compute dynamic progress using localStorage completion data
+            const subjectId = subject._id;
+            const subjectExperiments = experiments.filter((e) => {
+              return (
+                e.subjectId === subjectId || 
+                e.subject === subjectId ||
+                e.subjectId?._id === subjectId
+              );
+            });
+
+            let completedMainExps = 0;
+            const totalMainExps = subjectExperiments.length;
+            
+            try {
+              const saved = localStorage.getItem(`bhlabs_completed_${subjectId}`);
+              const completedList = saved ? JSON.parse(saved) : [];
+              subjectExperiments.forEach(exp => {
+                const subExperiments = exp.subExperiments || [];
+                if (subExperiments.length > 0) {
+                  const allDone = subExperiments.every(sub => completedList.includes(`${exp._id}__${sub.part}`));
+                  if (allDone) {
+                    completedMainExps++;
+                  }
+                }
+              });
+            } catch (err) {
+              console.error(err);
+            }
+
+            const progress = totalMainExps > 0 ? Math.round((completedMainExps / totalMainExps) * 100) : 0;
             const isCompleted = progress === 100;
 
             return (
@@ -144,11 +176,6 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
                 key={subject._id}
                 className="bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
               >
-                {/* Progress bar top strip */}
-                <div
-                  className={`h-2 w-full ${progress > 70 ? "bg-emerald-400" : progress > 40 ? "bg-violet-500" : "bg-amber-400"
-                    }`}
-                />
 
                 <div className="p-6">
                   <h3
@@ -162,7 +189,7 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
                   <div className="mb-5">
                     <div className="flex justify-between text-xs mb-2">
                       <span className="font-medium text-gray-500">Progress</span>
-                      <span className="font-bold text-violet-600">{progress}%</span>
+                      <span className="font-bold text-[#5521FF]">{progress}%</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
@@ -179,7 +206,7 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
                       onClick={() => onSelectSubject?.(subject._id)}
                       className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${isCompleted
                           ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                          : "bg-violet-600 hover:bg-violet-700 text-white shadow-sm shadow-violet-200"
+                          : "bg-[#5521FF] hover:bg-violet-700 text-white shadow-sm shadow-violet-200"
                         }`}
                     >
                       {isCompleted ? "Review Subject" : "Continue Learning"}
@@ -189,7 +216,7 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
                     {/* Take Viva */}
                     <button
                       onClick={() => onNavigate?.("viva-subject", { subjectId: subject._id })}
-                      className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-violet-200 text-violet-600 hover:bg-violet-50 transition-all active:scale-[0.98]"
+                      className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-violet-200 text-[#5521FF] hover:bg-violet-50 transition-all active:scale-[0.98]"
                     >
                       <Mic className="w-3.5 h-3.5" />
                       Take Viva
@@ -207,7 +234,7 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
             <h2 className="text-xl font-semibold mb-2">Weekly Performance Insight</h2>
             <p className="text-gray-500 text-sm">
               You've completed <span className="font-bold text-emerald-600">12 labs</span> this week.
-              You're <span className="font-bold text-violet-600">15% ahead</span> of your batch in core subjects.
+              You're <span className="font-bold text-[#5521FF]">15% ahead</span> of your batch in core subjects.
             </p>
           </div>
           <div className="absolute bottom-3 right-6 opacity-[0.07] pointer-events-none">
@@ -227,7 +254,7 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
           <LayoutDashboard className="w-5 h-5" />
           <span className="text-[10px]">Home</span>
         </button>
-        <button className="flex flex-col items-center gap-0.5 text-violet-600">
+        <button className="flex flex-col items-center gap-0.5 text-[#5521FF]">
           <BookOpen className="w-5 h-5" />
           <span className="text-[10px] font-bold">Subjects</span>
         </button>
