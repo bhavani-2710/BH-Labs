@@ -121,6 +121,16 @@ const styles = `
   }
   .btn-journal:hover { filter: brightness(1.1); }
 
+  .btn-solve {
+    background: rgba(85, 33, 255, 0.1); color: #5521FF;
+    border: 1px solid rgba(85, 33, 255, 0.3); padding: 5px 14px;
+    border-radius: 6px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-solve:hover { background: rgba(85, 33, 255, 0.2); }
+
   .btn-mark-completed {
     background: #F4F4F5; color: #18181B;
     border: 1px solid #E4E4E7; padding: 5px 14px;
@@ -476,7 +486,7 @@ export default function LabWorkspace({
     console.log(subExp)
     const initial = {};
     supportedLanguages.forEach(lang => {
-      initial[lang] = subExp?.referenceSolution?.[lang] || "";
+      initial[lang] = "";
     });
     setCodeByLang(initial);
     setConsoleOutput("");
@@ -490,15 +500,113 @@ export default function LabWorkspace({
 
   // Runs when language changes — loads reference solution, then starter code, then saved code
   useEffect(() => {
-    const refSol = subExp?.referenceSolution?.[editorLanguage];
-    const starter = subExp?.starterCode?.templates?.[editorLanguage] || "";
-    setCode(savedCode || refSol || starter);
+    // Keep it blank by default unless we have savedCode
+    setCode(savedCode || "");
   }, [editorLanguage, subPart, experiment]);
 
   const handleLanguageChange = (e) => {
     setEditorLanguage(e.target.value);
     setConsoleOutput("");
     setConsoleErrors("");
+  };
+
+  const handleSolveQuestion = async () => {
+    const refSol = subExp?.referenceSolution?.[editorLanguage] || "";
+    if (!refSol) {
+      alert("No solution available for this language.");
+      return;
+    }
+    
+    // Set the code in editor
+    setCode(refSol);
+    setCodeByLang(prev => ({ ...prev, [editorLanguage]: refSol }));
+    
+    // Auto-save the code if supported
+    if (onSaveCode) {
+      onSaveCode(experiment._id, subPart, refSol);
+    }
+    
+    // Open AI assistant tab
+    setActiveRightTab("assistant");
+    
+    // Initialize streaming explanation in chat
+    setChatMessages(prev => [
+      ...prev,
+      { sender: "user", text: "Explain the solved code for me." },
+      { sender: "ai", text: "Analyzing the solution code..." }
+    ]);
+    setIsAiTyping(true);
+    
+    try {
+      const res = await fetch(`${apiBase}/explain`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: refSol, language: editorLanguage })
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to load explanation from server");
+      }
+      
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let explanation = "";
+      setIsAiTyping(false);
+      
+      // Update last message to start empty for streaming
+      setChatMessages(prev => {
+        const next = [...prev];
+        if (next.length > 0) {
+          next[next.length - 1] = { sender: "ai", text: "" };
+        }
+        return next;
+      });
+      
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        
+        let boundary = buffer.indexOf("\n");
+        while (boundary !== -1) {
+          const line = buffer.substring(0, boundary).trim();
+          buffer = buffer.substring(boundary + 1);
+          boundary = buffer.indexOf("\n");
+          
+          if (line.startsWith("data: ")) {
+            const dataStr = line.slice(6).trim();
+            if (dataStr === "[DONE]") continue;
+            try {
+              const json = JSON.parse(dataStr);
+              const text = json.choices?.[0]?.delta?.content || "";
+              if (text) {
+                explanation += text;
+                setChatMessages(prev => {
+                  const next = [...prev];
+                  if (next.length > 0 && next[next.length - 1].sender === "ai") {
+                    next[next.length - 1] = { sender: "ai", text: explanation };
+                  }
+                  return next;
+                });
+              }
+            } catch (err) {
+              // Ignore partial JSON parsing errors
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setIsAiTyping(false);
+      setChatMessages(prev => {
+        const next = [...prev];
+        if (next.length > 0 && next[next.length - 1].sender === "ai") {
+          next[next.length - 1] = { sender: "ai", text: `Error generating explanation: ${err.message}` };
+        }
+        return next;
+      });
+    }
   };
 
   /**
@@ -656,22 +764,84 @@ export default function LabWorkspace({
     }
   };
 
-  const askAiMessage = (q) => {
+  const askAiMessage = async (q) => {
     if (!q.trim()) return;
-    setChatMessages(p => [...p, { sender: "user", text: q }]);
-    setInputValue(""); setIsAiTyping(true);
-    setTimeout(() => {
-      const ql = q.toLowerCase();
-      const reply = ql.includes("complexity") || ql.includes("time")
-        ? "Bubble Sort uses nested loops → O(n²) worst-case time complexity."
-        : ql.includes("swap") || ql.includes("temp")
-          ? "A temp variable holds one value while swapping so the original isn't overwritten."
-          : ql.includes("error") || ql.includes("debug")
-            ? "Check that <stdio.h> is imported and parameter types match."
-            : `For "${subExp?.title || "this experiment"}", let me know if you'd like a flowchart walkthrough.`;
-      setChatMessages(p => [...p, { sender: "ai", text: reply }]);
+    
+    // Add user's message to the chat
+    const updatedMessages = [...chatMessages, { sender: "user", text: q }];
+    setChatMessages(updatedMessages);
+    setInputValue("");
+    setIsAiTyping(true);
+    
+    // Append an empty AI message that we will stream into
+    setChatMessages(prev => [...prev, { sender: "ai", text: "" }]);
+    
+    try {
+      const res = await fetch(`${apiBase}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: q,
+          code,
+          language: editorLanguage,
+          history: chatMessages.slice(-6) // Send recent history for context
+        })
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to connect to assistant");
+      }
+      
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantText = "";
       setIsAiTyping(false);
-    }, 1000);
+      
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        
+        let boundary = buffer.indexOf("\n");
+        while (boundary !== -1) {
+          const line = buffer.substring(0, boundary).trim();
+          buffer = buffer.substring(boundary + 1);
+          boundary = buffer.indexOf("\n");
+          
+          if (line.startsWith("data: ")) {
+            const dataStr = line.slice(6).trim();
+            if (dataStr === "[DONE]") continue;
+            try {
+              const json = JSON.parse(dataStr);
+              const text = json.choices?.[0]?.delta?.content || "";
+              if (text) {
+                assistantText += text;
+                setChatMessages(prev => {
+                  const next = [...prev];
+                  if (next.length > 0 && next[next.length - 1].sender === "ai") {
+                    next[next.length - 1] = { sender: "ai", text: assistantText };
+                  }
+                  return next;
+                });
+              }
+            } catch (err) {
+              // Ignore partial JSON parsing errors
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setIsAiTyping(false);
+      setChatMessages(prev => {
+        const next = [...prev];
+        if (next.length > 0 && next[next.length - 1].sender === "ai") {
+          next[next.length - 1] = { sender: "ai", text: `Error: ${err.message}` };
+        }
+        return next;
+      });
+    }
   };
 
   return (
@@ -713,6 +883,9 @@ export default function LabWorkspace({
             <div className="divider-v" />
             <button className="btn-run" onClick={handleRunCode} disabled={isRunning}>
               {isRunning ? "Running..." : "Run"}
+            </button>
+            <button className="btn-solve" onClick={handleSolveQuestion}>
+              Solve Question
             </button>
             {completionKey && (
               <button
