@@ -1756,10 +1756,12 @@ const seedDB = async () => {
     await mongoose.connect(uri);
     console.log("Connected to MongoDB for seeding...");
 
-    await Subject.deleteMany({});
-    console.log("Deleted all subjects.");
-    await Experiment.deleteMany({});
-    console.log("Deleted all experiments.");
+    // Only removes CP data
+    await Subject.deleteMany({ code: "VSEC102" });
+    await Experiment.deleteMany({
+      subjectId: new ObjectId("685b2a1f3c4e8d0012a7b000"),
+    });
+    console.log("Cleared existing Python data.");
 
     await Subject.insertMany(subjects);
     console.log("Seeded", subjects.length, "subjects.");
