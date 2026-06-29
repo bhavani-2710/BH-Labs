@@ -25,6 +25,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b601"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 1,
+    problemStatement: "Learn basic programming with Python's syntax, variables, data types, operators, and input/output functions.",
     subExperiments: [
       {
         part: "a",
@@ -60,12 +61,9 @@ const experiments = [
             { source: "4", target: "5" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def generate_greeting(name, time_of_day):\n    # Write your code here\n    # Return a personalized greeting string using f-string\n    pass\n\nif __name__ == '__main__':\n    name = input('Enter your name: ')\n    time_of_day = input('Enter time of day (Morning/Afternoon/Evening): ')\n    print(generate_greeting(name, time_of_day))",
-          },
+        referenceSolution: {
+          python:
+            '# Program to generate a personalized greeting\n\n# Take user input for name\nname = input("Enter your name: ")\n\n# Generate greeting message\n# Using string concatenation\ngreeting = "Hello, " + name + "! Welcome to the program."\n\n# Display the greeting\nprint(greeting)\n',
         },
         samples: [
           {
@@ -114,12 +112,9 @@ const experiments = [
             { source: "8", target: "9" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import math\n\ndef area_circle(r):      return math.pi * r * r\ndef area_rectangle(l,w): return l * w\ndef area_triangle(b,h):  return 0.5 * b * h\n\nif __name__ == '__main__':\n    choice = int(input('Enter choice (1-Circle, 2-Rectangle, 3-Triangle): '))\n    if choice == 1:\n        r = float(input('Enter radius: '))\n        print(f'Area of Circle = {area_circle(r):.2f}')\n    elif choice == 2:\n        l, w = float(input('Length: ')), float(input('Width: '))\n        print(f'Area of Rectangle = {area_rectangle(l,w):.2f}')\n    elif choice == 3:\n        b, h = float(input('Base: ')), float(input('Height: '))\n        print(f'Area of Triangle = {area_triangle(b,h):.2f}')",
-          },
+        referenceSolution: {
+          python:
+            "# Program to calculate areas of circle, rectangle, and triangle\n# Using functions and user input for flexibility\n\nimport math\n\n# Function to calculate area of a circle\ndef area_circle(radius):\n    # Formula: πr^2\n    return math.pi * radius * radius\n\n# Function to calculate area of a rectangle\ndef area_rectangle(length, width):\n    # Formula: length × width\n    return length * width\n\n# Function to calculate area of a triangle\ndef area_triangle(base, height):\n    # Formula: (1/2) × base × height\n    return 0.5 * base * height\n\n# Display menu to user\nprint('Choose shape to calculate area:')\nprint('1. Circle')\nprint('2. Rectangle')\nprint('3. Triangle')\n\nchoice = input('Enter your choice (1/2/3): ')\n\n# Perform calculation based on user choice\nif choice == '1':\n    r = float(input('Enter radius of circle: '))\n    print('Area of circle is:', area_circle(r))\n\nelif choice == '2':\n    l = float(input('Enter length of rectangle: '))\n    w = float(input('Enter width of rectangle: '))\n    print('Area of rectangle is:', area_rectangle(l, w))\n\nelif choice == '3':\n    b = float(input('Enter base of triangle: '))\n    h = float(input('Enter height of triangle: '))\n    print('Area of triangle is:', area_triangle(b, h))\n\nelse:\n    print('Invalid choice! Please select 1, 2, or 3.')\n",
         },
         samples: [
           { input: "1\n7", output: "Area of Circle = 153.94\n" },
@@ -158,12 +153,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def rupees_to_dollars(r, rate=83.5): return r / rate\ndef celsius_to_fahrenheit(c):       return (c * 9/5) + 32\ndef inches_to_feet(i):              return i / 12\n\nif __name__ == '__main__':\n    print('1. Rupees to Dollars  2. Celsius to Fahrenheit  3. Inches to Feet')\n    choice = int(input('Choice: '))\n    val = float(input('Value: '))\n    if choice == 1:   print(f'{val} Rupees = {rupees_to_dollars(val):.4f} Dollars')\n    elif choice == 2: print(f'{val}°C = {celsius_to_fahrenheit(val):.2f}°F')\n    elif choice == 3: print(f'{val} inches = {inches_to_feet(val):.4f} feet')",
-          },
+        referenceSolution: {
+          python:
+            '# Program for unit conversion (Currency, Temperature, Length)\n# Supports: Rupees to Dollar, Celsius to Fahrenheit, Inch to Feet\n\n# Function to convert INR to USD\ndef rupees_to_dollar(inr):\n    # Assuming fixed conversion rate (example: 1 USD = 83 INR)\n    rate = 83\n    return inr / rate\n\n# Function to convert Celsius to Fahrenheit\ndef celsius_to_fahrenheit(c):\n    # Formula: (C × 9/5) + 32\n    return (c * 9/5) + 32\n\n# Function to convert Inch to Feet\ndef inch_to_feet(inch):\n    # 1 foot = 12 inches\n    return inch / 12\n\n# Menu display\nprint("Choose conversion type:")\nprint("1. Rupees to Dollar")\nprint("2. Celsius to Fahrenheit")\nprint("3. Inch to Feet")\n\nchoice = input("Enter your choice (1/2/3): ")\n\n# Perform conversion based on user choice\nif choice == \'1\':\n    inr = float(input("Enter amount in Rupees: "))\n    print("USD:", rupees_to_dollar(inr))\n\nelif choice == \'2\':\n    c = float(input("Enter temperature in Celsius: "))\n    print("Fahrenheit:", celsius_to_fahrenheit(c))\n\nelif choice == \'3\':\n    inch = float(input("Enter length in Inches: "))\n    print("Feet:", inch_to_feet(inch))\n\nelse:\n    print("Invalid choice!")\n',
         },
         samples: [
           { input: "1\n1000", output: "1000.0 Rupees = 11.9760 Dollars\n" },
@@ -206,12 +198,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def calculate_gross_salary(bs):\n    # Write your code here\n    # Compute DA (70%), TA (30%), HRA (10%), return gross = BS+DA+TA+HRA\n    pass\n\nif __name__ == '__main__':\n    bs = float(input('Enter Basic Salary: '))\n    da, ta, hra = 0.70*bs, 0.30*bs, 0.10*bs\n    gross = calculate_gross_salary(bs)\n    print(f'DA  = {da:.2f}')\n    print(f'TA  = {ta:.2f}')\n    print(f'HRA = {hra:.2f}')\n    print(f'Gross Salary = {gross:.2f}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to calculate Gross Salary of an employee\n\n# Take input for Basic Salary (BS)\nbs = float(input("Enter Basic Salary (BS): "))\n\n# Calculate allowances based on given percentages\n# DA = 70% of BS\nda = 0.70 * bs\n\n# TA = 30% of BS\nta = 0.30 * bs\n\n# HRA = 10% of BS\nhra = 0.10 * bs\n\n# Calculate Gross Salary\n# Gross Salary = BS + DA + TA + HRA\ngross_salary = bs + da + ta + hra\n\n# Display results\nprint("\\nSalary Details:")\nprint("Basic Salary:", bs)\nprint("Dearness Allowance (DA):", da)\nprint("Travel Allowance (TA):", ta)\nprint("House Rent Allowance (HRA):", hra)\nprint("Gross Salary:", gross_salary)\n',
         },
         samples: [
           {
@@ -253,12 +242,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def simple_interest(principal, rate, time):\n    # Write your code here\n    # Return SI = (P * R * T) / 100\n    pass\n\nif __name__ == '__main__':\n    p = float(input('Enter Principal: '))\n    r = float(input('Enter Rate of Interest (%): '))\n    t = float(input('Enter Time (years): '))\n    si = simple_interest(p, r, t)\n    print(f'Simple Interest = {si:.2f}')\n    print(f'Total Amount    = {p + si:.2f}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to calculate Simple Interest\n\n# Take user input for Principal, Rate, and Time\nprincipal = float(input("Enter Principal amount: "))\nrate = float(input("Enter Rate of Interest (in %): "))\ntime = float(input("Enter Time period (in years): "))\n\n# Calculate Simple Interest using formula\n# SI = (P × R × T) / 100\nsimple_interest = (principal * rate * time) / 100\n\n# Display result\nprint("\\nSimple Interest Calculation")\nprint("Principal:", principal)\nprint("Rate:", rate)\nprint("Time:", time)\nprint("Simple Interest:", simple_interest)\n',
         },
         samples: [
           {
@@ -305,12 +291,9 @@ const experiments = [
             { source: "4", target: "5" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def arithmetic_operations(a, b):\n    # Write your code here\n    # Print results of +, -, *, /, % operations\n    pass\n\nif __name__ == '__main__':\n    a = float(input('Enter first number: '))\n    b = float(input('Enter second number: '))\n    arithmetic_operations(a, b)",
-          },
+        referenceSolution: {
+          python:
+            '# Program to perform basic arithmetic operations\n\n# Take input from user\nnum1 = float(input("Enter first number: "))\nnum2 = float(input("Enter second number: "))\n\n# Perform arithmetic operations\naddition = num1 + num2\nsubtraction = num1 - num2\nmultiplication = num1 * num2\n\n# Handle division safely (avoid division by zero)\nif num2 != 0:\n    division = num1 / num2\n    modulus = num1 % num2\nelse:\n    division = "Undefined (cannot divide by zero)"\n    modulus = "Undefined (cannot mod by zero)"\n\n# Display results\nprint("\\nArithmetic Operations Result:")\nprint("Addition:", addition)\nprint("Subtraction:", subtraction)\nprint("Multiplication:", multiplication)\nprint("Division:", division)\nprint("Modulus:", modulus)\n',
         },
         samples: [
           {
@@ -328,6 +311,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b602"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 2,
+    problemStatement: "Mastering Python New Data Structures for Practical Applications.",
     subExperiments: [
       {
         part: "a",
@@ -364,12 +348,9 @@ const experiments = [
             { source: "6", target: "3" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def add_task(tasks, task):              tasks.append(task)\ndef remove_task(tasks, task):           tasks.remove(task) if task in tasks else print('Not found')\ndef update_task(tasks, old, new):       tasks[tasks.index(old)] = new if old in tasks else None\ndef sort_tasks(tasks):                  tasks.sort()\n\nif __name__ == '__main__':\n    tasks = []\n    while True:\n        print('1-Add 2-Remove 3-Update 4-View 5-Sort 6-Quit')\n        c = int(input('Choice: '))\n        if c == 6: break\n        elif c == 1: add_task(tasks, input('Task: '))\n        elif c == 2: remove_task(tasks, input('Task to remove: '))\n        elif c == 3: update_task(tasks, input('Old: '), input('New: '))\n        elif c == 4: print('Tasks:', tasks)\n        elif c == 5: sort_tasks(tasks); print('Sorted:', tasks)",
-          },
+        referenceSolution: {
+          python:
+            '# Program to manage a task list using lists and tuples\n# Each task is stored as a tuple: (task_name, priority)\n# List is used to store multiple tasks\n\n# Initialize empty task list\ntasks = []\n\n# Function to display tasks\ndef display_tasks():\n    if not tasks:\n        print("No tasks available.")\n    else:\n        print("\\nCurrent Task List:")\n        for i, task in enumerate(tasks):\n            print(f"{i + 1}. Task: {task[0]}, Priority: {task[1]}")\n\n# Function to add a task\ndef add_task(name, priority):\n    # Store task as tuple\n    task = (name, priority)\n    tasks.append(task)\n    print("Task added successfully!")\n\n# Function to remove a task\ndef remove_task(index):\n    if 0 <= index < len(tasks):\n        removed = tasks.pop(index)\n        print(f"Removed task: {removed[0]}")\n    else:\n        print("Invalid index!")\n\n# Function to update a task\ndef update_task(index, new_name, new_priority):\n    if 0 <= index < len(tasks):\n        tasks[index] = (new_name, new_priority)\n        print("Task updated successfully!")\n    else:\n        print("Invalid index!")\n\n# Function to sort tasks by priority (ascending)\ndef sort_tasks():\n    global tasks\n    tasks = sorted(tasks, key=lambda x: x[1])\n    print("Tasks sorted by priority!")\n\n# Menu-driven program\nwhile True:\n    print("\\n--- Task Manager ---")\n    print("1. Add Task")\n    print("2. Remove Task")\n    print("3. Update Task")\n    print("4. Display Tasks")\n    print("5. Sort Tasks by Priority")\n    print("6. Exit")\n\n    choice = input("Enter your choice: ")\n\n    if choice == \'1\':\n        name = input("Enter task name: ")\n        priority = int(input("Enter priority (lower number = higher priority): "))\n        add_task(name, priority)\n\n    elif choice == \'2\':\n        display_tasks()\n        idx = int(input("Enter task number to remove: ")) - 1\n        remove_task(idx)\n\n    elif choice == \'3\':\n        display_tasks()\n        idx = int(input("Enter task number to update: ")) - 1\n        name = input("Enter new task name: ")\n        priority = int(input("Enter new priority: "))\n        update_task(idx, name, priority)\n\n    elif choice == \'4\':\n        display_tasks()\n\n    elif choice == \'5\':\n        sort_tasks()\n\n    elif choice == \'6\':\n        print("Exiting program...")\n        break\n\n    else:\n        print("Invalid choice! Please try again.")\n',
         },
         samples: [
           {
@@ -421,12 +402,9 @@ const experiments = [
             { source: "6", target: "7" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def enrollment_operations(cet, jee, neet):\n    # Write your code here\n    # Compute and print union, intersection, and difference\n    pass\n\nif __name__ == '__main__':\n    cet  = {'Alice', 'Bob', 'Carol', 'Dave'}\n    jee  = {'Bob', 'Carol', 'Eve', 'Frank'}\n    neet = {'Carol', 'Dave', 'Eve', 'Grace'}\n    enrollment_operations(cet, jee, neet)",
-          },
+        referenceSolution: {
+          python:
+            '# Program to demonstrate set operations using student enrollments\n# We use sets to store students enrolled in different exams/courses\n\n# Sample student enrollments (set data structure)\ncet_students = {"Aarav", "Neha", "Rohan", "Isha", "Vikram"}\njee_students = {"Rohan", "Isha", "Karan", "Meera", "Aarav"}\nneet_students = {"Neha", "Meera", "Sahil", "Aarav", "Divya"}\n\n# Display original sets\nprint("CET Students:", cet_students)\nprint("JEE Students:", jee_students)\nprint("NEET Students:", neet_students)\n\n# UNION: Students appearing for any exam\nall_students = cet_students.union(jee_students).union(neet_students)\nprint("\\nAll Students (Union):", all_students)\n\n# INTERSECTION: Students common in CET and JEE\ncet_jee_common = cet_students.intersection(jee_students)\nprint("\\nCommon in CET and JEE:", cet_jee_common)\n\n# DIFFERENCE: Students in CET but not in JEE\ncet_not_jee = cet_students.difference(jee_students)\nprint("\\nCET but not JEE:", cet_not_jee)\n\n# Students appearing only in NEET (not in CET or JEE)\nneet_only = neet_students.difference(cet_students.union(jee_students))\nprint("\\nOnly NEET Students:", neet_only)\n\n# Example of symmetric difference (in either CET or JEE but not both)\nsym_diff = cet_students.symmetric_difference(jee_students)\nprint("\\nCET or JEE but not both:", sym_diff)\n',
         },
         samples: [
           {
@@ -473,12 +451,9 @@ const experiments = [
             { source: "5", target: "3" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def add_student(records, roll, name, grade, attendance):\n    # Write your code here\n    pass\n\ndef update_grade(records, roll, new_grade):\n    # Write your code here\n    pass\n\ndef display_records(records):\n    # Write your code here\n    # Print roll, name, grade, attendance for each student\n    pass\n\nif __name__ == '__main__':\n    records = {}\n    add_student(records, 101, 'Alice', 'A', 95)\n    add_student(records, 102, 'Bob', 'B', 80)\n    update_grade(records, 102, 'A')\n    display_records(records)",
-          },
+        referenceSolution: {
+          python:
+            '# Program to create, update, and manipulate a dictionary of student records\n# Each student record contains grades and attendance details\n\n# Dictionary to store student records\n# Structure: {student_name: {"grade": value, "attendance": value}}\nstudents = {}\n\n# Function to add a student record\ndef add_student(name, grade, attendance):\n    students[name] = {\n        "grade": grade,\n        "attendance": attendance\n    }\n    print(f"Student {name} added successfully!")\n\n# Function to update student record\ndef update_student(name, grade=None, attendance=None):\n    if name in students:\n        if grade is not None:\n            students[name]["grade"] = grade\n        if attendance is not None:\n            students[name]["attendance"] = attendance\n        print(f"Student {name} updated successfully!")\n    else:\n        print("Student not found!")\n\n# Function to delete student record\ndef delete_student(name):\n    if name in students:\n        del students[name]\n        print(f"Student {name} deleted successfully!")\n    else:\n        print("Student not found!")\n\n# Function to display all records\ndef display_students():\n    if not students:\n        print("No student records found.")\n    else:\n        print("\\nStudent Records:")\n        for name, info in students.items():\n            print(f"Name: {name}, Grade: {info[\'grade\']}, Attendance: {info[\'attendance\']}%")\n\n# Menu-driven program\nwhile True:\n    print("\\n--- Student Record Management ---")\n    print("1. Add Student")\n    print("2. Update Student")\n    print("3. Delete Student")\n    print("4. Display Students")\n    print("5. Exit")\n\n    choice = input("Enter your choice: ")\n\n    if choice == \'1\':\n        name = input("Enter student name: ")\n        grade = input("Enter grade: ")\n        attendance = float(input("Enter attendance (%): "))\n        add_student(name, grade, attendance)\n\n    elif choice == \'2\':\n        name = input("Enter student name to update: ")\n        grade = input("Enter new grade (or press Enter to skip): ")\n        attendance_input = input("Enter new attendance (or press Enter to skip): ")\n\n        grade = grade if grade != "" else None\n        attendance = float(attendance_input) if attendance_input != "" else None\n\n        update_student(name, grade, attendance)\n\n    elif choice == \'3\':\n        name = input("Enter student name to delete: ")\n        delete_student(name)\n\n    elif choice == \'4\':\n        display_students()\n\n    elif choice == \'5\':\n        print("Exiting program...")\n        break\n\n    else:\n        print("Invalid choice! Please try again.")\n',
         },
         samples: [
           {
@@ -496,6 +471,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b603"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 3,
+    problemStatement: "Understanding control statements and loops in Python.",
     subExperiments: [
       {
         part: "a",
@@ -536,12 +512,9 @@ const experiments = [
             { source: "6", target: "4" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def print_triangle(n):\n    # Write your code here\n    # Print right-angled triangle of n rows using *\n    pass\n\nif __name__ == '__main__':\n    n = int(input('Enter number of rows: '))\n    print_triangle(n)",
-          },
+        referenceSolution: {
+          python:
+            "# Program to print a triangle pattern in Python\n# This demonstrates the difference between C and Python syntax\n\n# In C, we use braces {}, semicolons ; and printf()\n# In Python, we use indentation and simpler syntax\n\n# Take number of rows from user\nrows = int(input(\"Enter number of rows: \"))\n\n# Print triangle pattern\n# Each row prints increasing number of '*' characters\nfor i in range(1, rows + 1):\n    # In Python, no need for printf or format specifiers\n    # Just use print() with string multiplication\n    print('* ' * i)\n\n# Example Output (rows = 3):\n# * \n# * * \n# * * *\n",
         },
         samples: [
           { input: "5", output: "*\n* *\n* * *\n* * * *\n* * * * *\n" },
@@ -584,12 +557,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def identify_number(n):\n    # Write your code here\n    # Return 'Even' or 'Odd'\n    pass\n\nif __name__ == '__main__':\n    n = int(input('Enter a number: '))\n    print(f'{n} is {identify_number(n)}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to check whether numbers are even or odd using conditional statements and loops\n\n# Take number of inputs from user\nn = int(input("Enter how many numbers you want to check: "))\n\n# Loop to take multiple numbers and check each one\nfor i in range(n):\n    # Take number input\n    num = int(input("Enter a number: "))\n\n    # Check even or odd using conditional statement\n    if num % 2 == 0:\n        print(num, "is Even")\n    else:\n        print(num, "is Odd")\n\n# End of program\n',
         },
         samples: [
           { input: "7", output: "7 is Odd\n" },
@@ -643,12 +613,9 @@ const experiments = [
             { source: "9", target: "10" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def identify_character(ch):\n    # Write your code here\n    # Return 'Digit', 'Lowercase', 'Uppercase', or 'Special Character'\n    pass\n\nif __name__ == '__main__':\n    ch = input('Enter a character: ')\n    print(identify_character(ch))",
-          },
+        referenceSolution: {
+          python:
+            '# Program to check whether input is digit, lowercase, uppercase, or special character\n# Using if-else ladder\n\n# Take input from user (single character)\nch = input("Enter a single character: ")\n\n# Check conditions using if-else ladder\nif len(ch) != 1:\n    print("Please enter only one character!")\n\nelif ch.isdigit():\n    # Checks if character is a digit (0-9)\n    print("It is a Digit.")\n\nelif ch.islower():\n    # Checks if character is lowercase letter\n    print("It is a Lowercase Character.")\n\nelif ch.isupper():\n    # Checks if character is uppercase letter\n    print("It is an Uppercase Character.")\n\nelse:\n    # If none of the above, it is a special character\n    print("It is a Special Character.")\n',
         },
         samples: [
           { input: "A", output: "Uppercase\n" },
@@ -691,12 +658,9 @@ const experiments = [
             { source: "6", target: "4" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def multiplication_table(n):\n    # Write your code here\n    # Print multiplication table for n (1 to 10)\n    pass\n\nif __name__ == '__main__':\n    n = int(input('Enter a number: '))\n    multiplication_table(n)",
-          },
+        referenceSolution: {
+          python:
+            '# Program to generate multiplication table of a given number\n# Using loop structure in Python\n\n# Take input from user\nnum = int(input("Enter a number to generate its multiplication table: "))\n\n# Take range input (optional: default 10)\nlimit = 10\n\nprint("\\nMultiplication Table of", num)\n\n# Loop to generate table\nfor i in range(1, limit + 1):\n    result = num * i\n    print(num, "x", i, "=", result)\n\n# End of program\n',
         },
         samples: [
           {
@@ -745,12 +709,9 @@ const experiments = [
             { source: "6", target: "4" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def fibonacci(n):\n    # Write your code here\n    # Print first n terms using a while loop\n    pass\n\nif __name__ == '__main__':\n    n = int(input('Enter number of terms: '))\n    fibonacci(n)",
-          },
+        referenceSolution: {
+          python:
+            '# Program to print Fibonacci sequence using a while loop\n\n# Take number of terms from user\nn = int(input("Enter number of terms: "))\n\n# First two terms of Fibonacci sequence\na = 0\nb = 1\ncount = 0\n\n# Check if number of terms is valid\nif n <= 0:\n    print("Please enter a positive integer")\nelif n == 1:\n    print("Fibonacci sequence:")\n    print(a)\nelse:\n    print("Fibonacci sequence:")\n\n    # Loop to generate sequence\n    while count < n:\n        print(a)\n        # Update values\n        temp = a + b\n        a = b\n        b = temp\n        count += 1\n',
         },
         samples: [{ input: "8", output: "0\n1\n1\n2\n3\n5\n8\n13\n" }],
       },
@@ -789,12 +750,9 @@ const experiments = [
             { source: "6", target: "7" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def factorial(n):\n    # Write your code here\n    # Return n! (iterative)\n    pass\n\nif __name__ == '__main__':\n    n = int(input('Enter N: '))\n    print(f'{n}! = {factorial(n)}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to compute factorial of a given number N\n# Using a loop\n\n# Take input from user\nn = int(input("Enter a number to find factorial: "))\n\n# Initialize result variable\nfact = 1\n\n# Check for negative numbers\nif n < 0:\n    print("Factorial is not defined for negative numbers.")\n\nelif n == 0 or n == 1:\n    print("Factorial of", n, "is 1")\n\nelse:\n    # Loop to calculate factorial\n    for i in range(1, n + 1):\n        fact = fact * i\n\n    print("Factorial of", n, "is", fact)\n',
         },
         samples: [
           { input: "5", output: "5! = 120\n" },
@@ -843,12 +801,9 @@ const experiments = [
             { source: "7", target: "8" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import math\n\ndef is_prime(n):\n    # Write your code here\n    # Return True if n is prime, False otherwise\n    pass\n\nif __name__ == '__main__':\n    n = int(input('Enter a number: '))\n    print(f'{n} is {\"Prime\" if is_prime(n) else \"Not Prime\"}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to check whether a number is prime using a function\n\n# Function to check prime number\ndef is_prime(num):\n    # Numbers less than or equal to 1 are not prime\n    if num <= 1:\n        return False\n\n    # Check divisibility from 2 to sqrt(num)\n    for i in range(2, int(num ** 0.5) + 1):\n        if num % i == 0:\n            return False\n\n    return True\n\n# Take input from user\nn = int(input("Enter a number: "))\n\n# Call function and display result\nif is_prime(n):\n    print(n, "is a Prime Number")\nelse:\n    print(n, "is Not a Prime Number")\n',
         },
         samples: [
           { input: "17", output: "17 is Prime\n" },
@@ -894,12 +849,9 @@ const experiments = [
             { source: "6", target: "7" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def add(a, b):      return a + b\ndef subtract(a, b): return a - b\ndef multiply(a, b): return a * b\ndef divide(a, b):\n    # Write your code here: handle ZeroDivisionError\n    pass\n\nif __name__ == '__main__':\n    a  = float(input('First number: '))\n    op = input('Operator (+, -, *, /): ')\n    b  = float(input('Second number: '))\n    ops = {'+': add, '-': subtract, '*': multiply, '/': divide}\n    if op in ops: print(f'Result: {ops[op](a, b)}')\n    else: print('Invalid operator')",
-          },
+        referenceSolution: {
+          python:
+            '# Simple Calculator using functions\n# Performs addition, subtraction, multiplication, and division\n\n# Function for addition\ndef add(a, b):\n    return a + b\n\n# Function for subtraction\ndef subtract(a, b):\n    return a - b\n\n# Function for multiplication\ndef multiply(a, b):\n    return a * b\n\n# Function for division\ndef divide(a, b):\n    # Handle division by zero\n    if b == 0:\n        return "Error: Division by zero not allowed"\n    return a / b\n\n# Menu-driven calculator\nprint("--- Simple Calculator ---")\nprint("1. Addition")\nprint("2. Subtraction")\nprint("3. Multiplication")\nprint("4. Division")\n\nchoice = input("Enter your choice (1-4): ")\n\n# Take input numbers\na = float(input("Enter first number: "))\nb = float(input("Enter second number: "))\n\n# Perform operation based on user choice\nif choice == \'1\':\n    print("Result:", add(a, b))\nelif choice == \'2\':\n    print("Result:", subtract(a, b))\nelif choice == \'3\':\n    print("Result:", multiply(a, b))\nelif choice == \'4\':\n    print("Result:", divide(a, b))\nelse:\n    print("Invalid choice!")\n',
         },
         samples: [
           { input: "10\n+\n5", output: "Result: 15.0\n" },
@@ -946,12 +898,9 @@ const experiments = [
             { source: "8", target: "3" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import random\n\ndef guessing_game():\n    secret = random.randint(1, 100)\n    attempts = 0\n    print('Guess a number between 1 and 100.')\n    # Write your code here\n    # Loop until correct; give Too Low/Too High hints; print attempts on win\n\nif __name__ == '__main__':\n    guessing_game()",
-          },
+        referenceSolution: {
+          python:
+            '# Number Guessing Game using loops and conditional statements\n# Program generates a random number and user has to guess it\n\nimport random\n\n# Generate random number between 1 and 100\nsecret_number = random.randint(1, 100)\n\n# Initialize attempt counter\nattempts = 0\n\nprint("Welcome to the Number Guessing Game!")\nprint("I have selected a number between 1 and 100.")\nprint("Try to guess it!")\n\nwhile True:\n    # Take user input\n    guess = int(input("Enter your guess: "))\n    attempts += 1\n\n    # Check conditions\n    if guess < secret_number:\n        print("Too low! Try again.")\n    elif guess > secret_number:\n        print("Too high! Try again.")\n    else:\n        print("Congratulations! You guessed the correct number.")\n        print("Total attempts:", attempts)\n        break\n\n# End of game\n',
         },
         samples: [
           {
@@ -969,6 +918,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b604"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 4,
+    problemStatement: "To proficiently handle file operations, manage exceptions, and create Python packages and executable files.",
     subExperiments: [
       {
         part: "a",
@@ -1006,12 +956,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def extract_words_by_length(filename, length):\n    # Write your code here\n    # Open file, split into words, return list of words with given length\n    pass\n\nif __name__ == '__main__':\n    filename = input('Enter filename: ')\n    length = int(input('Enter word length: '))\n    words = extract_words_by_length(filename, length)\n    print(f'Words of length {length}: {words}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to read a text file and print words of specified lengths\n# Demonstrates file handling, loops, and string processing\n\n# Ask user for file name\nfile_name = input("Enter the text file name (with .txt extension): ")\n\n# Ask user for word length criteria\nlengths_input = input("Enter word lengths to filter (comma separated, e.g., 3,4,5): ")\n\n# Convert input string into a list of integers\nlengths = [int(x.strip()) for x in lengths_input.split(",")]\n\ntry:\n    # Open file in read mode\n    file = open(file_name, "r")\n    content = file.read()\n    file.close()\n\n    # Convert text into words (split by whitespace)\n    words = content.split()\n\n    print("\\nWords matching specified lengths:")\n\n    # Loop through each word\n    for word in words:\n        # Remove punctuation (basic cleaning)\n        cleaned_word = word.strip(".,!?;:\\"\'()").lower()\n\n        # Check if word length matches user criteria\n        if len(cleaned_word) in lengths:\n            print(cleaned_word)\n\nexcept FileNotFoundError:\n    print("Error: File not found. Please check the file name.")\n',
         },
         samples: [
           {
@@ -1070,12 +1017,9 @@ const experiments = [
             { source: "7", target: "8" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import csv, math\nfrom itertools import combinations\n\ndef read_points(filename):\n    # Write your code here: return list of (x,y,z) tuples from CSV\n    pass\n\ndef find_closest(points):\n    # Write your code here: return (p1, p2, distance) with minimum distance\n    pass\n\nif __name__ == '__main__':\n    filename = input('CSV filename: ')\n    points = read_points(filename)\n    p1, p2, dist = find_closest(points)\n    print(f'Closest: {p1} and {p2}')\n    print(f'Distance: {dist:.4f}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to find the two closest points from a CSV file (3D coordinates)\n# Each row in CSV is assumed to be: x,y,z\n# Uses Euclidean distance formula\n\nimport csv\nimport math\n\n# Function to calculate distance between two 3D points\ndef distance(p1, p2):\n    return math.sqrt((p1[0] - p2[0])**2 + \n                     (p1[1] - p2[1])**2 + \n                     (p1[2] - p2[2])**2)\n\n# Take CSV file name from user\nfile_name = input("Enter CSV file name: ")\n\n# List to store points\npoints = []\n\ntry:\n    # Read CSV file\n    with open(file_name, "r") as file:\n        reader = csv.reader(file)\n        for row in reader:\n            # Convert each row into a tuple of floats (x, y, z)\n            if len(row) >= 3:\n                x, y, z = float(row[0]), float(row[1]), float(row[2])\n                points.append((x, y, z))\n\n    # Check if enough points exist\n    if len(points) < 2:\n        print("Need at least two points to compute distance.")\n    else:\n        min_dist = float("inf")\n        closest_pair = (None, None)\n\n        # Compare all pairs of points\n        for i in range(len(points)):\n            for j in range(i + 1, len(points)):\n                d = distance(points[i], points[j])\n\n                if d < min_dist:\n                    min_dist = d\n                    closest_pair = (points[i], points[j])\n\n        # Display result\n        print("\\nClosest Points:")\n        print("Point 1:", closest_pair[0])\n        print("Point 2:", closest_pair[1])\n        print("Minimum Distance:", min_dist)\n\nexcept FileNotFoundError:\n    print("Error: CSV file not found.")\n',
         },
         samples: [
           {
@@ -1127,12 +1071,9 @@ const experiments = [
             { source: "6", target: "7" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def sort_cities(input_file, output_file):\n    # Write your code here\n    # Read cities, sort, write to output file\n    pass\n\nif __name__ == '__main__':\n    inp = input('Input filename: ')\n    out = input('Output filename: ')\n    sort_cities(inp, out)\n    print(f'Sorted cities written to {out}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to read city names from a file, sort them alphabetically, and write to another file\n\n# Take input file name from user\ninput_file = input("Enter input file name: ")\n\n# Take output file name from user\noutput_file = input("Enter output file name: ")\n\ntry:\n    # Read city names from input file\n    with open(input_file, "r") as file:\n        cities = file.readlines()\n\n    # Remove newline characters and extra spaces\n    cities = [city.strip() for city in cities]\n\n    # Sort cities alphabetically (case-insensitive)\n    cities.sort(key=str.lower)\n\n    # Write sorted cities to output file\n    with open(output_file, "w") as file:\n        for city in cities:\n            file.write(city + "\\n")\n\n    print("Cities sorted and written successfully to", output_file)\n\nexcept FileNotFoundError:\n    print("Error: Input file not found.")\n',
         },
         samples: [
           {
@@ -1186,12 +1127,9 @@ const experiments = [
             { source: "6", target: "8" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "# Steps to create an executable:\n# 1. pip install pyinstaller\n# 2. pyinstaller --onefile --name MyCalculator calculator.py\n# 3. Run dist/MyCalculator(.exe)\n\n# Sample program to package:\ndef simple_calculator():\n    a = float(input('First number: '))\n    op = input('Operator (+,-,*,/): ')\n    b = float(input('Second number: '))\n    if op == '+':          print(f'Result: {a+b}')\n    elif op == '-':        print(f'Result: {a-b}')\n    elif op == '*':        print(f'Result: {a*b}')\n    elif op == '/' and b:  print(f'Result: {a/b}')\n    else:                  print('Invalid input')\n\nif __name__ == '__main__':\n    simple_calculator()",
-          },
+        referenceSolution: {
+          python:
+            "# Steps to create an executable:\n# 1. pip install pyinstaller\n# 2. pyinstaller --onefile --name MyCalculator calculator.py\n# 3. Run dist/MyCalculator(.exe)\n\n# Sample program to package:\ndef simple_calculator():\n    a = float(input('First number: '))\n    op = input('Operator (+,-,*,/): ')\n    b = float(input('Second number: '))\n    if op == '+':          print(f'Result: {a+b}')\n    elif op == '-':        print(f'Result: {a-b}')\n    elif op == '*':        print(f'Result: {a*b}')\n    elif op == '/' and b:  print(f'Result: {a/b}')\n    else:                  print('Invalid input')\n\nif __name__ == '__main__':\n    simple_calculator()",
         },
         samples: [{ input: "10\n+\n5", output: "Result: 15.0\n" }],
       },
@@ -1203,6 +1141,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b605"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 5,
+    problemStatement: "Handle errors and exceptions in Python programs, ensuring robust and fault-tolerant code. Learn debugging skills to identify, diagnose, and fix issues efficiently using scientific debugging methods.",
     subExperiments: [
       {
         part: "a",
@@ -1241,12 +1180,9 @@ const experiments = [
             { source: "7", target: "8" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "def safe_divide(a, b):\n    # Write your code here: handle ZeroDivisionError\n    pass\n\nif __name__ == '__main__':\n    try:\n        a = float(input('Numerator: '))\n        b = float(input('Denominator: '))\n        print(f'Result: {safe_divide(a, b)}')\n    except ValueError:\n        print('Invalid input: enter numeric values')\n    finally:\n        print('Program ended.')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to perform division with exception handling\n# Handles division by zero and invalid input errors\n\ntry:\n    # Take input from user\n    num1 = float(input("Enter first number (numerator): "))\n    num2 = float(input("Enter second number (denominator): "))\n\n    # Perform division\n    result = num1 / num2\n\n    # Display result\n    print("\\nResult of division:", result)\n\n# Handle division by zero error\nexcept ZeroDivisionError:\n    print("Error: Division by zero is not allowed.")\n\n# Handle invalid input (e.g., alphabets instead of numbers)\nexcept ValueError:\n    print("Error: Invalid input. Please enter numeric values only.")\n\n# General exception handling\nexcept Exception as e:\n    print("An unexpected error occurred:", e)\n\n# End of program\n',
         },
         samples: [
           { input: "10\n2", output: "Result: 5.0\nProgram ended.\n" },
@@ -1297,12 +1233,9 @@ const experiments = [
             { source: "7", target: "8" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "class InsufficientFundsError(Exception): pass\nclass InvalidAccountError(Exception):   pass\n\nclass BankAccount:\n    def __init__(self, account_no, balance):\n        self.account_no = account_no\n        self.balance    = balance\n\n    def withdraw(self, amount):\n        # Write your code here\n        # Raise custom exceptions where appropriate\n        pass\n\nif __name__ == '__main__':\n    account = BankAccount('ACC001', 5000)\n    try:\n        amount = float(input('Withdrawal amount: '))\n        account.withdraw(amount)\n        print(f'Success. Balance: {account.balance}')\n    except InsufficientFundsError as e: print(f'Error: {e}')\n    except InvalidAccountError  as e: print(f'Error: {e}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to simulate a banking system with custom exceptions\n\n# Custom exception for insufficient funds\nclass InsufficientFundsError(Exception):\n    pass\n\n# Custom exception for invalid account number\nclass InvalidAccountError(Exception):\n    pass\n\n# Simple bank database (dictionary)\naccounts = {\n    "1001": 5000,\n    "1002": 3000,\n    "1003": 10000\n}\n\n# Function to withdraw money\ndef withdraw(account_number, amount):\n    # Check if account exists\n    if account_number not in accounts:\n        raise InvalidAccountError("Invalid account number!")\n\n    # Check sufficient balance\n    if amount > accounts[account_number]:\n        raise InsufficientFundsError("Insufficient funds in account!")\n\n    # Perform withdrawal\n    accounts[account_number] -= amount\n    return accounts[account_number]\n\n# Main program\ntry:\n    acc_no = input("Enter account number: ")\n    amt = float(input("Enter amount to withdraw: "))\n\n    balance = withdraw(acc_no, amt)\n    print("Withdrawal successful!")\n    print("Remaining balance:", balance)\n\nexcept InvalidAccountError as e:\n    print("Error:", e)\n\nexcept InsufficientFundsError as e:\n    print("Error:", e)\n\nexcept ValueError:\n    print("Error: Invalid input for amount!")\n\nexcept Exception as e:\n    print("Unexpected error:", e)\n',
         },
         samples: [
           { input: "2000", output: "Success. Balance: 3000.0\n" },
@@ -1354,12 +1287,9 @@ const experiments = [
             { source: "4", target: "5" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import logging\n\n# Write your code here: configure basicConfig\n# logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')\nlogger = logging.getLogger(__name__)\n\ndef divide(a, b):\n    logger.debug(f'divide called: a={a}, b={b}')\n    # Write your code here: log INFO before division; log ERROR on exception\n    pass\n\nif __name__ == '__main__':\n    logger.info('Program started')\n    divide(10, 2)\n    divide(10, 0)\n    logger.info('Program ended')",
-          },
+        referenceSolution: {
+          python:
+            '# Program demonstrating logging in Python\n# Shows INFO, DEBUG, and ERROR levels using logging module\n\nimport logging\n\n# Configure logging\nlogging.basicConfig(\n    level=logging.DEBUG,  # Set lowest level to capture all logs\n    format=\'%(asctime)s - %(levelname)s - %(message)s\'\n)\n\nlogging.info("Program started")\n\ntry:\n    # Take user input\n    num1 = float(input("Enter first number: "))\n    logging.debug(f"First number entered: {num1}")\n\n    num2 = float(input("Enter second number: "))\n    logging.debug(f"Second number entered: {num2}")\n\n    # Check division\n    logging.info("Performing division operation")\n    result = num1 / num2\n\n    logging.info("Division successful")\n    print("Result:", result)\n\nexcept ZeroDivisionError:\n    logging.error("Attempted division by zero")\n    print("Error: Cannot divide by zero")\n\nexcept ValueError:\n    logging.error("Invalid input provided by user")\n    print("Error: Please enter valid numeric values")\n\nexcept Exception as e:\n    logging.error(f"Unexpected error occurred: {e}")\n    print("Unexpected error occurred")\n\nfinally:\n    logging.info("Program ended")\n',
         },
         samples: [
           {
@@ -1410,12 +1340,9 @@ const experiments = [
             { source: "7", target: "8" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "# Debugging demonstration — find and fix the bug below\n\ndef calculate_average(numbers):\n    total = 0\n    for num in numbers:\n        total += num\n    # Bug: divides by len-1 instead of len\n    average = total / (len(numbers) - 1)  # intentional bug\n    return average\n\nif __name__ == '__main__':\n    # Uncomment to use debugger:\n    # import pdb; pdb.set_trace()\n    numbers = [10, 20, 30, 40, 50]\n    print(f'Average: {calculate_average(numbers)}')  # Expected: 30.0",
-          },
+        referenceSolution: {
+          python:
+            '# Demonstration program for Python debugger (pdb)\n# This program contains intentional logical flow to practice debugging\n\nimport pdb\n\n# Function with intentional mistake for debugging practice\ndef calculate_average(numbers):\n    total = 0\n    count = 0\n\n    # Set breakpoint here to inspect variables\n    pdb.set_trace()\n\n    for num in numbers:\n        total += num\n        count += 1\n\n    # Intentional potential issue: division by zero if list is empty\n    average = total / count\n    return average\n\n# Sample data\nnums = [10, 20, 30, 40]\n\nprint("Program started")\n\n# Call function\nresult = calculate_average(nums)\n\nprint("Average is:", result)\n\nprint("Program ended")\n\n"""\nDEBUGGING GUIDE (for students):\n\n1. Run program in terminal:\n   python filename.py\n\n2. When execution stops at pdb.set_trace(), use commands:\n\n   - n (next line execution)\n   - s (step into function)\n   - c (continue execution)\n   - p variable_name (print variable value)\n   - l (list current code)\n\n3. Example checks:\n   p total\n   p count\n   p numbers\n\n4. Observe how values change step-by-step\n\n5. Remove pdb.set_trace() after debugging\n"""\n',
         },
         samples: [{ input: "", output: "Average: 30.0\n" }],
       },
@@ -1463,12 +1390,9 @@ const experiments = [
             { source: "8", target: "9" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "# Program with multiple bugs — apply scientific debugging\n\ndef bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(0, n-i):      # Bug 1: should be n-i-1\n            if arr[j] > arr[j+1]:    # Bug 2: index error from Bug 1\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\n\ndef find_max(arr):\n    max_val = arr[0]\n    for i in range(len(arr)):\n        if arr[i] > max_val:\n            max_val == arr[i]        # Bug 3: == should be =\n    return max_val\n\nif __name__ == '__main__':\n    data = [64, 34, 25, 12, 22, 11, 90]\n    print('Sorted:', bubble_sort(data[:]))\n    print('Max:',    find_max(data))",
-          },
+        referenceSolution: {
+          python:
+            '# Program with multiple intentional logic and runtime errors for debugging practice\n# Students are expected to identify and fix issues using scientific debugging (e.g., binary search debugging)\n\nimport random\n\n# Function to compute sum of even numbers incorrectly (intentional logic bug)\ndef sum_even_numbers(numbers):\n    total = 1  # BUG: should start from 0\n    for num in numbers:\n        if num % 2 = 0:  # BUG: assignment operator instead of comparison\n            total += num\n    return total\n\n# Function to compute factorial (intentional runtime and logic issues)\ndef factorial(n):\n    result = 1\n    for i in range(0, n):  # BUG: should be range(1, n+1)\n        result *= i        # BUG: multiplication by 0 causes wrong result\n    return result\n\n# Function to generate random list with possible hidden edge cases\ndef generate_numbers():\n    return [random.randint(-5, 5) for i in range(10)]\n\n# Main program\nprint("Program started")\n\nnums = generate_numbers()\nprint("Generated list:", nums)\n\n# Intentional runtime risk: division without check\navg = sum(nums) / len(nums)\nprint("Average:", avg)\n\n# Function calls\nprint("Sum of evens:", sum_even_numbers(nums))\nprint("Factorial of 5:", factorial(5))\n\nprint("Program ended")\n\n"""\nDEBUGGING INSTRUCTIONS (Scientific / Binary Search Debugging Approach):\n\n1. Identify symptoms:\n   - Wrong outputs\n   - Crashes or exceptions\n\n2. Use binary search debugging strategy:\n   Step 1: Comment out half of the program\n   Step 2: Check if error still exists\n   Step 3: Narrow down to smaller block\n   Step 4: Repeat until faulty line is found\n\n3. Suggested checkpoints:\n   - After generating list\n   - After sum_even_numbers()\n   - After factorial()\n\n4. Common errors to find:\n   - Assignment vs comparison error\n   - Incorrect loop range\n   - Wrong initialization\n   - Division by zero risk\n\n5. Fix one bug at a time and re-run program\n\n6. Validate final output with manual calculation\n"""\n',
         },
         samples: [
           {
@@ -1485,6 +1409,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b606"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 6,
+    problemStatement: "Apply object-oriented programming (OOP) principles in Python to model real-world scenarios and systems.",
     subExperiments: [
       {
         part: "a",
@@ -1530,12 +1455,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "class Event:\n    def __init__(self, name, date, venue):\n        # Write your code here\n        pass\n    def display(self):\n        # Write your code here\n        pass\n\nclass CulturalEvent(Event):\n    def __init__(self, name, date, venue, theme):\n        super().__init__(name, date, venue)\n        self.theme = theme\n    def display(self):\n        # Write your code here (override)\n        pass\n\nclass Participant:\n    def __init__(self, name, roll_no):\n        self.name, self.roll_no = name, roll_no\n    def register(self, event):\n        # Write your code here\n        pass\n\nif __name__ == '__main__':\n    e1 = CulturalEvent('Techfest 2024', '2024-03-15', 'Auditorium', 'Innovation')\n    p1 = Participant('Alice', 'CS101')\n    p1.register(e1)\n    e1.display()",
-          },
+        referenceSolution: {
+          python:
+            '# Event Management System using OOP Concepts\n# Demonstrates Encapsulation, Inheritance, and Polymorphism\n\n# Base class: Event\nclass Event:\n    def __init__(self, name, date):\n        # Encapsulation: private attributes\n        self.__name = name\n        self.__date = date\n        self.participants = []\n        self.activities = []\n\n    # Getter methods (Encapsulation)\n    def get_name(self):\n        return self.__name\n\n    def get_date(self):\n        return self.__date\n\n    # Method to add participant\n    def register_participant(self, participant):\n        self.participants.append(participant)\n        print(participant.get_name(), "registered for", self.__name)\n\n    # Method to add activity\n    def add_activity(self, activity):\n        self.activities.append(activity)\n        print("Activity added:", activity.get_details())\n\n    # Polymorphic method (can be overridden)\n    def show_details(self):\n        print("Event:", self.__name)\n        print("Date:", self.__date)\n        print("Participants:")\n        for p in self.participants:\n            print(" -", p.get_name())\n        print("Activities:")\n        for a in self.activities:\n            print(" -", a.get_details())\n\n\n# Inheritance: Organizer is a type of Event Manager role\nclass Organizer:\n    def __init__(self, name, role):\n        self.name = name\n        self.role = role\n\n    def manage_event(self, event):\n        print(self.name, "is managing event:", event.get_name())\n\n\n# Participant class\nclass Participant:\n    def __init__(self, name, department):\n        self.name = name\n        self.department = department\n\n    def get_name(self):\n        return self.name\n\n\n# Activity base class (for polymorphism)\nclass Activity:\n    def get_details(self):\n        return "Generic Activity"\n\n\n# Derived Activity classes (Polymorphism)\nclass Competition(Activity):\n    def __init__(self, title, team_size):\n        self.title = title\n        self.team_size = team_size\n\n    def get_details(self):\n        return f"Competition: {self.title}, Team Size: {self.team_size}"\n\n\nclass Workshop(Activity):\n    def __init__(self, topic, speaker):\n        self.topic = topic\n        self.speaker = speaker\n\n    def get_details(self):\n        return f"Workshop: {self.topic}, Speaker: {self.speaker}"\n\n\n# Main Program\nprint("--- College Event Management System ---")\n\n# Create event\nfest = Event("Tech Fest 2026", "10-07-2026")\n\n# Create organizer\norg = Organizer("Bhavani", "Coordinator")\norg.manage_event(fest)\n\n# Create participants\np1 = Participant("Aarav", "CSE")\np2 = Participant("Neha", "IT")\n\n# Register participants\nfest.register_participant(p1)\nfest.register_participant(p2)\n\n# Create activities\nc1 = Competition("Coding Contest", 2)\nw1 = Workshop("AI Basics", "Dr. Sharma")\n\n# Add activities\nfest.add_activity(c1)\nfest.add_activity(w1)\n\n# Show event details (polymorphism in action)\nprint("\\nEvent Summary:")\nfest.show_details()\n',
         },
         samples: [
           {
@@ -1585,12 +1507,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "class Product:\n    def __init__(self, name, price, stock):\n        # Write your code here\n        pass\n\nclass ShoppingCart:\n    def __init__(self): self.items = []\n    def add_item(self, product, qty=1):\n        # Write your code here\n        pass\n    def calculate_total(self):\n        # Write your code here\n        pass\n    def display(self):\n        # Write your code here\n        pass\n\nclass Customer:\n    def __init__(self, name): self.name = name; self.cart = ShoppingCart()\n\nif __name__ == '__main__':\n    p1 = Product('Laptop', 45000, 10)\n    p2 = Product('Mouse', 500, 50)\n    c = Customer('Alice')\n    c.cart.add_item(p1)\n    c.cart.add_item(p2, 2)\n    c.cart.display()\n    print(f'Total: Rs. {c.cart.calculate_total()}')",
-          },
+        referenceSolution: {
+          python:
+            '# Online Shopping System using OOP principles\n# Demonstrates encapsulation, classes, and object interaction\n\n# Product class\nclass Product:\n    def __init__(self, product_id, name, price, stock):\n        self.product_id = product_id\n        self.name = name\n        self.price = price\n        self.stock = stock\n\n    def reduce_stock(self, quantity):\n        if quantity <= self.stock:\n            self.stock -= quantity\n            return True\n        return False\n\n    def __str__(self):\n        return f"{self.name} (Price: {self.price}, Stock: {self.stock})"\n\n\n# Customer class\nclass Customer:\n    def __init__(self, name):\n        self.name = name\n        self.cart = ShoppingCart()\n\n    def add_to_cart(self, product, quantity):\n        self.cart.add_item(product, quantity)\n\n    def checkout(self):\n        return self.cart.checkout()\n\n\n# Shopping Cart class\nclass ShoppingCart:\n    def __init__(self):\n        self.items = {}  # product -> quantity\n\n    # Add item to cart\n    def add_item(self, product, quantity):\n        if product.stock >= quantity:\n            if product in self.items:\n                self.items[product] += quantity\n            else:\n                self.items[product] = quantity\n            print(f"Added {quantity} of {product.name} to cart")\n        else:\n            print(f"Not enough stock for {product.name}")\n\n    # Calculate total cost\n    def calculate_total(self):\n        total = 0\n        for product, qty in self.items.items():\n            total += product.price * qty\n        return total\n\n    # Process order\n    def checkout(self):\n        print("\\nProcessing Order...")\n        for product, qty in self.items.items():\n            if product.reduce_stock(qty):\n                print(f"Purchased {qty} x {product.name}")\n            else:\n                print(f"Failed for {product.name}")\n        total = self.calculate_total()\n        self.items.clear()\n        print("Total Amount Paid:", total)\n        return total\n\n\n# Main Program\nprint("--- Online Shopping System ---")\n\n# Create products\np1 = Product(1, "Laptop", 50000, 5)\np2 = Product(2, "Headphones", 2000, 10)\np3 = Product(3, "Mouse", 500, 20)\n\n# Create customer\ncust = Customer("Aarav")\n\n# Display products\nprint("\\nAvailable Products:")\nprint(p1)\nprint(p2)\nprint(p3)\n\n# Add items to cart\ncust.add_to_cart(p1, 1)\ncust.add_to_cart(p2, 2)\ncust.add_to_cart(p3, 3)\n\n# Checkout\ncust.checkout()\n\n# Show remaining stock\nprint("\\nUpdated Inventory:")\nprint(p1)\nprint(p2)\nprint(p3)\n',
         },
         samples: [
           {
@@ -1641,12 +1560,9 @@ const experiments = [
             { source: "7", target: "8" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "class Vehicle:\n    def __init__(self, vid, model, daily_rate):\n        self.vid, self.model, self.daily_rate = vid, model, daily_rate\n        self._is_available = True\n    def rent(self):           self._is_available = False\n    def return_vehicle(self): self._is_available = True\n\nclass Car(Vehicle):\n    def __init__(self, vid, model, daily_rate, seats):\n        super().__init__(vid, model, daily_rate)\n        self.seats = seats\n\nclass RentalAgency:\n    def __init__(self, name): self.name = name; self.fleet = []\n    def add_vehicle(self, v): self.fleet.append(v)\n    def rent_vehicle(self, vid, customer, days):\n        # Write your code here\n        # Find vehicle by vid, check availability, calculate cost\n        pass\n\nif __name__ == '__main__':\n    agency = RentalAgency('SpeedyRentals')\n    car1 = Car('C001', 'Toyota Innova', 1500, 7)\n    agency.add_vehicle(car1)\n    agency.rent_vehicle('C001', 'Bob', 3)",
-          },
+        referenceSolution: {
+          python:
+            '# Vehicle Rental System using OOP principles\n# Includes Vehicles, Rental Agency, and Rental Transactions\n\nfrom datetime import datetime, timedelta\n\n# ---------------- Vehicle Class ----------------\nclass Vehicle:\n    def __init__(self, vehicle_id, name, price_per_day):\n        self.vehicle_id = vehicle_id\n        self.name = name\n        self.price_per_day = price_per_day\n        self.is_available = True\n\n    def rent(self):\n        if self.is_available:\n            self.is_available = False\n            return True\n        return False\n\n    def return_vehicle(self):\n        self.is_available = True\n\n    def __str__(self):\n        status = "Available" if self.is_available else "Not Available"\n        return f"{self.name} (ID: {self.vehicle_id}, Price/Day: {self.price_per_day}, {status})"\n\n\n# ---------------- Rental Transaction ----------------\nclass RentalTransaction:\n    def __init__(self, customer_name, vehicle, days):\n        self.customer_name = customer_name\n        self.vehicle = vehicle\n        self.days = days\n        self.start_date = datetime.now()\n        self.end_date = self.start_date + timedelta(days=days)\n        self.total_cost = self.calculate_cost()\n\n    def calculate_cost(self):\n        return self.vehicle.price_per_day * self.days\n\n    def show_details(self):\n        print("\\n--- Rental Details ---")\n        print("Customer:", self.customer_name)\n        print("Vehicle:", self.vehicle.name)\n        print("Days:", self.days)\n        print("Start Date:", self.start_date.date())\n        print("End Date:", self.end_date.date())\n        print("Total Cost:", self.total_cost)\n\n\n# ---------------- Rental Agency ----------------\nclass RentalAgency:\n    def __init__(self, name):\n        self.name = name\n        self.vehicles = []\n        self.transactions = []\n\n    def add_vehicle(self, vehicle):\n        self.vehicles.append(vehicle)\n\n    def show_available_vehicles(self):\n        print("\\nAvailable Vehicles:")\n        for v in self.vehicles:\n            if v.is_available:\n                print(v)\n\n    def rent_vehicle(self, customer_name, vehicle_id, days):\n        for v in self.vehicles:\n            if v.vehicle_id == vehicle_id and v.is_available:\n                v.rent()\n                transaction = RentalTransaction(customer_name, v, days)\n                self.transactions.append(transaction)\n                print("\\nBooking Successful!")\n                transaction.show_details()\n                return transaction\n\n        print("Vehicle not available or invalid ID!")\n        return None\n\n    def return_vehicle(self, vehicle_id):\n        for v in self.vehicles:\n            if v.vehicle_id == vehicle_id:\n                v.return_vehicle()\n                print(f"Vehicle {v.name} returned successfully.")\n                return\n        print("Invalid vehicle ID!")\n\n\n# ---------------- Main Program ----------------\nprint("--- Vehicle Rental System ---")\n\nagency = RentalAgency("City Rentals")\n\n# Add vehicles\nagency.add_vehicle(Vehicle(1, "Car", 1500))\nagency.add_vehicle(Vehicle(2, "Bike", 500))\nagency.add_vehicle(Vehicle(3, "SUV", 2500))\n\n# Show available vehicles\nagency.show_available_vehicles()\n\n# Rent vehicles\nagency.rent_vehicle("Aarav", 1, 3)\nagency.rent_vehicle("Neha", 2, 2)\n\n# Show availability after booking\nagency.show_available_vehicles()\n\n# Return vehicle\nagency.return_vehicle(1)\n\n# Final availability\nagency.show_available_vehicles()\n',
         },
         samples: [
           {
@@ -1664,6 +1580,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b607"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 7,
+    problemStatement: "Develop a graphical user interface (GUI) application.",
     subExperiments: [
       {
         part: "a",
@@ -1699,12 +1616,9 @@ const experiments = [
             { source: "6", target: "3" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import tkinter as tk\nfrom tkinter import ttk, messagebox\n\ndef convert():\n    # Write your code here\n    # Read entry value and conversion_var, apply formula, update result_label\n    pass\n\nroot = tk.Tk()\nroot.title('Unit Converter')\nroot.geometry('400x250')\n\ntk.Label(root, text='Enter Value:').grid(row=0, column=0, padx=10, pady=10)\nentry = tk.Entry(root)\nentry.grid(row=0, column=1, padx=10)\n\nconversion_var = tk.StringVar(value='Rupees to Dollars')\nttk.OptionMenu(root, conversion_var, 'Rupees to Dollars',\n               'Rupees to Dollars', 'Celsius to Fahrenheit', 'Inches to Feet'\n).grid(row=1, column=0, columnspan=2, pady=5)\n\ntk.Button(root, text='Convert', command=convert).grid(row=2, column=0, columnspan=2, pady=10)\nresult_label = tk.Label(root, text='Result: ', font=('Arial', 12))\nresult_label.grid(row=3, column=0, columnspan=2)\n\nroot.mainloop()",
-          },
+        referenceSolution: {
+          python:
+            '# GUI Application for Unit Conversion using Tkinter\n# Supports: Currency (Rupees to Dollars), Temperature (Celsius to Fahrenheit), Length (Inches to Feet)\n\nimport tkinter as tk\nfrom tkinter import ttk\n\n# Conversion functions\n\ndef convert():\n    try:\n        value = float(entry_value.get())\n        choice = combo.get()\n\n        if choice == "Rupees to Dollars":\n            result = value / 83  # Approx conversion rate\n            result_label.config(text=f"Result: {result:.2f} USD")\n\n        elif choice == "Celsius to Fahrenheit":\n            result = (value * 9/5) + 32\n            result_label.config(text=f"Result: {result:.2f} °F")\n\n        elif choice == "Inches to Feet":\n            result = value / 12\n            result_label.config(text=f"Result: {result:.2f} ft")\n\n        else:\n            result_label.config(text="Please select a conversion type")\n\n    except ValueError:\n        result_label.config(text="Invalid input! Please enter a number")\n\n\n# Create main window\nroot = tk.Tk()\nroot.title("Unit Converter")\nroot.geometry("350x250")\n\n# Input field\nentry_label = tk.Label(root, text="Enter Value:")\nentry_label.pack()\nentry_value = tk.Entry(root)\nentry_value.pack()\n\n# Dropdown menu\noptions = ["Rupees to Dollars", "Celsius to Fahrenheit", "Inches to Feet"]\ncombo = ttk.Combobox(root, values=options)\ncombo.set("Select Conversion")\ncombo.pack()\n\n# Convert button\nbutton = tk.Button(root, text="Convert", command=convert)\nbutton.pack(pady=10)\n\n# Result label\nresult_label = tk.Label(root, text="Result will be shown here")\nresult_label.pack()\n\n# Run application\nroot.mainloop()\n',
         },
         samples: [
           { input: "", output: "(GUI Application — no console output)\n" },
@@ -1748,12 +1662,9 @@ const experiments = [
             { source: "6", target: "3" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import tkinter as tk\nfrom tkinter import ttk, messagebox\nimport math\n\ndef calc_circle():\n    try:\n        r = float(radius_entry.get())\n        circle_result.config(text=f'Area = {math.pi*r*r:.2f}')\n    except ValueError:\n        messagebox.showerror('Error', 'Enter a valid radius')\n\n# Write your code here: calc_rectangle() and calc_triangle() similarly\n\nroot = tk.Tk()\nroot.title('Area Calculator')\nnb = ttk.Notebook(root)\nnb.pack(fill='both', expand=True, padx=10, pady=10)\n\ncf = ttk.Frame(nb); nb.add(cf, text='Circle')\ntk.Label(cf, text='Radius:').grid(row=0, column=0, padx=10, pady=10)\nradius_entry = tk.Entry(cf); radius_entry.grid(row=0, column=1)\ntk.Button(cf, text='Calculate', command=calc_circle).grid(row=1, columnspan=2)\ncircle_result = tk.Label(cf, text='Area = ')\ncircle_result.grid(row=2, columnspan=2)\n\n# Add Rectangle and Triangle frames similarly\nroot.mainloop()",
-          },
+        referenceSolution: {
+          python:
+            '# GUI Application to calculate areas of geometric figures\n# Supports Circle, Rectangle, and Triangle using Tkinter\n\nimport tkinter as tk\nfrom tkinter import ttk\nimport math\n\n# Function to calculate area\ndef calculate_area():\n    try:\n        shape = combo.get()\n\n        if shape == "Circle":\n            r = float(entry1.get())\n            area = math.pi * r * r\n            result_label.config(text=f"Area of Circle: {area:.2f}")\n\n        elif shape == "Rectangle":\n            l = float(entry1.get())\n            w = float(entry2.get())\n            area = l * w\n            result_label.config(text=f"Area of Rectangle: {area:.2f}")\n\n        elif shape == "Triangle":\n            b = float(entry1.get())\n            h = float(entry2.get())\n            area = 0.5 * b * h\n            result_label.config(text=f"Area of Triangle: {area:.2f}")\n\n        else:\n            result_label.config(text="Please select a shape")\n\n    except ValueError:\n        result_label.config(text="Invalid input! Enter numeric values")\n\n\n# Main window\nroot = tk.Tk()\nroot.title("Area Calculator")\nroot.geometry("400x300")\n\n# Shape selection\nlabel = tk.Label(root, text="Select Shape:")\nlabel.pack()\n\ncombo = ttk.Combobox(root, values=["Circle", "Rectangle", "Triangle"])\ncombo.set("Select Shape")\ncombo.pack()\n\n# Input fields\nlabel1 = tk.Label(root, text="Value 1 (Radius / Length / Base):")\nlabel1.pack()\nentry1 = tk.Entry(root)\nentry1.pack()\n\nlabel2 = tk.Label(root, text="Value 2 (Width / Height - if applicable):")\nlabel2.pack()\nentry2 = tk.Entry(root)\nentry2.pack()\n\n# Button\nbtn = tk.Button(root, text="Calculate Area", command=calculate_area)\nbtn.pack(pady=10)\n\n# Result label\nresult_label = tk.Label(root, text="Result will appear here")\nresult_label.pack()\n\n# Run application\nroot.mainloop()\n',
         },
         samples: [
           { input: "", output: "(GUI Application — no console output)\n" },
@@ -1796,12 +1707,9 @@ const experiments = [
             { source: "7", target: "3" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import tkinter as tk\nfrom tkinter import messagebox\n\nroot = tk.Tk()\nroot.title('College Admission Form')\nroot.geometry('500x450')\n\ntk.Label(root, text='Full Name:').grid(row=0, column=0, sticky='w', padx=10, pady=5)\nname_entry = tk.Entry(root, width=30)\nname_entry.grid(row=0, column=1, padx=10)\n\nbranch_var = tk.StringVar(value='CS')\nfor i, (label, val) in enumerate([('Computer Science','CS'),('Electronics','EC'),('Mechanical','ME')]):\n    tk.Radiobutton(root, text=label, variable=branch_var, value=val).grid(row=1+i, column=1, sticky='w')\n\ngames_vars = {g: tk.BooleanVar() for g in ['Cricket','Football','Chess']}\nfor i, (g, v) in enumerate(games_vars.items()):\n    tk.Checkbutton(root, text=g, variable=v).grid(row=4+i, column=1, sticky='w')\n\ndef submit():\n    # Write your code here: validate and display formatted summary\n    pass\n\ntk.Button(root, text='Submit', command=submit, bg='green', fg='white').grid(row=8, columnspan=2, pady=15)\nroot.mainloop()",
-          },
+        referenceSolution: {
+          python:
+            '# College Admission Registration Form using Tkinter GUI\n# Collects personal, educational, and contact information\n\nimport tkinter as tk\nfrom tkinter import messagebox\n\n# Function to submit form data\ndef submit_form():\n    name = entry_name.get()\n    email = entry_email.get()\n    phone = entry_phone.get()\n\n    branch = branch_var.get()\n\n    # Collect selected games\n    games = []\n    if cricket_var.get():\n        games.append("Cricket")\n    if football_var.get():\n        games.append("Football")\n    if chess_var.get():\n        games.append("Chess")\n\n    # Format output message\n    result = "--- Admission Form Details ---\\n"\n    result += f"Name: {name}\\n"\n    result += f"Email: {email}\\n"\n    result += f"Phone: {phone}\\n"\n    result += f"Branch: {branch}\\n"\n    result += f"Favorite Games: {\', \'.join(games) if games else \'None\'}\\n"\n\n    # Show result in popup\n    messagebox.showinfo("Form Submitted", result)\n\n\n# Create main window\nroot = tk.Tk()\nroot.title("College Admission Form")\nroot.geometry("400x450")\n\n# Name\ntk.Label(root, text="Full Name:").pack()\nentry_name = tk.Entry(root)\nentry_name.pack()\n\n# Email\ntk.Label(root, text="Email:").pack()\nentry_email = tk.Entry(root)\nentry_email.pack()\n\n# Phone\ntk.Label(root, text="Phone Number:").pack()\nentry_phone = tk.Entry(root)\nentry_phone.pack()\n\n# Branch selection (Radio Buttons)\ntk.Label(root, text="Select Branch:").pack()\nbranch_var = tk.StringVar()\n\nbranches = ["Computer Engineering", "Information Technology", "Mechanical", "Civil"]\n\nfor b in branches:\n    tk.Radiobutton(root, text=b, variable=branch_var, value=b).pack()\n\n# Games selection (Checkboxes)\ntk.Label(root, text="Select Favorite Games:").pack()\n\ncricket_var = tk.IntVar()\nfootball_var = tk.IntVar()\nchess_var = tk.IntVar()\n\ntk.Checkbutton(root, text="Cricket", variable=cricket_var).pack()\ntk.Checkbutton(root, text="Football", variable=football_var).pack()\ntk.Checkbutton(root, text="Chess", variable=chess_var).pack()\n\n# Submit Button\ntk.Button(root, text="Submit", command=submit_form).pack(pady=10)\n\n# Run GUI\nroot.mainloop()\n',
         },
         samples: [
           { input: "", output: "(GUI Application — no console output)\n" },
@@ -1815,6 +1723,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b608"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 8,
+    problemStatement: "Effectively utilize regular expressions in Python for pattern matching, validation, and data extraction tasks,",
     subExperiments: [
       {
         part: "a",
@@ -1856,12 +1765,9 @@ const experiments = [
             { source: "8", target: "9" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import re\n\nphone_pattern = r'^[6-9]\\d{9}$'\nemail_pattern = r'^[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$'\n\ndef validate_phone(phone): return bool(re.fullmatch(phone_pattern, phone))\ndef validate_email(email): return bool(re.fullmatch(email_pattern, email))\n\nif __name__ == '__main__':\n    phone = input('Enter phone number: ')\n    email = input('Enter email ID: ')\n    print(f'Phone: {\"Valid\" if validate_phone(phone) else \"Invalid\"}')\n    print(f'Email: {\"Valid\" if validate_email(email) else \"Invalid\"}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to validate phone number and email ID using regular expressions\n# Demonstrates use of Python\'s re module for pattern matching\n\nimport re\n\n# Function to validate email\ndef validate_email(email):\n    # Basic email pattern: username@domain.extension\n    pattern = r\'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\'\n    return re.match(pattern, email)\n\n# Function to validate phone number\ndef validate_phone(phone):\n    # Accepts 10-digit phone numbers (simple validation)\n    pattern = r\'^[0-9]{10}$\'\n    return re.match(pattern, phone)\n\n# Take user input\nemail = input("Enter your email ID: ")\nphone = input("Enter your phone number: ")\n\n# Validate email\nif validate_email(email):\n    print("Valid Email ID")\nelse:\n    print("Invalid Email ID")\n\n# Validate phone number\nif validate_phone(phone):\n    print("Valid Phone Number")\nelse:\n    print("Invalid Phone Number (must be 10 digits)")\n',
         },
         samples: [
           {
@@ -1918,12 +1824,9 @@ const experiments = [
             { source: "8", target: "9" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import re\n\ndef check_password_strength(password):\n    criteria = {\n        'Length >= 8':        len(password) >= 8,\n        'Uppercase letter':   bool(re.search(r'[A-Z]', password)),\n        'Lowercase letter':   bool(re.search(r'[a-z]', password)),\n        'Digit':              bool(re.search(r'\\d',    password)),\n        # Write your code here: Special character check\n    }\n    score = sum(criteria.values())\n    for crit, ok in criteria.items():\n        print(f'  {crit}: {\"Pass\" if ok else \"Fail\"}')\n    # Write your code here: return 'Strong', 'Medium', or 'Weak'\n    pass\n\nif __name__ == '__main__':\n    pwd = input('Enter password: ')\n    print('Password Analysis:')\n    strength = check_password_strength(pwd)\n    print(f'Strength: {strength}')",
-          },
+        referenceSolution: {
+          python:
+            "# Program to validate password strength using regular expressions\n# Criteria:\n# 1. At least 8 characters\n# 2. At least one uppercase letter\n# 3. At least one lowercase letter\n# 4. At least one digit\n# 5. At least one special character\n\nimport re\n\n# Function to validate password\ndef validate_password(password):\n    # Check length first\n    if len(password) < 8:\n        return False\n\n    # Regex patterns for required conditions\n    upper = re.search(r'[A-Z]', password)\n    lower = re.search(r'[a-z]', password)\n    digit = re.search(r'[0-9]', password)\n    special = re.search(r'[!@#$%^&*(),.?\":{}|<>]', password)\n\n    # Return True only if all conditions are satisfied\n    if upper and lower and digit and special:\n        return True\n\n    return False\n\n# Take input from user\npassword = input(\"Enter your password: \")\n\n# Validate password\nif validate_password(password):\n    print(\"Strong password ✔\")\nelse:\n    print(\"Weak password ❌ (Must be 8+ chars, include uppercase, lowercase, digit, special char)\")\n",
         },
         samples: [
           {
@@ -1973,12 +1876,9 @@ const experiments = [
             { source: "6", target: "7" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import re\n\nurl_pattern = r'^(https?://)([\\w-]+\\.)+[\\w]{2,}(/[\\w/._~:?#\\[\\]@!$&\\'()*+,;=%-]*)?$'\n\ndef validate_url(url):\n    # Write your code here: return True if URL matches pattern\n    pass\n\nif __name__ == '__main__':\n    urls = [\n        'https://www.example.com',\n        'http://example.com/path',\n        'ftp://invalid.com',\n        'not_a_url'\n    ]\n    for url in urls:\n        print(f'{url}: {\"Valid\" if validate_url(url) else \"Invalid\"}')",
-          },
+        referenceSolution: {
+          python:
+            "# Program to validate a URL using regular expressions\n# Checks protocol (http/https), domain name, and optional path\n\nimport re\n\n# Function to validate URL\ndef validate_url(url):\n    # Regex pattern for basic URL validation\n    pattern = r'^(https?:\\/\\/)' \\\n              r'([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}' \\\n              r'(\\/[^\\s]*)?$'\n\n    return re.match(pattern, url)\n\n# Take input from user\nurl = input(\"Enter a URL: \")\n\n# Validate URL\nif validate_url(url):\n    print(\"Valid URL\")\nelse:\n    print(\"Invalid URL!\")\n",
         },
         samples: [
           {
@@ -2022,12 +1922,9 @@ const experiments = [
             { source: "4", target: "5" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import re\n\nemail_pattern = r'[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}'\nphone_pattern = r'\\b[6-9]\\d{9}\\b'\ndate_pattern  = r'\\b(0?[1-9]|1[0-2])/(0?[1-9]|[12]\\d|3[01])/(\\d{4})\\b'\n\ndef extract_data(text):\n    emails = re.findall(email_pattern, text)\n    phones = re.findall(phone_pattern, text)\n    # Write your code here: extract dates using date_pattern\n    dates = []\n    return emails, phones, dates\n\nif __name__ == '__main__':\n    text = \"\"\"\n    Contact Alice at alice@example.com or call 9876543210.\n    Bob's email is bob@college.edu, phone: 8765432109.\n    Meeting on 03/15/2024 and 12/25/2024.\n    \"\"\"\n    emails, phones, dates = extract_data(text)\n    print('Emails:', emails)\n    print('Phones:', phones)\n    print('Dates:', dates)",
-          },
+        referenceSolution: {
+          python:
+            '# Program to extract emails, phone numbers, and dates from a text file using regular expressions\n\nimport re\n\n# Take file name as input\nfile_name = input("Enter text file name: ")\n\n# Regular expression patterns\nemail_pattern = r\'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\'\nphone_pattern = r\'\\b\\d{10}\\b\'  # 10-digit phone numbers\ndate_pattern = r\'\\b(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/\\d{4}\\b\'  # MM/DD/YYYY\n\ntry:\n    # Read file content\n    with open(file_name, \'r\') as file:\n        data = file.read()\n\n    # Extract data using regex\n    emails = re.findall(email_pattern, data)\n    phones = re.findall(phone_pattern, data)\n    dates = re.findall(date_pattern, data)\n\n    # Display results\n    print("\\n--- Extracted Data ---")\n\n    print("\\nEmail Addresses:")\n    for email in emails:\n        print(email)\n\n    print("\\nPhone Numbers:")\n    for phone in phones:\n        print(phone)\n\n    print("\\nDates (MM/DD/YYYY):")\n    for date in dates:\n        # date_pattern returns tuples due to groups, so reconstruct full match\n        print(date[0] + "/" + date[1] + "/" + date[2])\n\nexcept FileNotFoundError:\n    print("Error: File not found.")\n',
         },
         samples: [
           {
@@ -2045,6 +1942,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b609"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 9,
+    problemStatement: "Utilize the NumPy libraries for efficient numerical computing.",
     subExperiments: [
       {
         part: "a",
@@ -2076,12 +1974,9 @@ const experiments = [
             { source: "4", target: "5" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import numpy as np\n\n# 1. Create 1D array of 5 elements\narr_1d = np.array([1, 2, 3, 4, 5])\n\n# 2. Create 2D array (3x3)\narr_2d = None  # Write your code here\n\n# 3. Create 3D zero array (2x3x4)\narr_3d = None  # Write your code here\n\n# 4. Reshape arr_1d to (5,1); slice first 3 elements\nreshaped = None  # Write your code here\nsliced   = None  # Write your code here\n\nprint('1D:', arr_1d)\nprint('2D:\\n', arr_2d)\nprint('3D shape:', arr_3d.shape if arr_3d is not None else None)\nprint('Reshaped:', reshaped)\nprint('Sliced:', sliced)",
-          },
+        referenceSolution: {
+          python:
+            '# Program to demonstrate 1D, 2D, and 3D NumPy arrays\n# Includes reshaping, slicing, and indexing operations\n\nimport numpy as np\n\n# -------------------- 1D Array --------------------\narr_1d = np.array([1, 2, 3, 4, 5, 6])\nprint("1D Array:", arr_1d)\n\n# Indexing\nprint("Element at index 2:", arr_1d[2])\n\n# Slicing\nprint("Sliced Array [1:4]:", arr_1d[1:4])\n\n# Reshaping 1D -> 2D\narr_2d_from_1d = arr_1d.reshape(2, 3)\nprint("\\nReshaped to 2D (2x3):\\n", arr_2d_from_1d)\n\n# -------------------- 2D Array --------------------\narr_2d = np.array([[1, 2, 3],\n                   [4, 5, 6],\n                   [7, 8, 9]])\nprint("\\n2D Array:\\n", arr_2d)\n\n# Indexing\nprint("Element at (1,2):", arr_2d[1][2])\n\n# Slicing rows\nprint("Rows 0 to 1:\\n", arr_2d[0:2])\n\n# Slicing columns\nprint("First column:", arr_2d[:, 0])\n\n# -------------------- 3D Array --------------------\narr_3d = np.array([\n    [[1, 2], [3, 4]],\n    [[5, 6], [7, 8]]\n])\nprint("\\n3D Array:\\n", arr_3d)\n\n# Indexing in 3D\nprint("Element at [1][0][1]:", arr_3d[1][0][1])\n\n# Slicing 3D array\nprint("First block:\\n", arr_3d[0])\n\n# Reshaping 2D -> 1D\nflat = arr_2d.reshape(9)\nprint("\\nFlattened 2D Array:", flat)\n\n# End of program\n',
         },
         samples: [
           {
@@ -2127,12 +2022,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import numpy as np\n\na = np.array([1, 2, 3])\nb = np.array([4, 5, 6])\n\n# Write your code here\nprint('Addition:',        a + b)\nprint('Subtraction:',     a - b)\nprint('Multiplication:',  a * b)\nprint('Division:',        a / b)\nprint('Dot product:',     np.dot(a, b))\nprint('Cross product:',   np.cross(a, b))",
-          },
+        referenceSolution: {
+          python:
+            '# Program to perform element-wise and vector operations using NumPy\n\nimport numpy as np\n\n# Create two arrays of same shape\narr1 = np.array([[1, 2, 3],\n                 [4, 5, 6]])\n\narr2 = np.array([[7, 8, 9],\n                 [10, 11, 12]])\n\nprint("Array 1:\\n", arr1)\nprint("\\nArray 2:\\n", arr2)\n\n# ---------------- Element-wise operations ----------------\nprint("\\nElement-wise Addition:\\n", arr1 + arr2)\nprint("Element-wise Subtraction:\\n", arr1 - arr2)\nprint("Element-wise Multiplication:\\n", arr1 * arr2)\nprint("Element-wise Division:\\n", arr1 / arr2)\n\n# ---------------- Vector operations ----------------\n# For dot product and cross product, use 1D vectors\nvec1 = np.array([1, 2, 3])\nvec2 = np.array([4, 5, 6])\n\nprint("\\nVector 1:", vec1)\nprint("Vector 2:", vec2)\n\n# Dot product\nprint("Dot Product:", np.dot(vec1, vec2))\n\n# Cross product\nprint("Cross Product:", np.cross(vec1, vec2))\n',
         },
         samples: [
           {
@@ -2186,12 +2078,9 @@ const experiments = [
             { source: "5", target: "6" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import numpy as np\n\ndata = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])\ndata2 = np.array([15, 25, 35, 45, 55, 65, 75, 85, 95, 105])\n\n# Write your code here\nprint(f'Mean:               {np.mean(data)}')\nprint(f'Median:             {np.median(data)}')\nprint(f'Standard Deviation: {np.std(data):.4f}')\nprint(f'Variance:           {np.var(data):.4f}')\nprint(f'Correlation:\\n{np.corrcoef(data, data2)}')",
-          },
+        referenceSolution: {
+          python:
+            '# Program to calculate mean, median, standard deviation, variance, and correlation coefficients\n# Using NumPy for statistical operations\n\nimport numpy as np\n\n# Input array (you can modify or take user input if needed)\ndata = np.array([10, 20, 30, 40, 50])\n\n# If correlation is needed, we use a second array\ndata2 = np.array([5, 15, 25, 35, 45])\n\n# Mean\nmean = np.mean(data)\n\n# Median\nmedian = np.median(data)\n\n# Standard Deviation\nstd_dev = np.std(data)\n\n# Variance\nvariance = np.var(data)\n\n# Correlation coefficient (between two datasets)\ncorr_matrix = np.corrcoef(data, data2)\ncorrelation = corr_matrix[0][1]\n\n# Display results\nprint("Data:", data)\nprint("Mean:", mean)\nprint("Median:", median)\nprint("Standard Deviation:", std_dev)\nprint("Variance:", variance)\nprint("Correlation Coefficient (with second dataset):", correlation)\n',
         },
         samples: [
           {
@@ -2209,6 +2098,7 @@ const experiments = [
     _id: new ObjectId("685b2a1f3c4e8d0012a7b60a"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b003"),
     experimentNumber: 10,
+    problemStatement: "Effectively use the Pandas library for data manipulation and the Matplotlib library for data visualization.",
     subExperiments: [
       {
         part: "a",
@@ -2252,12 +2142,9 @@ const experiments = [
             { source: "6", target: "7" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import pandas as pd\nimport matplotlib.pyplot as plt\n\n# Write your code here\n# 1. Load: df = pd.read_csv('covid.csv')\n# 2. Explore: print(df.head()); print(df.dtypes); print(df.describe())\n# 3. Clean: df.dropna(inplace=True); df.drop_duplicates(inplace=True)\n# 4. Aggregate: country_data = df.groupby('Country')['Cases'].sum()\n# 5. Plot: line, bar, histogram, scatter\n\ndf = pd.DataFrame({\n    'Date': pd.date_range('2021-01-01', periods=10),\n    'Cases': [100, 150, 200, 180, 220, 300, 250, 400, 350, 500],\n    'Deaths': [5, 8, 10, 9, 11, 15, 12, 20, 18, 25]\n})\nprint(df.head())\nprint(df.describe())\n\nplt.figure(figsize=(10, 4))\nplt.plot(df['Date'], df['Cases'], label='Cases')\nplt.title('COVID-19 Cases Trend')\nplt.xlabel('Date')\nplt.ylabel('Cases')\nplt.legend()\nplt.tight_layout()\nplt.show()",
-          },
+        referenceSolution: {
+          python:
+            "# COVID-19 Data Analysis using Pandas and Matplotlib\n# Includes loading CSV, cleaning data, aggregation, and visualization\n\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\n# -------------------- Load Dataset --------------------\nfile_name = input(\"Enter COVID-19 CSV file path: \")\ndf = pd.read_csv(file_name)\n\n# -------------------- Basic Exploration --------------------\nprint(\"\\nFirst 5 rows:\")\nprint(df.head())\n\nprint(\"\\nData Types:\")\nprint(df.dtypes)\n\nprint(\"\\nBasic Statistics:\")\nprint(df.describe(include='all'))\n\n# -------------------- Data Cleaning --------------------\n# Handle missing values\ndf = df.fillna(0)\n\n# Remove duplicates\ndf = df.drop_duplicates()\n\nprint(\"\\nAfter Cleaning:\")\nprint(df.info())\n\n# -------------------- Aggregation --------------------\n# Example: group by a 'Country' column (if present)\nif 'Country' in df.columns:\n    country_cases = df.groupby('Country').sum(numeric_only=True).iloc[:, 0]\n    print(\"\\nTop 5 Countries by cases:\")\n    print(country_cases.sort_values(ascending=False).head())\n\n# -------------------- Visualization --------------------\n\nplt.figure(figsize=(10,5))\n\n# Line Plot (trend over index or date if available)\nif 'Date' in df.columns and 'Confirmed' in df.columns:\n    df['Date'] = pd.to_datetime(df['Date'])\n    temp = df.groupby('Date')['Confirmed'].sum()\n    temp.plot(kind='line')\n    plt.title(\"COVID-19 Confirmed Cases Over Time\")\n    plt.xlabel(\"Date\")\n    plt.ylabel(\"Cases\")\n    plt.show()\n\n# Bar Plot\nif 'Country' in df.columns:\n    country_cases.sort_values(ascending=False).head(10).plot(kind='bar')\n    plt.title(\"Top 10 Countries by Cases\")\n    plt.xlabel(\"Country\")\n    plt.ylabel(\"Cases\")\n    plt.show()\n\n# Histogram\nnumeric_cols = df.select_dtypes(include=np.number).columns\nif len(numeric_cols) > 0:\n    df[numeric_cols[0]].plot(kind='hist', bins=20)\n    plt.title(\"Distribution\")\n    plt.show()\n\n# Scatter Plot (if at least 2 numeric columns exist)\nif len(numeric_cols) >= 2:\n    df.plot(kind='scatter', x=numeric_cols[0], y=numeric_cols[1])\n    plt.title(\"Scatter Plot\")\n    plt.show()\n",
         },
         samples: [
           {
@@ -2309,12 +2196,9 @@ const experiments = [
             { source: "6", target: "7" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import pandas as pd\nfrom sklearn.datasets import load_iris\n\niris = load_iris(as_frame=True)\ndf = iris.frame\ndf.columns = ['SepalLengthCm','SepalWidthCm','PetalLengthCm','PetalWidthCm','Species']\n\n# Write your code here\nprint('First 8 rows:')\nprint(df.head(8))\nprint('\\nColumns:', df.columns.tolist())\n\n# Fill missing values with column means\ndf.fillna(df.mean(numeric_only=True), inplace=True)\ndf.dropna(inplace=True)\n\n# Group by species and compute stats for Sepal Length\nstats = df.groupby('Species')['SepalLengthCm'].agg(['mean','min','max'])\nprint('\\nSepal Length stats by species:')\nprint(stats)",
-          },
+        referenceSolution: {
+          python:
+            "# Iris Dataset Analysis using Pandas\n# Tasks: read first 8 rows, display columns, handle missing data, grouping, and statistics\n\nimport pandas as pd\nfrom sklearn.datasets import load_iris\n\n# Load Iris dataset\niris = load_iris()\n\n# Create DataFrame\ndf = pd.DataFrame(iris.data, columns=iris.feature_names)\n\n# Add species column\ndf['species'] = pd.Categorical.from_codes(iris.target, iris.target_names)\n\n# -------------------- Basic Display --------------------\nprint(\"First 8 rows:\")\nprint(df.head(8))\n\nprint(\"\\nColumn Names:\")\nprint(df.columns)\n\n# -------------------- Introduce & Handle Missing Values --------------------\n# (For demonstration, we artificially introduce missing values)\ndf.iloc[0, 0] = None\ndf.iloc[3, 1] = None\n\n# Fill missing values with column mean\ndf_filled = df.fillna(df.mean(numeric_only=True))\n\nprint(\"\\nAfter Filling Missing Values:\")\nprint(df_filled.head())\n\n# Remove rows with missing values (before fill)\ndf_dropped = df.dropna()\nprint(\"\\nAfter Dropping Missing Values (if any):\")\nprint(df_dropped.shape)\n\n# -------------------- Grouping by Species --------------------\nprint(\"\\nGrouped by Species:\")\ngrouped = df_filled.groupby('species')\nprint(grouped.mean(numeric_only=True))\n\n# -------------------- Sepal Length Statistics --------------------\nprint(\"\\nSepal Length Statistics by Species:\")\nsepal_stats = grouped['sepal length (cm)'].agg(['mean', 'min', 'max'])\nprint(sepal_stats)\n",
         },
         samples: [
           {
@@ -2362,12 +2246,9 @@ const experiments = [
             { source: "6", target: "7" },
           ],
         },
-        starterCode: {
-          supportedLanguages: ["python"],
-          templates: {
-            python:
-              "import pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Create sample cars DataFrame\ndf = pd.DataFrame({\n    'Age': [2, 5, 3, 7, 1, 4, 6, 2, 8, 3],\n    'Price': [800000, 450000, 650000, 250000, 950000, 550000, 300000, 750000, 200000, 620000],\n    'km_driven': [15000, 60000, 30000, 80000, 5000, 50000, 70000, 20000, 100000, 35000],\n    'fuel': ['Petrol','Diesel','Petrol','Diesel','Petrol','CNG','Diesel','Petrol','Diesel','CNG']\n})\n\n# Write your code here\n# 1. Scatter: Age vs Price\nplt.scatter(df['Age'], df['Price'])\nplt.title('Age vs Price'); plt.xlabel('Age'); plt.ylabel('Price'); plt.show()\n\n# 2. Histogram: km_driven\n# 3. Bar: fuel type count\n# 4. Pie: fuel type percentages\n# 5. Box: price by fuel type",
-          },
+        referenceSolution: {
+          python:
+            '# Cars Dataset Visualization using Pandas & Matplotlib\n# Includes scatter, histogram, bar plot, pie chart, and box plot\n\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\n# -------------------- Load Dataset --------------------\nfile_name = input("Enter Cars dataset CSV file path: ")\ndf = pd.read_csv(file_name)\n\n# Display first few rows\nprint("\\nFirst 5 rows:")\nprint(df.head())\n\n# Check column names\nprint("\\nColumns:")\nprint(df.columns)\n\n# -------------------- Data Cleaning --------------------\ndf = df.dropna()\n\n# -------------------- Scatter Plot: Age vs Price --------------------\nif \'Age\' in df.columns and \'Price\' in df.columns:\n    plt.figure()\n    plt.scatter(df[\'Age\'], df[\'Price\'])\n    plt.title("Age vs Price")\n    plt.xlabel("Age")\n    plt.ylabel("Price")\n    plt.show()\n\n# -------------------- Histogram: Kilometers Driven --------------------\nif \'Kilometers_Driven\' in df.columns:\n    plt.figure()\n    plt.hist(df[\'Kilometers_Driven\'], bins=20)\n    plt.title("Distribution of Kilometers Driven")\n    plt.xlabel("Kilometers Driven")\n    plt.ylabel("Frequency")\n    plt.show()\n\n# -------------------- Bar Plot: Fuel Type Distribution --------------------\nif \'Fuel_Type\' in df.columns:\n    fuel_counts = df[\'Fuel_Type\'].value_counts()\n\n    plt.figure()\n    fuel_counts.plot(kind=\'bar\')\n    plt.title("Fuel Type Distribution")\n    plt.xlabel("Fuel Type")\n    plt.ylabel("Count")\n    plt.show()\n\n    # -------------------- Pie Chart --------------------\n    plt.figure()\n    fuel_counts.plot(kind=\'pie\', autopct=\'%1.1f%%\')\n    plt.title("Fuel Type Percentage Distribution")\n    plt.ylabel("")\n    plt.show()\n\n# -------------------- Box Plot: Price by Fuel Type --------------------\nif \'Fuel_Type\' in df.columns and \'Price\' in df.columns:\n    plt.figure()\n    df.boxplot(column=\'Price\', by=\'Fuel_Type\')\n    plt.title("Price Distribution by Fuel Type")\n    plt.suptitle("")\n    plt.xlabel("Fuel Type")\n    plt.ylabel("Price")\n    plt.show()\n',
         },
         samples: [{ input: "", output: "(5 plots displayed)\n" }],
       },
