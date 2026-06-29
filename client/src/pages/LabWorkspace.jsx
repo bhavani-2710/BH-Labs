@@ -395,9 +395,10 @@ export default function LabWorkspace({
 
   // Runs when experiment/subPart changes — pre-fill starter code for all languages
   useEffect(() => {
+    console.log(subExp)
     const initial = {};
     supportedLanguages.forEach(lang => {
-      initial[lang] = subExp?.starterCode?.templates?.[lang] || "";
+      initial[lang] = subExp?.referenceSolution?.[lang] || "";
     });
     setCodeByLang(initial);
     setConsoleOutput("");

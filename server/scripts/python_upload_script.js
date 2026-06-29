@@ -1,19 +1,10 @@
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-import path from "path";
-import { fileURLToPath } from "url";
-
-import Subject from "../models/Subject.js";
-import Experiment from "../models/Experiment.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, "../.env") });
-
+require("dotenv").config({ path: __dirname + "/../.env" });
+const mongoose = require("mongoose");
 const {
   Types: { ObjectId },
 } = mongoose;
+const Subject = require("../models/Subject");
+const Experiment = require("../models/Experiment");
 
 // ─── Subject ──────────────────────────────────────────────────────────────────
 const subjects = [
@@ -38,6 +29,12 @@ const experiments = [
       {
         part: "a",
         title: "Personalized Greeting Generator",
+        concepts: ["Basic Input/Output", "String Formatting", "f-strings"],
+        hints: [
+          "Use the input() function to read strings from the standard input.",
+          "Use f-strings (e.g. f'Hello, {name}!') for clean and modern string interpolation.",
+          "Remember that input() always returns a string; no type conversion is needed for names.",
+        ],
         problemStatement:
           "Write a python code to generate Personalized Greeting.",
         theory:
@@ -80,6 +77,12 @@ const experiments = [
       {
         part: "b",
         title: "Calculating Areas of Geometric Figures",
+        concepts: ["Functions", "Basic Mathematics", "Standard Library math"],
+        hints: [
+          "Import the math module to use math.pi for precise circle area calculations.",
+          "Create separate helper functions for each shape to keep the code modular and clean.",
+          "Use conditional statements (if-elif-else) to route the user's choice to the correct formula.",
+        ],
         problemStatement:
           "Write a Python program to calculate areas of any geometric figures like circle, rectangle and triangle.",
         theory:
@@ -126,6 +129,12 @@ const experiments = [
       {
         part: "c",
         title: "Developing Conversion Utilities",
+        concepts: ["Functions", "Arithmetic Operators", "Conditional Logic"],
+        hints: [
+          "Write conversion functions that accept a value and return the converted equivalent.",
+          "Use parameters with default arguments if you want to support fixed conversion rates (e.g. 83.5 for USD).",
+          "Format floating-point results to a specific number of decimal places using formatting (e.g., :.2f).",
+        ],
         problemStatement:
           "Develop any converter such as Rupees to dollar, temperature convertor, inch to feet etc.",
         theory:
@@ -164,6 +173,12 @@ const experiments = [
       {
         part: "d",
         title: "Calculating Gross Salary of an Employee",
+        concepts: ["Arithmetic Operators", "Variables", "Data Types"],
+        hints: [
+          "Prompt the user for input and convert the resulting string to a float before calculation.",
+          "Compute DA, TA, and HRA using multiplication operators: e.g., da = 0.7 * basic_salary.",
+          "Gross salary is the sum of basic salary and all allowances.",
+        ],
         problemStatement:
           "Write a Python program to calculate the gross salary of an employee. The program should prompt the user for the basic salary (BS) and then compute the dearness allowance (DA) as 70% of BS, the travel allowance (TA) as 30% of BS, and the house rent allowance (HRA) as 10% of BS. Finally, it should calculate the gross salary as the sum of BS, DA, TA, and HRA and display the result.",
         theory:
@@ -209,6 +224,12 @@ const experiments = [
       {
         part: "e",
         title: "Calculating Simple Interest",
+        concepts: ["Arithmetic Formulas", "User Input", "Type Casting"],
+        hints: [
+          "Convert input values to float since principal, rate, and time can be decimals.",
+          "Implement the formula: Simple Interest = (Principal * Rate * Time) / 100.",
+          "Add the interest to the principal to compute the total accumulated amount.",
+        ],
         problemStatement:
           "Write a Python program to calculate the simple interest based on user input. The program should prompt the user to enter the principal amount, the rate of interest, and the time period in years. It should then compute the simple interest using the formula Simple Interest=(Principal×Rate×Time)/100 and display the result.",
         theory:
@@ -249,6 +270,16 @@ const experiments = [
       {
         part: "f",
         title: "Exploring Basic Arithmetic Operations",
+        concepts: [
+          "Arithmetic Operators",
+          "Division Types",
+          "Formatted Outputs",
+        ],
+        hints: [
+          "In Python 3, the '/' operator performs true division and always returns a float.",
+          "Use the '%' operator for modulus to obtain the remainder of division.",
+          "Try converting inputs to float to allow arithmetic operations on both integers and decimals.",
+        ],
         problemStatement:
           "Write a Python program to explore basic arithmetic operations. The program should prompt the user to enter two numbers and then perform addition, subtraction, multiplication, division, and modulus operations on those numbers.",
         theory:
@@ -301,6 +332,12 @@ const experiments = [
       {
         part: "a",
         title: "Task List Manager",
+        concepts: ["Lists", "Mutable Sequences", "Interactive Menus"],
+        hints: [
+          "Use a Python list to store tasks; append() adds tasks, and remove() deletes them.",
+          "Use index lookup with lists to locate and update a specific task by value.",
+          "Use the sort() method to arrange tasks in alphabetical order in-place.",
+        ],
         problemStatement:
           "Develop a Python program to manage a task list using lists and tuples, including adding, removing, updating, and sorting tasks.",
         theory:
@@ -345,6 +382,12 @@ const experiments = [
       {
         part: "b",
         title: "Student Enrollment Manager",
+        concepts: ["Sets", "Set Operations", "Unordered Collections"],
+        hints: [
+          "Use curly braces {} or set() to define a set of student names.",
+          "Perform set operations: '|' for union, '&' for intersection, and '-' for set difference.",
+          "Remember that sets automatically eliminate duplicate entries.",
+        ],
         problemStatement:
           "Create a Python code to demonstrate the use of sets and perform set operations (union, intersection, difference) to manage student enrollments in multiple courses / appearing for multiple entrance exams like CET, JEE, NEET etc.",
         theory:
@@ -396,6 +439,12 @@ const experiments = [
       {
         part: "c",
         title: "Student Record Keeper",
+        concepts: ["Dictionaries", "Key-Value Stores", "Nested Structures"],
+        hints: [
+          "Use a dictionary where the student's roll number or ID serves as the unique key.",
+          "Values can be another nested dictionary containing student attributes like grade and attendance.",
+          "Use the items() method of a dictionary to iterate over key-value pairs simultaneously.",
+        ],
         problemStatement:
           "Write a Python program to create, update, and manipulate a dictionary of student records, including their grades and attendance.",
         theory:
@@ -451,6 +500,16 @@ const experiments = [
       {
         part: "a",
         title: "Triangle Pattern Generator Using Loops",
+        concepts: [
+          "Nested Loops",
+          "String Multiplication",
+          "Indentation in Python",
+        ],
+        hints: [
+          "Python supports string multiplication (e.g. '*' * 5) which simplifies printing repetitive patterns.",
+          "Use the range(1, n+1) function in a for loop to iterate from 1 up to 'n' inclusive.",
+          "Ensure proper indentation, as Python uses whitespace instead of curly braces to define blocks.",
+        ],
         problemStatement:
           "Write a Python program to print a triangle pattern (give any), emphasizing the transition from C to Python syntax.",
         theory:
@@ -491,6 +550,16 @@ const experiments = [
       {
         part: "b",
         title: "Number Type Identifier",
+        concepts: [
+          "Conditional Statements",
+          "Modulus Operator",
+          "Type Casting",
+        ],
+        hints: [
+          "Check if a number is even by testing if n % 2 == 0.",
+          "Use if-else statements to execute different print blocks based on the check.",
+          "Convert user input using int() to perform mathematical operations.",
+        ],
         problemStatement:
           "Develop a Python program that takes a numerical input and identifies whether it is even or odd, utilizing conditional statements and loops.",
         theory:
@@ -530,6 +599,16 @@ const experiments = [
       {
         part: "c",
         title: "Character Type Identifier",
+        concepts: [
+          "String Built-in Methods",
+          "Conditional Ladders",
+          "ASCII Checks",
+        ],
+        hints: [
+          "Use built-in string methods like ch.isdigit(), ch.islower(), and ch.isupper() for checks.",
+          "Structure the code using an if-elif-else ladder to evaluate each character classification.",
+          "If all isdigit(), islower(), and isupper() return False, classify the character as a special character.",
+        ],
         problemStatement:
           "Create a Python program to check whether the given input is a digit, lowercase character, uppercase character, or a special character using an 'if-else' ladder.",
         theory:
@@ -580,6 +659,12 @@ const experiments = [
       {
         part: "d",
         title: "Multiplication Table Generator",
+        concepts: ["Loop Control Structures", "Range Function", "f-strings"],
+        hints: [
+          "Use range(1, 11) to generate numbers from 1 to 10 for the multiplication table.",
+          "Format the output statement inside the loop using f-strings for clean layout (e.g. f'{n} x {i} = {n*i}').",
+          "An iterative for loop is more readable than a while loop for this scenario.",
+        ],
         problemStatement:
           "Write a Python program to take a numerical input from the user and generate its multiplication table using loops.",
         theory:
@@ -624,6 +709,16 @@ const experiments = [
       {
         part: "e",
         title: "Fibonacci Sequence Generator",
+        concepts: [
+          "While Loops",
+          "Multiple Assignment",
+          "Arbitrary-Precision Integers",
+        ],
+        hints: [
+          "Initialize two variables, a = 0 and b = 1, to represent the first two numbers of the sequence.",
+          "Use Python's multiple assignment feature: 'a, b = b, a + b' to update variables in a single line.",
+          "Use a loop counter or check if the sequence length has reached the target 'n'.",
+        ],
         problemStatement:
           "Develop a Python program to print the Fibonacci sequence using a while loop.",
         theory:
@@ -662,6 +757,12 @@ const experiments = [
       {
         part: "f",
         title: "Factorial Generator",
+        concepts: ["Iterative Loops", "Recursion", "Big Integers"],
+        hints: [
+          "Use a loop that multiplies a running product variable by each number from 1 to N.",
+          "Handle the base case: the factorial of 0 is defined as 1.",
+          "Python handles arbitrary-precision integers automatically, so you don't need to worry about overflow.",
+        ],
         problemStatement:
           "Design a Python program to compute the factorial of a given integer N.",
         theory:
@@ -703,6 +804,16 @@ const experiments = [
       {
         part: "g",
         title: "Prime Number Analyzer",
+        concepts: [
+          "Prime Numbers",
+          "Algorithm Optimization",
+          "Modulo Arithmetic",
+        ],
+        hints: [
+          "A prime number is greater than 1 and has no positive divisors other than 1 and itself.",
+          "Optimize search by checking for factors only up to the square root of the number (use math.isqrt or math.sqrt).",
+          "Immediately return False (not prime) if a factor is found; otherwise return True after the loop.",
+        ],
         problemStatement:
           "Using function, write a Python program to analyze the input number is prime or not.",
         theory:
@@ -747,6 +858,16 @@ const experiments = [
       {
         part: "h",
         title: "Simple Calculator Using Functions",
+        concepts: [
+          "Functions as First-Class Citizens",
+          "Dictionaries",
+          "Arithmetic Operations",
+        ],
+        hints: [
+          "Define helper functions for basic arithmetic tasks: addition, subtraction, multiplication, and division.",
+          "Use a dictionary mapping operator strings (e.g., '+', '/') to function objects for clean dispatch.",
+          "Check for division by zero using conditionals or try-except blocks in the division function.",
+        ],
         problemStatement:
           "Implement a simple Python calculator that takes user input and performs basic arithmetic operations (addition, subtraction, multiplication, division) using functions.",
         theory:
@@ -788,6 +909,12 @@ const experiments = [
       {
         part: "i",
         title: "Interactive Guessing Game",
+        concepts: ["Random Module", "Infinite Loops", "Conditional Branches"],
+        hints: [
+          "Import the random module and use random.randint(1, 100) to generate the target number.",
+          "Use an infinite loop ('while True') and terminate it using 'break' when the user guesses correctly.",
+          "Compare the user's guess to the secret number and print feedback like 'Too High' or 'Too Low'.",
+        ],
         problemStatement:
           "Develop a number guessing game where the program generates a random number, and the user has to guess it. Implement loops and conditional statements for user interaction.",
         theory:
@@ -846,6 +973,12 @@ const experiments = [
       {
         part: "a",
         title: "Extracting Words from Text File",
+        concepts: ["File I/O", "String Methods", "List Comprehensions"],
+        hints: [
+          "Use the 'with open(filename, 'r') as file:' context manager to safely open and read files.",
+          "Read file contents using file.read() and split into words using split().",
+          "Strip punctuation marks from words using string.strip() to clean the extracted data.",
+        ],
         problemStatement:
           "Develop a Python program that reads a text file and prints words of specified lengths (e.g., three, four, five, etc.) found within the file.",
         theory:
@@ -891,6 +1024,12 @@ const experiments = [
       {
         part: "b",
         title: "Finding Closest Points in 3D Coordinates from CSV",
+        concepts: ["CSV Processing", "Euclidean Distance", "Optimization"],
+        hints: [
+          "Use Python's built-in csv module (csv.reader) to read coordinate rows from a file.",
+          "Implement the 3D distance formula: d = sqrt((x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2).",
+          "Use nested loops to calculate distances between all pairs of coordinates and track the minimum.",
+        ],
         problemStatement:
           "Write a python code to take a csv file as input with coordinates of points in three dimensions. Find out the two closest points.",
         theory:
@@ -949,6 +1088,12 @@ const experiments = [
       {
         part: "c",
         title: "Sorting City Names from File",
+        concepts: ["File Operations", "Sorting Lists", "Writing Files"],
+        hints: [
+          "Read city names from an input file, storing each line as an item in a list.",
+          "Use the strip() method to remove trailing newline characters from each name.",
+          "Sort the list in-place using sort() and write the sorted names to a new output file.",
+        ],
         problemStatement:
           "Write a python code to take a file which contains city names on each line. Alphabetically sort the city names and write it in another file.",
         theory:
@@ -999,6 +1144,16 @@ const experiments = [
       {
         part: "d",
         title: "Building an Executable File",
+        concepts: [
+          "PyInstaller",
+          "Python Scripts packaging",
+          "Command-line Utilities",
+        ],
+        hints: [
+          "Use tools like PyInstaller to bundle your Python script and all dependencies into a single executable.",
+          "Run 'pyinstaller --onefile script.py' in the terminal to package it as a single file.",
+          "Verify that the executable works in environments without a Python interpreter installed.",
+        ],
         problemStatement:
           "Create a executable file for any program developed in earlier practical.",
         theory:
@@ -1052,6 +1207,12 @@ const experiments = [
       {
         part: "a",
         title: "Basic Exception Handling",
+        concepts: ["Try-Except Blocks", "Error Catching", "Input Validation"],
+        hints: [
+          "Wrap dangerous operations (like division or user input conversions) in a try block.",
+          "Catch specific exceptions like ZeroDivisionError or ValueError to prevent script crashes.",
+          "Use an except block to display a user-friendly error message when something goes wrong.",
+        ],
         problemStatement:
           "Write a Python program that takes two numbers as input and performs division. Implement exception handling to manage division by zero and invalid input errors gracefully.",
         theory:
@@ -1098,6 +1259,16 @@ const experiments = [
       {
         part: "b",
         title: "Custom Exceptions",
+        concepts: [
+          "Object-Oriented Programming",
+          "Inheritance",
+          "Exception Handling",
+        ],
+        hints: [
+          "Define custom exception classes by inheriting from Python's built-in Exception class.",
+          "Use the 'raise' keyword to trigger your custom exception when specific validation rules fail.",
+          "Include descriptive error messages when raising the exception so users understand the issue.",
+        ],
         problemStatement:
           "Develop a Python program that simulates a banking system with a function to withdraw money. Raise custom exceptions for scenarios such as insufficient funds and invalid account numbers.",
         theory:
@@ -1144,6 +1315,12 @@ const experiments = [
       {
         part: "c",
         title: "Logging for Debugging",
+        concepts: ["Standard logging Module", "Log Levels", "File Logging"],
+        hints: [
+          "Import the logging module and configure it using logging.basicConfig().",
+          "Set appropriate logging levels like DEBUG, INFO, WARNING, ERROR, and CRITICAL.",
+          "Redirect logs to a file using the filename argument in basicConfig to preserve debugging history.",
+        ],
         problemStatement:
           "Enhance a Python program by adding logging statements to record the flow of execution and error messages. Use the logging module to configure different logging levels (INFO, DEBUG, ERROR).",
         theory:
@@ -1195,6 +1372,12 @@ const experiments = [
       {
         part: "d",
         title: "Using a Debugger",
+        concepts: ["Pdb Module", "Breakpoints", "Interactive Debugging"],
+        hints: [
+          "Import the pdb module and insert 'pdb.set_trace()' to pause code execution at a specific line.",
+          "Use commands like 'n' (next line), 's' (step into), and 'c' (continue execution) inside the debugger.",
+          "Print variable values directly in the debugger prompt to inspect the application state.",
+        ],
         problemStatement:
           "Demonstrate the use of a Python debugger (e.g., pdb or an IDE with debugging capabilities) on a sample program with intentional errors. Guide students on setting breakpoints, stepping through code, and examining variable values.",
         theory:
@@ -1239,6 +1422,16 @@ const experiments = [
       {
         part: "e",
         title: "Scientific Debugging Techniques",
+        concepts: [
+          "Debugging Methodologies",
+          "Hypothesis Testing",
+          "Assert Statements",
+        ],
+        hints: [
+          "Formulate a hypothesis about the bug and use print/logs to confirm or reject it.",
+          "Use python's 'assert' statements to enforce invariants and catch logic errors early.",
+          "Isolate the buggy code by writing minimal test cases with expected inputs and outputs.",
+        ],
         problemStatement:
           "Provide a Python program with multiple logic and runtime errors. Instruct students to apply scientific debugging techniques, such as binary search debugging, to identify and resolve the issues methodically.",
         theory:
@@ -1296,6 +1489,16 @@ const experiments = [
       {
         part: "a",
         title: "Event Management System",
+        concepts: [
+          "Object-Oriented Programming",
+          "Classes and Objects",
+          "List Attributes",
+        ],
+        hints: [
+          "Create an Event class with attributes like name, date, and attendee_list.",
+          "Implement methods within the class to add attendees, remove attendees, and display event details.",
+          "Instantiate multiple event objects to represent different schedules.",
+        ],
         problemStatement:
           "Implement an event management system using OOP concepts (encapsulation, inheritance, polymorphism) to manage college festivals or events. Design classes for events, organizers, participants, and activities, including methods for event registration, scheduling, participant management, and activity coordination.",
         theory:
@@ -1345,6 +1548,16 @@ const experiments = [
       {
         part: "b",
         title: "Online Shopping System",
+        concepts: [
+          "Object-Oriented Programming",
+          "Class Associations",
+          "Logic Methods",
+        ],
+        hints: [
+          "Define classes like Product, Cart, and Customer to represent actors in the shopping system.",
+          "The Cart class should contain a list of Product objects and methods to calculate the total price.",
+          "Enable customers to add items to their cart, update quantities, and checkout.",
+        ],
         problemStatement:
           "Develop an online shopping system using OOP principles. Create classes for products, customers, and shopping carts, with methods for adding items to the cart, calculating total costs, processing orders, and managing inventory.",
         theory:
@@ -1390,6 +1603,12 @@ const experiments = [
       {
         part: "c",
         title: "Vehicle Rental System",
+        concepts: ["OOP Inheritance", "Polymorphism", "Abstract Base Classes"],
+        hints: [
+          "Create a parent Vehicle class and inherit from it to build Car, Bike, and Truck subclasses.",
+          "Override common methods (like calculate_rental_cost) in subclass definitions for specialized logic.",
+          "Use constructor delegation (super().__init__) to pass common attributes to the parent class.",
+        ],
         problemStatement:
           "Design a vehicle rental system using OOP principles with classes for vehicles, rental agencies, and rental transactions. Implement methods to handle vehicle availability, rental periods, pricing, and customer bookings.",
         theory:
@@ -1449,6 +1668,12 @@ const experiments = [
       {
         part: "a",
         title: "GUI for Developing Conversion Utilities",
+        concepts: ["Tkinter Library", "GUI Components", "Event Handling"],
+        hints: [
+          "Import tkinter (or tkinter.ttk) to build windows, input fields (Entry), and labels.",
+          "Define callback functions to process input when the user clicks the convert Button.",
+          "Use grid() or pack() geometry managers to place buttons and inputs neatly on the screen.",
+        ],
         problemStatement:
           "Develop a Python GUI application that performs various unit conversions such as currency (Rupees to Dollars), temperature (Celsius to Fahrenheit), and length (Inches to Feet). Include input fields, dropdown menus or buttons for selection, and labels to display results.",
         theory:
@@ -1488,6 +1713,12 @@ const experiments = [
       {
         part: "b",
         title: "GUI for Calculating Areas of Geometric Figures",
+        concepts: ["Tkinter Geometry", "Event Bindings", "Dynamic UI Elements"],
+        hints: [
+          "Create a window that allows users to select a shape using options like dropdown menus or radio buttons.",
+          "Dynamically display input entry boxes depending on the selected shape (e.g. radius for circle, length/width for rectangle).",
+          "Read input values, perform calculations, and display the calculated area in a label widget.",
+        ],
         problemStatement:
           "Develop a Python GUI application to calculate areas of geometric figures such as circles, rectangles, and triangles. Include input fields for dimensions, buttons to trigger calculations, and labels to display the results.",
         theory:
@@ -1531,6 +1762,12 @@ const experiments = [
       {
         part: "c",
         title: "College Admission Registration Form",
+        concepts: ["Tkinter Forms", "Input Validation", "Data Storage"],
+        hints: [
+          "Use various Tkinter widgets: Entry (for text), Radiobuttons (for gender), and Checkbuttons (for courses).",
+          "Implement validation to verify that required fields are filled before submitting the form.",
+          "Write the submitted registration data to a text or CSV file for persistent storage.",
+        ],
         problemStatement:
           "Create a GUI application for a college admission registration form that collects personal, educational, and contact information. The interface should include text fields for names, radio buttons for branch selection, checkboxes for favorite games, and a submit button that displays a formatted output message based on user inputs.",
         theory:
@@ -1582,6 +1819,12 @@ const experiments = [
       {
         part: "a",
         title: "Script to Validate Phone Number and Email ID",
+        concepts: ["Regular Expressions", "re Module", "Pattern Matching"],
+        hints: [
+          "Import the re module and use re.match() or re.fullmatch() for pattern validation.",
+          "Use the email regex pattern: r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'.",
+          "Use the phone regex pattern for 10-digit validation: r'^[6-9]\d{9}$'.",
+        ],
         problemStatement:
           "Write a Python script that prompts the user to enter their phone number and email ID, employing regular expressions to verify if these inputs adhere to standard formats.",
         theory:
@@ -1634,6 +1877,12 @@ const experiments = [
       {
         part: "b",
         title: "Password Strength Checker",
+        concepts: ["Regular Expressions", "String Analysis", "Logic Checks"],
+        hints: [
+          "Check password length first (e.g., minimum 8 characters).",
+          "Use regular expressions to verify the presence of uppercase, lowercase, numbers, and special symbols.",
+          "Assign strength levels (Weak, Medium, Strong) based on how many criteria the password meets.",
+        ],
         problemStatement:
           "Write a Python script that prompts the user to enter a password and uses regular expressions to validate it based on criteria: at least 8 characters long, contains at least one uppercase letter, one lowercase letter, one digit, and one special character.",
         theory:
@@ -1692,6 +1941,12 @@ const experiments = [
       {
         part: "c",
         title: "URL Validator",
+        concepts: ["Regular Expressions", "URL Anatomy", "Pattern Validation"],
+        hints: [
+          "Construct a regex pattern matching URL components: protocol (http/https), domain, optional port, and path.",
+          "Ensure the URL pattern allows optional components like 'www' or query parameters.",
+          "Use re.match() to check if the input URL conforms to the standard URL structure.",
+        ],
         problemStatement:
           "Develop a script that verifies if a given string is a valid URL using regular expressions to check for standard formats, including protocols (http, https), domain names, and optional path segments.",
         theory:
@@ -1736,6 +1991,12 @@ const experiments = [
       {
         part: "d",
         title: "Extracting Data from Text",
+        concepts: ["Regular Expressions", "re.findall", "Pattern Extraction"],
+        hints: [
+          "Use re.findall() to search and extract all occurrences of a pattern (like email addresses or phone numbers) in a large text.",
+          "Use regex character classes and qualifiers to capture desired text structures precisely.",
+          "Iterate and print the list of extracted matches.",
+        ],
         problemStatement:
           "Create a program that reads a text file containing various data (e.g., names, emails, phone numbers) and uses regular expressions to extract specific types of data, such as email addresses, phone numbers, and dates (e.g., MM/DD/YYYY format).",
         theory:
@@ -1788,6 +2049,12 @@ const experiments = [
       {
         part: "a",
         title: "Creating and Manipulating Arrays",
+        concepts: ["NumPy Arrays", "Array Creation", "Vectorized Operations"],
+        hints: [
+          "Import numpy as np and use np.array() to convert lists into multidimensional arrays.",
+          "Use helper functions like np.arange() or np.zeros() to generate initial arrays easily.",
+          "Inspect array dimensions and types using properties like shape, ndim, and dtype.",
+        ],
         problemStatement:
           "Write a Python program to create a 1D, 2D, and 3D NumPy array, and perform basic operations like reshaping, slicing, and indexing.",
         theory:
@@ -1827,6 +2094,12 @@ const experiments = [
       {
         part: "b",
         title: "Array Mathematics",
+        concepts: ["NumPy Vectorization", "Matrix Arithmetic", "Broadcasting"],
+        hints: [
+          "Use standard arithmetic operators (+, -, *, /) to perform element-wise array operations in NumPy.",
+          "Use np.dot() or the '@' operator to perform matrix multiplication.",
+          "Understand broadcasting: NumPy's mechanism to perform operations on arrays of different shapes.",
+        ],
         problemStatement:
           "Develop a Python script to create two arrays of the same shape and perform element-wise addition, subtraction, multiplication, and division; additionally, calculate the dot product and cross product of two vectors.",
         theory:
@@ -1872,6 +2145,16 @@ const experiments = [
       {
         part: "c",
         title: "Statistical Operations",
+        concepts: [
+          "NumPy Statistics",
+          "Descriptive Statistics",
+          "Data Aggregation",
+        ],
+        hints: [
+          "Use NumPy functions like np.mean(), np.median(), and np.std() to compute descriptive statistics.",
+          "Specify the axis parameter (axis=0 for columns, axis=1 for rows) to calculate statistics along a specific dimension.",
+          "Find minimum and maximum values using np.min() and np.max() respectively.",
+        ],
         problemStatement:
           "Write a Python program to calculate mean, median, standard deviation, variance, and correlation coefficients of a given array.",
         theory:
@@ -1930,6 +2213,12 @@ const experiments = [
       {
         part: "a",
         title: "Data Analysis on Global COVID-19 Dataset",
+        concepts: ["Pandas DataFrames", "Data Filtering", "Data Aggregation"],
+        hints: [
+          "Import pandas as pd and read the dataset using pd.read_csv().",
+          "Use head() and info() to quickly inspect the DataFrame structure.",
+          "Perform filtering (e.g. df[df['cases'] > 1000]) and group data by country/region using groupby().",
+        ],
         problemStatement:
           "Load a CSV file of global COVID-19 cases into a DataFrame, display the first few rows, check data types, and summarize basic statistics. Perform data cleaning to handle missing values and duplicates, execute aggregation operations, and generate various plots (line, bar, histogram, scatter) to visualize trends and relationships.",
         theory:
@@ -1981,6 +2270,16 @@ const experiments = [
       {
         part: "b",
         title: "Data Analysis on Iris Dataset",
+        concepts: [
+          "Pandas DataFrames",
+          "Statistical Grouping",
+          "Descriptive Analysis",
+        ],
+        hints: [
+          "Load the Iris dataset and inspect group statistics using groupby('species').mean().",
+          "Check for missing data using isnull().sum() and handle it if necessary.",
+          "Use describe() to obtain standard summary statistics for numerical features (mean, std, min, max, quartiles).",
+        ],
         problemStatement:
           "Using the Iris dataset, read the first 8 rows, display column names, fill missing data with column means, remove rows with missing values, group data by species, and calculate/display mean, minimum, and maximum values for the Sepal length column.",
         theory:
@@ -2028,6 +2327,16 @@ const experiments = [
       {
         part: "c",
         title: "Data Analysis on Cars Dataset",
+        concepts: [
+          "Pandas Data Manipulation",
+          "Sorting and Filtering",
+          "Data Cleaning",
+        ],
+        hints: [
+          "Read the cars dataset and filter rows based on conditions (e.g., horsepower > 150 or mpg > 30).",
+          "Sort the DataFrame by specific columns like price or fuel efficiency using sort_values().",
+          "Calculate summary metrics such as the average mileage or total count of cars per manufacturer.",
+        ],
         problemStatement:
           "Using the Cars dataset, create a scatter plot of Age vs. Price, a histogram of kilometers driven, a bar plot of distribution by fuel type, a pie chart for fuel type percentage distribution, and a box plot for car prices across different fuel types.",
         theory:

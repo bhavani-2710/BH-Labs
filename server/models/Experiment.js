@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const sampleSchema = new mongoose.Schema(
   {
     input: { type: String, default: "" },
-    output: { type: String, default: "" }
+    output: { type: String, default: "" },
   },
   {
     _id: false,
-  }
+  },
 );
 
 const subExperimentSchema = new mongoose.Schema(
@@ -47,19 +47,21 @@ const subExperimentSchema = new mongoose.Schema(
         },
       ],
     },
-    starterCode: {
-      supportedLanguages: {
-        type: [String],
-        default: [],
-      },
-      templates: {
-        type: Map,
-        of: String,
-        default: {},
-      },
+    referenceSolution: {
+      type: Map,
+      of: String, // Key: language (e.g., 'python'), Value: solution code
+      default: {},
     },
     samples: {
       type: [sampleSchema],
+      default: [],
+    },
+    hints: {
+      type: [String],
+      default: [],
+    },
+    concepts: {
+      type: [String],
       default: [],
     },
     difficulty: {
@@ -70,7 +72,7 @@ const subExperimentSchema = new mongoose.Schema(
   },
   {
     _id: false,
-  }
+  },
 );
 
 const experimentSchema = new mongoose.Schema(
@@ -86,37 +88,22 @@ const experimentSchema = new mongoose.Schema(
       required: true,
     },
 
-    title: {
+    problemStatement: {
       type: String,
-      trim: true,
-    },
-
-    problemStatement: String,
-
-    theory: String,
-
-    algorithm: String,
-
-
-    difficulty: {
-      type: String,
-      enum: ["Easy", "Medium", "Hard"],
+      required: true,
     },
 
     subExperiments: {
       type: [subExperimentSchema],
-      default: [],
+      required: true,
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Prevent duplicate experiment number for same subject
-experimentSchema.index(
-  { subjectId: 1, experimentNumber: 1 },
-  { unique: true }
-);
+experimentSchema.index({ subjectId: 1, experimentNumber: 1 }, { unique: true });
 
 module.exports = mongoose.model("Experiment", experimentSchema);
