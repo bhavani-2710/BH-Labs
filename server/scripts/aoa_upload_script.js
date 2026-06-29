@@ -41,6 +41,7 @@ const experiments = [
           "Swap the found minimum element with the first element of the unsorted portion.",
           "Maintain two subarrays: one sorted and one unsorted.",
         ],
+        difficulty: "Easy",
         problemStatement: "Implement and analyze the Selection Sort algorithm.",
         theory:
           "Selection Sort divides the array into sorted and unsorted regions. Each pass finds the minimum element in the unsorted region and swaps it into the correct position. Time complexity: O(n²) in all cases; Space: O(1). It performs at most n-1 swaps, making it useful when memory writes are costly.",
@@ -84,6 +85,7 @@ const experiments = [
           "Shift elements larger than the key to the right to make space for the key.",
           "Start from the second element (index 1) and compare it with elements before it.",
         ],
+        difficulty: "Easy",
         problemStatement: "Implement and analyze the Insertion Sort algorithm.",
         theory:
           "Insertion Sort builds a sorted subarray one element at a time by picking each element and inserting it into its correct position. Time: O(n²) worst/average, O(n) best (already sorted); Space: O(1). Stable and in-place; efficient for small or nearly-sorted datasets.",
@@ -139,6 +141,7 @@ const experiments = [
           "Sort the individual halves and then merge them back together in sorted order.",
           "Use auxiliary arrays to store temp halves during the merge step.",
         ],
+        difficulty: "Medium",
         problemStatement: "Implement and analyze the Merge Sort algorithm.",
         theory:
           "Merge Sort is a divide-and-conquer algorithm that recursively splits the array into two halves, sorts each, and merges them. Time: O(n log n) all cases; Space: O(n) auxiliary. Stable sort, well-suited for large datasets and linked lists.",
@@ -188,6 +191,7 @@ const experiments = [
           "Partition the array such that elements smaller than the pivot are on the left and larger on the right.",
           "Recursively apply the quicksort algorithm to the left and right partitions.",
         ],
+        difficulty: "Medium",
         problemStatement: "Implement and analyze the Quick Sort algorithm.",
         theory:
           "Quick Sort selects a pivot and partitions the array so smaller elements come before it and larger after. Time: O(n log n) average, O(n²) worst; Space: O(log n) stack. In-place, not stable. Generally faster than Merge Sort in practice due to cache efficiency.",
@@ -241,6 +245,7 @@ const experiments = [
           "Use low and high pointers to track the current search range.",
           "Calculate the mid index and narrow the search range based on comparing target with array[mid].",
         ],
+        difficulty: "Easy",
         problemStatement: "Implement and analyze the Binary Search algorithm.",
         theory:
           "Binary Search finds a target in a sorted array by repeatedly halving the search interval. Time: O(log n); Space: O(1) iterative. The array must be sorted beforehand. If mid equals the target return its index; otherwise narrow the search to the left or right half.",
@@ -308,6 +313,7 @@ const experiments = [
           "Repeatedly choose the unvisited vertex with the minimum distance.",
           "Relax the neighboring vertices of the selected vertex by updating their shortest path distance.",
         ],
+        difficulty: "Medium",
         problemStatement:
           "Implement and analyze Dijkstra's Algorithm for Single Source Shortest Path.",
         theory:
@@ -369,6 +375,7 @@ const experiments = [
           "Sort the items in descending order of their value-to-weight ratios.",
           "Greedily choose the items with the highest ratios, taking fractions of items if capacity is reached.",
         ],
+        difficulty: "Medium",
         problemStatement:
           "Implement and analyze the Fractional Knapsack Problem.",
         theory:
@@ -422,6 +429,7 @@ const experiments = [
           "For Prim's, start from an arbitrary vertex and grow the tree by adding the minimum weight edge connecting the tree to unvisited vertices.",
           "An MST of a graph with V vertices always contains exactly V-1 edges and no cycles.",
         ],
+        difficulty: "Hard",
         problemStatement:
           "Implement and analyze Kruskal's and Prim's algorithms for Minimum Cost Spanning Trees.",
         theory:
@@ -486,6 +494,7 @@ const experiments = [
           "Iteratively update the shortest distance between all pairs of vertices using every vertex 'k' as an intermediate node.",
           "Check if distance from i to j can be minimized by passing through k: dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]).",
         ],
+        difficulty: "Hard",
         problemStatement:
           "Implement and analyze the All-Pairs Shortest Path using the Floyd-Warshall algorithm.",
         theory:
@@ -538,6 +547,7 @@ const experiments = [
           "Build a 2D DP table where dp[i][w] represents the maximum value using the first 'i' items with capacity 'w'.",
           "The recurrence relation is: dp[i][w] = max(val[i-1] + dp[i-1][w-wt[i-1]], dp[i-1][w]).",
         ],
+        difficulty: "Hard",
         problemStatement: "Implement and analyze the 0/1 Knapsack problem.",
         theory:
           "0/1 Knapsack uses DP: dp[i][w] = max value using first i items with capacity w. Each item is taken whole or not at all. Time: O(nW); Space: O(nW). Answer is dp[n][W].",
@@ -603,6 +613,7 @@ const experiments = [
           "Define dp[mask][i] as the minimum cost to visit all cities in the bitmask ending at city 'i'.",
           "The base case is when all cities are visited; return to the starting city to complete the round-trip.",
         ],
+        difficulty: "Hard",
         problemStatement:
           "Implement and analyze the Travelling Salesperson Problem.",
         theory:
@@ -663,6 +674,7 @@ const experiments = [
           "If characters match, add 1 to the diagonal cell value: dp[i][j] = dp[i-1][j-1] + 1.",
           "If characters mismatch, take the maximum of top and left cell values: dp[i][j] = max(dp[i-1][j], dp[i][j-1]).",
         ],
+        difficulty: "Hard",
         problemStatement:
           "Implement and analyze the Longest Common Subsequence problem.",
         theory:
@@ -719,6 +731,7 @@ const experiments = [
           "Use recursion or a stack for Depth-First Search (DFS) to explore as deep as possible before backtracking.",
           "Maintain a visited array to keep track of explored vertices and prevent infinite loops.",
         ],
+        difficulty: "Medium",
         problemStatement:
           "Implement and analyze fundamental graph algorithms including Breadth-First Search (BFS) and Depth-First Search (DFS).",
         theory:
@@ -776,6 +789,7 @@ const experiments = [
           "Before placing a queen, verify if it is safe from attack by other queens (check row, column, and both diagonals).",
           "If a placement leads to no valid configurations, backtrack by removing the queen and trying the next position.",
         ],
+        difficulty: "Hard",
         problemStatement: "Implement and analyze the N-Queens problem.",
         theory:
           "Place N queens on an N×N board so no two attack each other (same row, column, or diagonal). Solved by backtracking: place column by column, verify safety, and backtrack if no safe row exists. Time: O(N!); demonstrates systematic search with pruning.",
@@ -826,6 +840,7 @@ const experiments = [
           "At each step, make two choices: include the current element or exclude it.",
           "Backtrack if the current sum equals the target, or if the sum of remaining elements is insufficient to reach the target.",
         ],
+        difficulty: "Hard",
         problemStatement: "Implement and analyze the Sum of Subsets problem.",
         theory:
           "Find all subsets of a given set that sum to target M using backtracking. Sorting enables pruning: if current sum exceeds M or remaining elements cannot contribute enough, backtrack immediately. Time: O(2^n) worst case.",
@@ -871,6 +886,7 @@ const experiments = [
           "Ensure that no two adjacent vertices share the same color (isSafe helper check).",
           "If a vertex cannot be colored with any of the available colors, backtrack and change the color of the previously colored vertex.",
         ],
+        difficulty: "Hard",
         problemStatement: "Implement and analyze the Graph Coloring problem.",
         theory:
           "Assign colors to vertices so no two adjacent vertices share the same color, using at most m colors. Solved by backtracking: try each color per vertex, backtrack on conflict. Time: O(m^V) worst case. Applications: register allocation, scheduling, map coloring.",
@@ -935,6 +951,7 @@ const experiments = [
           "Compute an upper bound (for maximization problems) using fractional relaxation to prune unpromising branches.",
           "Discard any node whose upper bound is less than the current best solution found.",
         ],
+        difficulty: "Hard",
         problemStatement:
           "Implement and analyze optimization problems using the branch and bound strategy.",
         theory:
@@ -1005,6 +1022,7 @@ const experiments = [
           "Check for a match at each position by comparing characters index-by-index.",
           "The maximum number of shifts/positions to check is n-m, where n is text length and m is pattern length.",
         ],
+        difficulty: "Medium",
         problemStatement:
           "Implement and analyze the Naive String-Matching algorithm.",
         theory:
@@ -1054,6 +1072,7 @@ const experiments = [
           "Use a rolling hash function to update the substring hash value in O(1) time as you slide the window.",
           "Only perform character-by-character comparison if the hash values match, to handle potential hash collisions.",
         ],
+        difficulty: "Medium",
         problemStatement: "Implement and analyze the Rabin-Karp algorithm.",
         theory:
           "Rabin-Karp uses a rolling hash to find pattern matches. If a window's hash matches the pattern hash, it verifies character-by-character. Rolling hash computes the next window in O(1). Average time: O(n+m); worst case: O(n*m) with many hash collisions.",
@@ -1109,6 +1128,7 @@ const experiments = [
           "Use the LPS array to skip unnecessary character comparisons when a mismatch occurs.",
           "Never backtrack the text pointer 'i'; only shift the pattern pointer 'j' based on the LPS value.",
         ],
+        difficulty: "Hard",
         problemStatement:
           "Implement and analyze the Knuth-Morris-Pratt (KMP) algorithm.",
         theory:
@@ -1173,6 +1193,7 @@ const experiments = [
           "At leaf nodes, return the heuristic evaluation value of the board state.",
           "Implement Alpha-Beta pruning to discard branches that cannot influence the final decision, reducing the search space.",
         ],
+        difficulty: "Medium",
         problemStatement: "Implement and analyze the Min-Max algorithm.",
         theory:
           "Min-Max is used in two-player zero-sum game trees. The Maximizer picks the highest-scoring move; the Minimizer picks the lowest. The algorithm recursively evaluates all possible moves. Time: O(b^d). Alpha-Beta pruning reduces this to O(b^(d/2)) by eliminating irrelevant branches.",
@@ -1231,6 +1252,7 @@ const experiments = [
           "For each job, find the latest available time slot that is less than or equal to its deadline.",
           "If a slot is found, allocate it to the job and add the job's profit to the total profit.",
         ],
+        difficulty: "Hard",
         problemStatement:
           "Implement and analyze the Job Sequencing with Deadlines problem.",
         theory:
@@ -1298,6 +1320,7 @@ const experiments = [
           "To detect negative weight cycles, run a V-th relaxation step; if any distance decreases, a negative cycle exists.",
           "Unlike Dijkstra's algorithm, Bellman-Ford can handle negative weight edges.",
         ],
+        difficulty: "Hard",
         problemStatement:
           "Implement and analyze the Bellman-Ford Algorithm using dynamic programming.",
         theory:
