@@ -4,7 +4,7 @@ const path = require("path");
 const Subject = require("../models/Subject");
 const Experiment = require("../models/Experiment");
 const VivaQA = require("../models/VivaQA");
-const { generateVivaQA } = require("./aiController");
+const { generateVivaQA } = require("../services/vivaServices");
 
 // Groq client for Whisper transcription (free, fast, accurate for technical terms)
 const getGroqClient = () => {
