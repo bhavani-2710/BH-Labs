@@ -7,6 +7,7 @@ const {
   generateVivaQuestions, 
   evaluateVivaAnswer,
   transcribeAudio,
+  getVivaQA,
 } = require("../controllers/vivaController");
 
 const router = express.Router();
@@ -30,5 +31,10 @@ router.post("/", saveVivaScore);
 router.post("/generate", generateVivaQuestions);
 router.post("/evaluate", evaluateVivaAnswer);
 router.post("/transcribe", upload.single("audio"), transcribeAudio);
+
+// POST /api/vivas/qa
+// Body: { experimentId, part }
+// Returns cached Q&A from DB, or generates + stores via OpenAI
+router.post("/qa", getVivaQA);
 
 module.exports = router;

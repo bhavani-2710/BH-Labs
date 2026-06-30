@@ -3,6 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const Subject = require("../models/Subject");
 const Experiment = require("../models/Experiment");
+const VivaQA = require("../models/VivaQA");
+const { generateVivaQA } = require("./aiController");
 
 // Groq client for Whisper transcription (free, fast, accurate for technical terms)
 const getGroqClient = () => {
@@ -361,11 +363,59 @@ const transcribeAudio = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/vivas/qa
+ * Body: { experimentId, part }
+ *
+ * If a VivaQA document already exists for (experimentId, part), return it.
+ * Otherwise fetch the sub-experiment from the Experiment document, call OpenAI
+ * to generate 7-9 Q&A pairs, persist them, and return.
+ */
+const getVivaQA = async (req, res) => {
+  try {
+    const { experimentId, part } = req.body;
+
+    if (!experimentId || !part) {
+      return res.status(400).json({ error: "experimentId and part are required" });
+    }
+
+    // 1. Check DB cache first
+    const existing = await VivaQA.findOne({ experimentId, part });
+    if (existing) {
+      return res.json({ source: "db", qaPairs: existing.qaPairs });
+    }
+
+    // 2. Load the experiment and locate the matching sub-experiment
+    const experiment = await Experiment.findById(experimentId);
+    if (!experiment) {
+      return res.status(404).json({ error: "Experiment not found" });
+    }
+
+    const subExp = experiment.subExperiments.find(
+      (s) => s.part && s.part.toLowerCase() === part.toLowerCase(),
+    );
+    if (!subExp) {
+      return res.status(404).json({ error: `Sub-experiment with part "${part}" not found` });
+    }
+
+    // 3. Generate via OpenAI
+    const qaPairs = await generateVivaQA(subExp);
+
+    // 4. Persist to DB so subsequent requests are instant
+    const doc = await VivaQA.create({ experimentId, part, qaPairs });
+
+    return res.status(201).json({ source: "ai", qaPairs: doc.qaPairs });
+  } catch (err) {
+    console.error("getVivaQA error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getVivas,
   saveVivaScore,
   generateVivaQuestions,
   evaluateVivaAnswer,
   transcribeAudio,
+  getVivaQA,
 };
-

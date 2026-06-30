@@ -9,7 +9,7 @@ import LabWorkspace from "./pages/LabWorkspace";
 import VivaPractice from "./pages/VivaPractice";
 import PracticalJournal from "./pages/PracticalJournal";
 
-const API = import.meta.env.VITE_API_URL 
+const API = import.meta.env.VITE_API_URL;
 
 // ====================== WRAPPERS ======================
 
@@ -18,16 +18,22 @@ function SubjectsListWrapper() {
   return (
     <SubjectsListPage
       onNavigate={(page, params) => {
-        if (page === "subject-detail")    navigate(`/subject/${params.subjectId}`);
-        else if (page === "viva-subject") navigate(`/viva/subject/${params.subjectId}`);
-        else                              navigate(`/${page}`);
+        if (page === "subject-detail") navigate(`/subject/${params.subjectId}`);
+        else if (page === "viva-subject")
+          navigate(`/viva/subject/${params.subjectId}`);
+        else navigate(`/${page}`);
       }}
       onSelectSubject={(subjectId) => navigate(`/subject/${subjectId}`)}
     />
   );
 }
 
-function SubjectDetailWrapper({ subjects, experiments, subjectSpecificExperiments, setSubjectSpecificExperiments }) {
+function SubjectDetailWrapper({
+  subjects,
+  experiments,
+  subjectSpecificExperiments,
+  setSubjectSpecificExperiments,
+}) {
   const { subjectId } = useParams();
   const navigate = useNavigate();
 
@@ -71,7 +77,7 @@ function SubjectDetailWrapper({ subjects, experiments, subjectSpecificExperiment
 function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
   const { experimentId, part } = useParams();
   const navigate = useNavigate();
-  const experiment = experiments.find(e => e._id === experimentId);
+  const experiment = experiments.find((e) => e._id === experimentId);
 
   return (
     <LabWorkspace
@@ -84,8 +90,10 @@ function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
         else navigate("/subjects");
       }}
       onNavigate={(page, params) => {
-        if (page === "viva")    navigate(`/viva/${params.experimentId}/${params.part || "a"}`);
-        if (page === "journal") navigate(`/journal/${params.experimentId}/${params.part || "a"}`);
+        if (page === "viva")
+          navigate(`/viva/${params.experimentId}/${params.part || "a"}`);
+        if (page === "journal")
+          navigate(`/journal/${params.experimentId}/${params.part || "a"}`);
       }}
     />
   );
@@ -94,7 +102,7 @@ function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
 function VivaWrapper({ experiments, onCompleteViva }) {
   const { experimentId, part } = useParams();
   const navigate = useNavigate();
-  const experiment = experiments.find(e => e._id === experimentId);
+  const experiment = experiments.find((e) => e._id === experimentId);
 
   return (
     <VivaPractice
@@ -127,7 +135,7 @@ function SubjectVivaWrapper({ onCompleteViva }) {
 function JournalWrapper({ experiments, codeStore }) {
   const { experimentId, part } = useParams();
   const navigate = useNavigate();
-  const experiment = experiments.find(e => e._id === experimentId);
+  const experiment = experiments.find((e) => e._id === experimentId);
   const key = `${experimentId}_${part || "a"}`;
 
   return (
@@ -143,13 +151,15 @@ function JournalWrapper({ experiments, codeStore }) {
 // ====================== MAIN APP ======================
 
 export default function App() {
-  const [subjects, setSubjects]                                   = useState([]);
-  const [experiments, setExperiments]                             = useState([]);
-  const [subjectSpecificExperiments, setSubjectSpecificExperiments] = useState([]);
-  const [codeStore, setCodeStore]                                 = useState({});
-  const [vivaScores, setVivaScores]                               = useState({});
-  const [loading, setLoading]                                     = useState(true);
-  const [error, setError]                                         = useState(null);
+  const [subjects, setSubjects] = useState([]);
+  const [experiments, setExperiments] = useState([]);
+  const [subjectSpecificExperiments, setSubjectSpecificExperiments] = useState(
+    [],
+  );
+  const [codeStore, setCodeStore] = useState({});
+  const [vivaScores, setVivaScores] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
@@ -160,7 +170,8 @@ export default function App() {
           fetch(`${API}/subjects`),
           fetch(`${API}/experiments`),
         ]);
-        if (!subjectsRes.ok || !experimentsRes.ok) throw new Error("Failed to load data");
+        if (!subjectsRes.ok || !experimentsRes.ok)
+          throw new Error("Failed to load data");
         setSubjects(await subjectsRes.json());
         setExperiments(await experimentsRes.json());
       } catch (err) {
@@ -175,13 +186,14 @@ export default function App() {
 
   const handleSaveCode = async (expId, part, codeContent) => {
     const key = `${expId}_${part}`;
-    setCodeStore(prev => ({ ...prev, [key]: codeContent }));
+    setCodeStore((prev) => ({ ...prev, [key]: codeContent }));
     try {
-      await fetch(`${API}/codes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, code: codeContent }),
-      });
+      // await fetch(`${API}/codes`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ key, code: codeContent }),
+      // });
+      console.log(JSON.stringify({ key, code: codeContent }));
     } catch (e) {
       console.error("Save failed", e);
     }
@@ -189,7 +201,7 @@ export default function App() {
 
   const handleCompleteViva = async (score, experimentId, part) => {
     const key = `${experimentId}_${part || "a"}`;
-    setVivaScores(prev => ({ ...prev, [key]: score }));
+    setVivaScores((prev) => ({ ...prev, [key]: score }));
     try {
       await fetch(`${API}/vivas`, {
         method: "POST",
@@ -201,58 +213,89 @@ export default function App() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen">Loading BH.Lab...</div>;
-  if (error)   return <div className="text-red-600 p-8">Error: {error}</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading BH.Lab...
+      </div>
+    );
+  if (error) return <div className="text-red-600 p-8">Error: {error}</div>;
 
   return (
     <Routes>
-      <Route path="/" element={<LandingPage onStart={() => navigate("/dashboard")} />} />
+      <Route
+        path="/"
+        element={<LandingPage onStart={() => navigate("/dashboard")} />}
+      />
 
-      <Route path="/dashboard" element={
-        <Dashboard
-          subjects={subjects}
-          experiments={experiments}
-          onNavigate={(page, params) => {
-            if (page === "subjects")      navigate("/subjects");
-            else if (page === "subject-detail") navigate(`/subject/${params.subjectId}`);
-          }}
-        />
-      } />
+      <Route
+        path="/dashboard"
+        element={
+          <Dashboard
+            subjects={subjects}
+            experiments={experiments}
+            onNavigate={(page, params) => {
+              if (page === "subjects") navigate("/subjects");
+              else if (page === "subject-detail")
+                navigate(`/subject/${params.subjectId}`);
+            }}
+          />
+        }
+      />
 
       <Route path="/subjects" element={<SubjectsListWrapper />} />
 
-      <Route path="/subject/:subjectId" element={
-        <SubjectDetailWrapper
-          subjects={subjects}
-          experiments={experiments}
-          subjectSpecificExperiments={subjectSpecificExperiments}
-          setSubjectSpecificExperiments={setSubjectSpecificExperiments}
-        />
-      } />
+      <Route
+        path="/subject/:subjectId"
+        element={
+          <SubjectDetailWrapper
+            subjects={subjects}
+            experiments={experiments}
+            subjectSpecificExperiments={subjectSpecificExperiments}
+            setSubjectSpecificExperiments={setSubjectSpecificExperiments}
+          />
+        }
+      />
 
-      <Route path="/workspace/:experimentId/:part?" element={
-        <WorkspaceWrapper
-          experiments={experiments}
-          codeStore={codeStore}
-          onSaveCode={handleSaveCode}
-        />
-      } />
+      <Route
+        path="/workspace/:experimentId/:part?"
+        element={
+          <WorkspaceWrapper
+            experiments={experiments}
+            codeStore={codeStore}
+            onSaveCode={handleSaveCode}
+          />
+        }
+      />
 
       {/* Viva from workspace (experiment-level) */}
-      <Route path="/viva/:experimentId/:part?" element={
-        <VivaWrapper experiments={experiments} onCompleteViva={handleCompleteViva} />
-      } />
+      <Route
+        path="/viva/:experimentId/:part?"
+        element={
+          <VivaWrapper
+            experiments={experiments}
+            onCompleteViva={handleCompleteViva}
+          />
+        }
+      />
 
       {/* Viva from subjects list (subject-level → first experiment) */}
-      <Route path="/viva/subject/:subjectId" element={
-        <SubjectVivaWrapper onCompleteViva={handleCompleteViva} />
-      } />
+      <Route
+        path="/viva/subject/:subjectId"
+        element={<SubjectVivaWrapper onCompleteViva={handleCompleteViva} />}
+      />
 
-      <Route path="/journal/:experimentId/:part?" element={
-        <JournalWrapper experiments={experiments} codeStore={codeStore} />
-      } />
+      <Route
+        path="/journal/:experimentId/:part?"
+        element={
+          <JournalWrapper experiments={experiments} codeStore={codeStore} />
+        }
+      />
 
-      <Route path="*" element={<LandingPage onStart={() => navigate("/dashboard")} />} />
+      <Route
+        path="*"
+        element={<LandingPage onStart={() => navigate("/dashboard")} />}
+      />
     </Routes>
   );
 }

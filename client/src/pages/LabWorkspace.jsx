@@ -79,6 +79,12 @@ export default function LabWorkspace({
   const [revealedHints, setRevealedHints] = useState(0);
   const [saveStatus, setSaveStatus] = useState("Saved");
 
+  // Viva Q&A
+  const [vivaQAPairs, setVivaQAPairs] = useState([]);
+  const [vivaQALoading, setVivaQALoading] = useState(false);
+  const [vivaQAError, setVivaQAError] = useState(null);
+  const [expandedQA, setExpandedQA] = useState(null);
+
   const subjectId =
     experiment?.subjectId?._id || experiment?.subjectId || experiment?.subject;
   const completionKey = subjectId ? `bhlabs_completed_${subjectId}` : null;
@@ -140,6 +146,35 @@ export default function LabWorkspace({
       },
     ]);
   }, [experiment, subPart]);
+
+  // Fetch Viva Q&A from backend whenever experiment+subPart changes
+  useEffect(() => {
+    const id = experiment?._id;
+    if (!id || !subPart) return;
+    let cancelled = false;
+    setVivaQAPairs([]);
+    setVivaQAError(null);
+    setVivaQALoading(true);
+    setExpandedQA(null);
+    fetch(`${apiBase}/vivas/qa`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ experimentId: id, part: subPart }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        if (data.qaPairs) setVivaQAPairs(data.qaPairs);
+        else setVivaQAError("No Q&A returned from server.");
+      })
+      .catch((err) => {
+        if (!cancelled) setVivaQAError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setVivaQALoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [experiment?._id, subPart]);
 
   // Runs when language changes — loads reference solution, then starter code, then saved code
   useEffect(() => {
@@ -1021,49 +1056,88 @@ export default function LabWorkspace({
 
               {activeRightTab === "viva" && (
                 <div className="flex flex-col gap-3">
-                  <div className="bg-white border border-[#E4E4E7] rounded-[10px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all duration-200 hover:shadow-[0_6px_20px_rgba(85,33,255,0.08)] hover:border-[#5521FF]">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
-                        Viva Prep
+                  {/* Header */}
+                  <div className="flex items-center justify-between pb-1.5 border-b border-[#E4E4E7] mb-0.5 shrink-0">
+                    <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
+                      Viva Q&amp;A
+                    </span>
+                    {vivaQAPairs.length > 0 && (
+                      <span className="text-[10px] font-bold text-[#5521FF] bg-[#F0ECFF] px-2 py-[2px] rounded-full border border-[#5521FF]/15">
+                        {vivaQAPairs.length} questions
                       </span>
-                      <span className="text-[10px] font-bold text-[#5521FF]">
-                        Latest Score
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <div className="text-[28px] font-black text-[#18181B] tracking-tighter shrink-0">
-                        86%
-                      </div>
-                      <div className="flex-1 h-1.5 bg-[#F4F4F5] rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#5521FF] rounded-full"
-                          style={{ width: "86%" }}
-                        />
-                      </div>
-                    </div>
-                    <button
-                      className="w-full mt-2.5 py-2 bg-[#5521FF] text-white border-none rounded-lg text-[11px] font-bold tracking-wider uppercase cursor-pointer shadow-[0_3px_10px_rgba(85,33,255,0.2)] transition-transform duration-100 font-sans hover:scale-[1.02] active:scale-[0.98]"
-                      onClick={() =>
-                        onNavigate?.("viva-practice", {
-                          subjectId: experiment?.subjectId,
-                          experimentId: experiment?._id,
-                          part: subPart,
-                        })
-                      }
-                    >
-                      Start Viva Practice
-                    </button>
+                    )}
                   </div>
-                  <div className="bg-[#F0ECFF] border border-[#5521FF]/10 rounded-lg p-2.5 text-[11px] text-[#52525B] leading-relaxed">
-                    <strong className="text-[#18181B] font-bold block mb-1.25">
-                      Why practice?
-                    </strong>
-                    <span>1. Simulates actual oral exam questions.</span>
-                    <br />
-                    <span>2. Analyzes verbal confidence and terminology.</span>
-                    <br />
-                    <span>3. Contributes up to 10 marks to your record.</span>
-                  </div>
+
+                  {/* Loading */}
+                  {vivaQALoading && (
+                    <div className="flex flex-col items-center justify-center py-8 gap-3">
+                      <Loader2 className="w-5 h-5 text-[#5521FF] animate-spin" />
+                      <p className="text-[11px] text-[#71717A] font-medium text-center">
+                        Generating viva questions…
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Error */}
+                  {!vivaQALoading && vivaQAError && (
+                    <div className="bg-red-50 border border-red-100 rounded-lg p-3 text-[11px] text-red-600">
+                      {vivaQAError}
+                    </div>
+                  )}
+
+                  {/* Q&A Accordion */}
+                  {!vivaQALoading && vivaQAPairs.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      {vivaQAPairs.map((qa, idx) => {
+                        const isOpen = expandedQA === idx;
+                        return (
+                          <div
+                            key={idx}
+                            className={`border rounded-lg overflow-hidden transition-all duration-150 ${
+                              isOpen
+                                ? "border-[#5521FF]/40 shadow-[0_2px_12px_rgba(85,33,255,0.08)]"
+                                : "border-[#E4E4E7] hover:border-[#5521FF]/30"
+                            }`}
+                          >
+                            {/* Question row */}
+                            <button
+                              className="w-full text-left px-3 py-2.5 flex items-start gap-2 bg-transparent border-none cursor-pointer"
+                              onClick={() => setExpandedQA(isOpen ? null : idx)}
+                            >
+                              <span
+                                className={`shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black mt-[1px] ${
+                                  isOpen
+                                    ? "bg-[#5521FF] text-white"
+                                    : "bg-[#F4F4F5] text-[#71717A]"
+                                }`}
+                              >
+                                {idx + 1}
+                              </span>
+                              <span className="text-[11px] font-semibold text-[#18181B] leading-snug flex-1">
+                                {qa.question}
+                              </span>
+                              <span
+                                className={`text-[#A1A1AA] text-[10px] shrink-0 mt-[1px] transition-transform duration-150 ${
+                                  isOpen ? "rotate-180" : ""
+                                }`}
+                              >
+                                ▾
+                              </span>
+                            </button>
+
+                            {/* Answer */}
+                            {isOpen && (
+                              <div className="px-3 pb-3 pt-0.5 border-t border-[#F0ECFF] bg-[#FAFAFE]">
+                                <p className="text-[11px] text-[#3730A3] leading-relaxed">
+                                  {qa.answer}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
