@@ -150,30 +150,58 @@ export default function LabWorkspace({
   // Fetch Viva Q&A from backend whenever experiment+subPart changes
   useEffect(() => {
     const id = experiment?._id;
+
     if (!id || !subPart) return;
+
     let cancelled = false;
-    setVivaQAPairs([]);
-    setVivaQAError(null);
-    setVivaQALoading(true);
-    setExpandedQA(null);
-    fetch(`${apiBase}/vivas/qa`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ experimentId: id, part: subPart }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
+
+    const fetchVivaQA = async () => {
+      try {
+        setVivaQAPairs([]);
+        setVivaQAError(null);
+        setVivaQALoading(true);
+        setExpandedQA(null);
+
+        const response = await fetch(`${apiBase}/vivas/qa`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            experimentId: id,
+            part: subPart,
+          }),
+        });
+
+        const data = await response.json();
+
         if (cancelled) return;
-        if (data.qaPairs) setVivaQAPairs(data.qaPairs);
-        else setVivaQAError("No Q&A returned from server.");
-      })
-      .catch((err) => {
-        if (!cancelled) setVivaQAError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setVivaQALoading(false);
-      });
-    return () => { cancelled = true; };
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch Viva Q&A");
+        }
+
+        if (data.qaPairs) {
+          setVivaQAPairs(data.qaPairs);
+        } else {
+          setVivaQAError("No Q&A returned from server.");
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setVivaQAError(err.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setVivaQALoading(false);
+        }
+      }
+    };
+
+    fetchVivaQA();
+
+    return () => {
+      cancelled = true;
+    };
   }, [experiment?._id, subPart]);
 
   // Runs when language changes — loads reference solution, then starter code, then saved code

@@ -23,10 +23,10 @@ const getOpenAiClient = () => {
     baseURL: "https://openrouter.ai/api/v1",
     apiKey: apiKey,
     defaultHeaders: {
-      "Authorization": `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       "HTTP-Referer": "http://localhost:5050",
       "X-Title": "BH Labs",
-    }
+    },
   });
 };
 
@@ -40,14 +40,14 @@ function cleanRawJson(rawText) {
 
     if (inString) {
       if (escapeNext) {
-        const validEscapes = ['"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u'];
+        const validEscapes = ['"', "\\", "/", "b", "f", "n", "r", "t", "u"];
         if (validEscapes.includes(char)) {
           result += char;
         } else {
           result = result.substring(0, result.length - 1) + "\\\\" + char;
         }
         escapeNext = false;
-      } else if (char === '\\') {
+      } else if (char === "\\") {
         escapeNext = true;
         result += char;
       } else if (char === '"') {
@@ -72,7 +72,10 @@ const vivaStore = {};
 // GET /api/vivas
 const getVivas = async (req, res) => {
   try {
-    const entries = Object.entries(vivaStore).map(([key, score]) => ({ key, score }));
+    const entries = Object.entries(vivaStore).map(([key, score]) => ({
+      key,
+      score,
+    }));
     res.json(entries);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -119,35 +122,47 @@ const generateVivaQuestions = async (req, res) => {
           code: "",
           hint: "Recall the main tools and logic you implemented throughout this course.",
           masteryTopic: "Overview",
-          transcript: "The core objectives are to understand basic programming structures and apply them to data manipulation and problem solving."
+          transcript:
+            "The core objectives are to understand basic programming structures and apply them to data manipulation and problem solving.",
         },
         {
           id: 2,
           label: "Viva Question 2 of 4",
-          question: experiments[0] ? `Explain the core logic of Experiment 1: "${experiments[0].subExperiments?.[0]?.title || "First Lab"}".` : "Explain the logic of variable swapping.",
-          code: experiments[0]?.subExperiments?.[0]?.referenceSolution ? Array.from(experiments[0].subExperiments[0].referenceSolution.values())[0] || "" : "",
+          question: experiments[0]
+            ? `Explain the core logic of Experiment 1: "${experiments[0].subExperiments?.[0]?.title || "First Lab"}".`
+            : "Explain the logic of variable swapping.",
+          code: experiments[0]?.subExperiments?.[0]?.referenceSolution
+            ? Array.from(
+                experiments[0].subExperiments[0].referenceSolution.values(),
+              )[0] || ""
+            : "",
           hint: "Recall the step-by-step variables manipulation you performed.",
           masteryTopic: "Logic Flow",
-          transcript: "The logic interchanges values in memory, utilizing a temporary variable to prevent data overwrite."
+          transcript:
+            "The logic interchanges values in memory, utilizing a temporary variable to prevent data overwrite.",
         },
         {
           id: 3,
           label: "Viva Question 3 of 4",
-          question: "How do you analyze space complexity in standard algorithms?",
+          question:
+            "How do you analyze space complexity in standard algorithms?",
           code: "",
           hint: "Count any extra arrays or memory structures allocated during algorithm run.",
           masteryTopic: "Space Optimization",
-          transcript: "Space complexity is analyzed by measuring auxiliary memory used relative to input size."
+          transcript:
+            "Space complexity is analyzed by measuring auxiliary memory used relative to input size.",
         },
         {
           id: 4,
           label: "Viva Question 4 of 4",
-          question: "Why do we flush the input buffer in C after scanning integers?",
+          question:
+            "Why do we flush the input buffer in C after scanning integers?",
           code: "while ((getchar()) != '\\n');",
           hint: "Think about what happens to the enter key newline character.",
           masteryTopic: "Input Buffer",
-          transcript: "We flush the buffer to discard the leftover newline character so it doesn't interfere with subsequent reads."
-        }
+          transcript:
+            "We flush the buffer to discard the leftover newline character so it doesn't interfere with subsequent reads.",
+        },
       ];
       return res.json({ questions: mockQuestions, subjectName: subject.name });
     }
@@ -190,14 +205,15 @@ Output ONLY a JSON array. No markdown, no backticks.`;
       messages: [
         {
           role: "system",
-          content: "You are an assistant that outputs only valid JSON arrays. Do not add markdown backticks or commentary."
+          content:
+            "You are an assistant that outputs only valid JSON arrays. Do not add markdown backticks or commentary.",
         },
         {
           role: "user",
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
-      temperature: 0.0
+      temperature: 0.0,
     });
 
     let rawText = response.choices?.[0]?.message?.content || "";
@@ -226,7 +242,9 @@ const evaluateVivaAnswer = async (req, res) => {
   try {
     const { question, studentAnswer, modelAnswer } = req.body;
     if (!question || !studentAnswer) {
-      return res.status(400).json({ error: "question and studentAnswer are required" });
+      return res
+        .status(400)
+        .json({ error: "question and studentAnswer are required" });
     }
 
     // 1. Fast-path local validation for obvious non-answers
@@ -240,7 +258,8 @@ const evaluateVivaAnswer = async (req, res) => {
     if (cleanAns.length < 5 || nonAnswers.includes(cleanAns) || cleanAns.split(" ").length < 3) {
       return res.json({
         score: 0,
-        feedback: "Your response does not address the question. Please provide a conceptual explanation of the topic."
+        feedback:
+          "Your response does not address the question. Please provide a conceptual explanation of the topic.",
       });
     }
 
@@ -248,7 +267,9 @@ const evaluateVivaAnswer = async (req, res) => {
     if (!openai) {
       // Mock evaluation in simulation mode
       const isGood = studentAnswer.toLowerCase().length > 15;
-      const score = isGood ? Math.floor(Math.random() * 15) + 80 : Math.floor(Math.random() * 20) + 10;
+      const score = isGood
+        ? Math.floor(Math.random() * 15) + 80
+        : Math.floor(Math.random() * 20) + 10;
       const feedback = isGood
         ? "Excellent explanation. You correctly identified the core logical variables. Focus now on time complexity analysis."
         : "Your response is too short or doesn't address the main concepts of the question.";
@@ -282,14 +303,14 @@ Student's Answer: "${studentAnswer}"`;
       messages: [
         {
           role: "system",
-          content: systemPrompt
+          content: systemPrompt,
         },
         {
           role: "user",
-          content: userPrompt
-        }
+          content: userPrompt,
+        },
       ],
-      temperature: 0.0
+      temperature: 0.0,
     });
 
     let rawText = response.choices?.[0]?.message?.content || "";
@@ -324,12 +345,17 @@ const transcribeAudio = async (req, res) => {
     const groq = getGroqClient();
     if (!groq) {
       fs.unlinkSync(req.file.path);
-      return res.status(503).json({ error: "GROQ_API_KEY not configured. Add it to your .env file." });
+      return res
+        .status(503)
+        .json({
+          error: "GROQ_API_KEY not configured. Add it to your .env file.",
+        });
     }
 
     // Multer saves file with a random hash name and no extension.
     // Whisper needs the extension to detect audio format — rename the file.
-    const ext = (req.file.originalname || "recording.webm").split(".").pop() || "webm";
+    const ext =
+      (req.file.originalname || "recording.webm").split(".").pop() || "webm";
     renamedPath = req.file.path + "." + ext;
     fs.renameSync(req.file.path, renamedPath);
 
@@ -367,43 +393,121 @@ const transcribeAudio = async (req, res) => {
  * Otherwise fetch the sub-experiment from the Experiment document, call OpenAI
  * to generate 7-9 Q&A pairs, persist them, and return.
  */
+// At the top of vivaController.js (outside the controller)
+const pendingGenerations = new Map();
+
 const getVivaQA = async (req, res) => {
   try {
     const { experimentId, part } = req.body;
 
     if (!experimentId || !part) {
-      return res.status(400).json({ error: "experimentId and part are required" });
+      return res.status(400).json({
+        error: "experimentId and part are required",
+      });
     }
 
-    // 1. Check DB cache first
-    const existing = await VivaQA.findOne({ experimentId, part });
+    const normalizedPart = part.toLowerCase();
+
+    // 1. Fast path: return cached Q&A if it already exists
+    const existing = await VivaQA.findOne({
+      experimentId,
+      part: normalizedPart,
+    });
+
     if (existing) {
-      return res.json({ source: "db", qaPairs: existing.qaPairs });
+      return res.json({
+        source: "db",
+        qaPairs: existing.qaPairs,
+      });
     }
 
-    // 2. Load the experiment and locate the matching sub-experiment
-    const experiment = await Experiment.findById(experimentId);
-    if (!experiment) {
-      return res.status(404).json({ error: "Experiment not found" });
+    // Unique key for this experiment + part
+    const key = `${experimentId}:${normalizedPart}`;
+
+    // 2. If another request is already generating, wait for it
+    if (pendingGenerations.has(key)) {
+      await pendingGenerations.get(key);
+
+      const generated = await VivaQA.findOne({
+        experimentId,
+        part: normalizedPart,
+      });
+
+      if (generated) {
+        return res.json({
+          source: "db",
+          qaPairs: generated.qaPairs,
+        });
+      }
     }
 
-    const subExp = experiment.subExperiments.find(
-      (s) => s.part && s.part.toLowerCase() === part.toLowerCase(),
-    );
-    if (!subExp) {
-      return res.status(404).json({ error: `Sub-experiment with part "${part}" not found` });
+    // 3. Start generation
+    const generationPromise = (async () => {
+      const experiment = await Experiment.findById(experimentId);
+
+      if (!experiment) {
+        throw new Error("Experiment not found");
+      }
+
+      const subExp = experiment.subExperiments.find(
+        (s) => s.part?.toLowerCase() === normalizedPart,
+      );
+
+      if (!subExp) {
+        throw new Error(
+          `Sub-experiment with part "${normalizedPart}" not found`,
+        );
+      }
+
+      const qaPairs = await generateVivaQA(subExp);
+
+      try {
+        const doc = await VivaQA.create({
+          experimentId,
+          part: normalizedPart,
+          qaPairs,
+        });
+
+        return doc;
+      } catch (err) {
+        // Another request inserted while we were generating
+        if (err.code === 11000) {
+          return await VivaQA.findOne({
+            experimentId,
+            part: normalizedPart,
+          });
+        }
+
+        throw err;
+      }
+    })();
+
+    pendingGenerations.set(key, generationPromise);
+
+    try {
+      const doc = await generationPromise;
+
+      return res.status(201).json({
+        source: "ai",
+        qaPairs: doc.qaPairs,
+      });
+    } finally {
+      pendingGenerations.delete(key);
     }
-
-    // 3. Generate via OpenAI
-    const qaPairs = await generateVivaQA(subExp);
-
-    // 4. Persist to DB so subsequent requests are instant
-    const doc = await VivaQA.create({ experimentId, part, qaPairs });
-
-    return res.status(201).json({ source: "ai", qaPairs: doc.qaPairs });
   } catch (err) {
     console.error("getVivaQA error:", err);
-    res.status(500).json({ error: err.message });
+
+    if (err.message === "Experiment not found") {
+      return res.status(404).json({ error: err.message });
+    }
+
+    if (err.message.includes("Sub-experiment")) {
+      return res.status(404).json({ error: err.message });
+    }
+
+    return res.status(500).json({
+      error: err.message || "Internal Server Error",
+    });
   }
 };
 
