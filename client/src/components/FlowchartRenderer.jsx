@@ -214,18 +214,11 @@ export default function FlowchartRenderer({ nodes = [], edges = [] }) {
 
   return (
     <div className="relative w-full overflow-auto bg-slate-50/50 rounded-2xl border border-slate-100 p-4 min-h-[300px] custom-scrollbar">
-      <div style={{ width, height, position: "relative" }} className="shrink-0 select-none">
+      <div style={{ width, height }} className="relative shrink-0 select-none">
         
         {/* SVG Path Layer */}
         <svg
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            pointerEvents: "none",
-          }}
+          className="absolute top-0 left-0 w-full h-full pointer-events-none"
         >
           <defs>
             <marker
@@ -283,13 +276,10 @@ export default function FlowchartRenderer({ nodes = [], edges = [] }) {
             <div
               key={node.id}
               style={{
-                position: "absolute",
                 left: pos.x,
                 top: pos.y,
-                transform: "translate(-50%, -50%)",
-                zIndex: 10,
               }}
-              className="group"
+              className="absolute -translate-x-1/2 -translate-y-1/2 z-10 group"
             >
               {node.type?.toLowerCase() === "decision" ? (
                 <div className="relative flex items-center justify-center w-14 h-14">

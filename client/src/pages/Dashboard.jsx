@@ -1,5 +1,6 @@
 import { LayoutDashboard, BookOpen, Mic2, FileSpreadsheet, Settings, LogOut, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 
 export default function Dashboard({ 
   onNavigate, 
@@ -14,77 +15,7 @@ export default function Dashboard({
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between p-6">
-        <div className="space-y-8">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-md shrink-0">
-              <img src="/logo.png" alt="BH.Lab Logo" className="w-full h-full object-cover" />
-            </div>
-            <span className="text-xl font-bold font-heading tracking-tight text-slate-900">
-              BH.Lab
-            </span>
-          </div>
-
-          {/* User Profile Card */}
-          <div className="bg-slate-50 rounded-xl p-4 flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center font-bold text-sm">
-              RS
-            </div>
-            <div>
-              <h4 className="text-xs font-bold text-slate-800">Rahul Sharma</h4>
-              <p className="text-[10px] text-slate-500 font-medium">Computer Engineering • SE</p>
-            </div>
-          </div>
-
-          {/* Nav Links */}
-          <nav className="space-y-1.5">
-            <button 
-              onClick={() => navigate("/dashboard")}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-xl bg-violet-50 text-violet-700 transition-all text-left"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>Dashboard</span>
-            </button>
-            <button 
-              onClick={() => navigate(`/subjects`)}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all text-left"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Subjects</span>
-            </button>
-            <button 
-              onClick={() => navigate(`/viva/${experiments[0]?._id}/a`)}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all text-left"
-            >
-              <Mic2 className="w-4 h-4" />
-              <span>Viva Practice</span>
-            </button>
-            <button 
-              onClick={() => navigate(`/journal/${experiments[1]?._id}/a`)}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all text-left"
-            >
-              <FileSpreadsheet className="w-4 h-4" />
-              <span>Journals</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Bottom actions */}
-        <div className="space-y-1.5 border-t border-slate-100 pt-4">
-          <button className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 transition-all text-left">
-            <Settings className="w-4 h-4" />
-            <span>Settings</span>
-          </button>
-          <button 
-            onClick={() => navigate("/")}
-            className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-xl text-rose-600 hover:bg-rose-50 transition-all text-left"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
+      <Sidebar activePage="dashboard" onNavigate={onNavigate} experiments={experiments} />
 
       {/* Main Content Area */}
       <main className="flex-1 p-8 overflow-y-auto max-w-6xl mx-auto space-y-8">

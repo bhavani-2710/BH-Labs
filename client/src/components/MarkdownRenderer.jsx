@@ -33,10 +33,10 @@ const highlightCode = (code, language) => {
         const p = patterns[i];
         p.regex.lastIndex = 0;
         if (p.regex.test(match)) {
-          let style = `color: ${p.color};`;
-          if (p.bold) style += " font-weight: 700;";
-          if (p.italic) style += " font-style: italic;";
-          return `<span style="${style}">${match}</span>`;
+          let classes = `text-[${p.color}]`;
+          if (p.bold) classes += " font-bold";
+          if (p.italic) classes += " italic";
+          return `<span class="${classes}">${match}</span>`;
         }
       }
       return match;
@@ -59,10 +59,10 @@ const highlightCode = (code, language) => {
         const p = patterns[i];
         p.regex.lastIndex = 0;
         if (p.regex.test(match)) {
-          let style = `color: ${p.color};`;
-          if (p.bold) style += " font-weight: 700;";
-          if (p.italic) style += " font-style: italic;";
-          return `<span style="${style}">${match}</span>`;
+          let classes = `text-[${p.color}]`;
+          if (p.bold) classes += " font-bold";
+          if (p.italic) classes += " italic";
+          return `<span class="${classes}">${match}</span>`;
         }
       }
       return match;
@@ -86,58 +86,22 @@ const CodeBlock = ({ language, code }) => {
 
   return (
     <div 
-      style={{
-        background: "#1E293B",
-        color: "#F8FAFC",
-        borderRadius: "8px",
-        padding: "10px 12px",
-        fontFamily: "'JetBrains Mono', monospace",
-        fontSize: "10px",
-        overflowX: "auto",
-        margin: "8px 0",
-        lineHeight: "1.5",
-        border: "1px solid #334155",
-        position: "relative",
-        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
-      }}
+      className="bg-[#1E293B] text-[#F8FAFC] rounded-lg px-3 py-2.5 font-mono text-[10px] overflow-x-auto my-2 leading-normal border border-[#334155] relative shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]"
     >
       <div 
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "6px",
-          borderBottom: "1px solid #334155",
-          paddingBottom: "4px",
-          fontSize: "8.5px",
-          color: "#94A3B8",
-          fontWeight: "bold",
-          userSelect: "none"
-        }}
+        className="flex justify-between items-center mb-1.5 border-b border-[#334155] pb-1 text-[8.5px] text-[#94A3B8] font-bold select-none"
       >
         <span>{language ? language.toUpperCase() : "CODE"}</span>
         <button
           onClick={handleCopy}
-          style={{
-            background: "none",
-            border: "none",
-            color: copied ? "#10B981" : "#94A3B8",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "3px",
-            fontSize: "8.5px",
-            padding: "2px 4px",
-            borderRadius: "4px",
-            transition: "all 0.15s"
-          }}
+          className={`bg-none border-none ${copied ? "text-[#10B981]" : "text-[#94A3B8]"} cursor-pointer flex items-center gap-[3px] text-[8.5px] px-1 py-0.5 rounded transition-all duration-150`}
           title="Copy Code"
         >
           {copied ? <Check size={10} /> : <Copy size={10} />}
           <span>{copied ? "Copied" : "Copy"}</span>
         </button>
       </div>
-      <pre style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+      <pre className="m-0 whitespace-pre-wrap break-all">
         <code dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
       </pre>
     </div>
@@ -155,7 +119,7 @@ const renderTextWithInlineFormatting = (text) => {
   return parts.map((part, idx) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={idx} style={{ fontWeight: 700, color: "#1E1B4B" }}>
+        <strong key={idx} className="font-bold text-[#1E1B4B]">
           {part.slice(2, -2)}
         </strong>
       );
@@ -164,15 +128,7 @@ const renderTextWithInlineFormatting = (text) => {
       return (
         <code
           key={idx}
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            background: "rgba(85, 33, 255, 0.08)",
-            padding: "1px 4px",
-            borderRadius: "4px",
-            fontSize: "9.5px",
-            color: "#4F46E5",
-            fontWeight: 600,
-          }}
+          className="font-mono bg-[#5521FF]/8 px-1 py-[1px] rounded text-[9.5px] text-[#4F46E5] font-semibold"
         >
           {part.slice(1, -1)}
         </code>
@@ -180,7 +136,7 @@ const renderTextWithInlineFormatting = (text) => {
     }
     if (part.startsWith("*") && part.endsWith("*")) {
       return (
-        <em key={idx} style={{ fontStyle: "italic", color: "#475569" }}>
+        <em key={idx} className="italic text-[#475569]">
           {part.slice(1, -1)}
         </em>
       );
@@ -209,31 +165,16 @@ const renderTable = (tableLines, key) => {
   const bodyRows = tableLines.slice(bodyStartIndex).map(line => parseRow(line));
 
   return (
-    <div key={`table-container-${key}`} style={{ overflowX: "auto", margin: "8px 0", width: "100%" }}>
+    <div key={`table-container-${key}`} className="overflow-x-auto my-2 w-full">
       <table 
-        style={{ 
-          width: "100%", 
-          borderCollapse: "collapse", 
-          fontSize: "10px", 
-          lineHeight: "1.4", 
-          border: "1px solid #E4E4E7",
-          background: "#FFFFFF",
-          borderRadius: "6px",
-          overflow: "hidden"
-        }}
+        className="w-full border-collapse text-[10px] leading-[1.4] border border-[#E4E4E7] bg-white rounded-[6px] overflow-hidden"
       >
         <thead>
-          <tr style={{ background: "#F4F4F5", borderBottom: "2px solid #E4E4E7" }}>
+          <tr className="bg-[#F4F4F5] border-b-2 border-b-[#E4E4E7]">
             {headerCells.map((cell, idx) => (
               <th 
                 key={idx} 
-                style={{ 
-                  padding: "6px 8px", 
-                  textAlign: "left", 
-                  fontWeight: "700", 
-                  color: "#18181B",
-                  borderRight: "1px solid #E4E4E7"
-                }}
+                className="px-2 py-1.5 text-left font-bold text-[#18181B] border-r border-[#E4E4E7]"
               >
                 {renderTextWithInlineFormatting(cell)}
               </th>
@@ -244,19 +185,12 @@ const renderTable = (tableLines, key) => {
           {bodyRows.map((row, rowIdx) => (
             <tr 
               key={rowIdx} 
-              style={{ 
-                borderBottom: "1px solid #E4E4E7",
-                background: rowIdx % 2 === 0 ? "#FFFFFF" : "#FAF9FF"
-              }}
+              className={`border-b border-[#E4E4E7] ${rowIdx % 2 === 0 ? "bg-white" : "bg-[#FAF9FF]"}`}
             >
               {row.map((cell, cellIdx) => (
                 <td 
                   key={cellIdx} 
-                  style={{ 
-                    padding: "6px 8px", 
-                    color: "#3F3F46",
-                    borderRight: "1px solid #E4E4E7"
-                  }}
+                  className="px-2 py-1.5 text-[#3F3F46] border-r border-[#E4E4E7]"
                 >
                   {renderTextWithInlineFormatting(cell)}
                 </td>
@@ -302,7 +236,7 @@ export default function MarkdownRenderer({ text }) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
+    <div className="flex flex-col gap-1.5 w-full">
       {blocks.map((block, idx) => {
         if (block.type === "code") {
           return (
@@ -325,9 +259,9 @@ export default function MarkdownRenderer({ text }) {
           if (currentList.length === 0) return;
           if (listType === "bullet") {
             renderedLines.push(
-              <ul key={`ul-${key}`} style={{ paddingLeft: "16px", margin: "4px 0", listStyleType: "disc", display: "flex", flexDirection: "column", gap: "3px" }}>
+              <ul key={`ul-${key}`} className="pl-4 my-1 list-disc flex flex-col gap-[3px]">
                 {currentList.map((item, i) => (
-                  <li key={i} style={{ margin: 0 }}>
+                  <li key={i} className="m-0">
                     {renderTextWithInlineFormatting(item)}
                   </li>
                 ))}
@@ -335,9 +269,9 @@ export default function MarkdownRenderer({ text }) {
             );
           } else if (listType === "number") {
             renderedLines.push(
-              <ol key={`ol-${key}`} style={{ paddingLeft: "16px", margin: "4px 0", listStyleType: "decimal", display: "flex", flexDirection: "column", gap: "3px" }}>
+              <ol key={`ol-${key}`} className="pl-4 my-1 list-decimal flex flex-col gap-[3px]">
                 {currentList.map((item, i) => (
-                  <li key={i} style={{ margin: 0 }}>
+                  <li key={i} className="m-0">
                     {renderTextWithInlineFormatting(item)}
                   </li>
                 ))}
@@ -385,7 +319,7 @@ export default function MarkdownRenderer({ text }) {
 
             flushTable(i);
             flushList(i);
-            renderedLines.push(<div key={`spacer-${i}`} style={{ height: "4px" }} />);
+            renderedLines.push(<div key={`spacer-${i}`} className="h-1" />);
             continue;
           }
 
@@ -398,18 +332,11 @@ export default function MarkdownRenderer({ text }) {
             flushList(i);
             const level = headerMatch[1].length;
             const content = headerMatch[2];
-            const fontSize = level === 1 ? "13px" : level === 2 ? "12px" : "11px";
+            const fontSizeClass = level === 1 ? "text-[13px]" : level === 2 ? "text-[12px]" : "text-[11px]";
             renderedLines.push(
               <div 
                 key={`h-${i}`} 
-                style={{ 
-                  fontWeight: 800, 
-                  color: "#1E1B4B", 
-                  marginTop: "8px", 
-                  marginBottom: "4px",
-                  fontSize,
-                  lineHeight: "1.4"
-                }}
+                className={`font-black text-[#1E1B4B] mt-2 mb-1 ${fontSizeClass} leading-[1.4]`}
               >
                 {renderTextWithInlineFormatting(content)}
               </div>
@@ -442,7 +369,7 @@ export default function MarkdownRenderer({ text }) {
           // Plain text line
           flushList(i);
           renderedLines.push(
-            <p key={`p-${i}`} style={{ margin: "3px 0", lineHeight: "1.5" }}>
+            <p key={`p-${i}`} className="my-[3px] leading-[1.5]">
               {renderTextWithInlineFormatting(line)}
             </p>
           );
@@ -453,7 +380,7 @@ export default function MarkdownRenderer({ text }) {
         flushList(lines.length);
 
         return (
-          <div key={idx} style={{ display: "flex", flexDirection: "column" }}>
+          <div key={idx} className="flex flex-col">
             {renderedLines}
           </div>
         );
