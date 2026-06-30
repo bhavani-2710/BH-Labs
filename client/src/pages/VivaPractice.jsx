@@ -16,6 +16,19 @@ import {
   MdVolumeOff,
 } from "react-icons/md";
 
+const formatCode = (code) => {
+  if (!code) return "";
+  // Split by double-quoted strings so we don't accidentally replace literal \n inside printf or similar C-strings.
+  const parts = code.split(/(".*?")/g);
+  return parts.map(part => {
+    if (part.startsWith('"') && part.endsWith('"')) {
+      return part; // keep literal \n inside strings intact
+    }
+    // outside strings, replace AI's unescaped \n texts with actual newlines
+    return part.replace(/\\n/g, '\n').replace(/\\t/g, '  ');
+  }).join('');
+};
+
 export default function VivaPractice({ subjectId, experiment, onBack, onCompleteViva }) {
   const [mode, setMode] = useState("voice");
   const [isListening, setIsListening] = useState(false);
@@ -494,7 +507,7 @@ export default function VivaPractice({ subjectId, experiment, onBack, onComplete
                     <span className="ml-2 font-mono text-[9px] text-white/40">snippet_code</span>
                   </div>
                   <pre className="font-mono text-xs overflow-x-auto leading-relaxed text-[#D4D4D4] whitespace-pre-wrap">
-                    <code>{currentQ.code}</code>
+                    <code>{formatCode(currentQ.code)}</code>
                   </pre>
                 </div>
               )}
@@ -666,28 +679,28 @@ export default function VivaPractice({ subjectId, experiment, onBack, onComplete
 
             <div className="space-y-4">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest select-none">Topics Mastery</p>
-              <div className="flex flex-wrap gap-2 select-none">
+              <div className="grid grid-cols-2 gap-3 select-none">
                 {Object.entries(mastery).map(([topic, status]) => {
                   if (status === "completed") {
                     return (
-                      <div key={topic} className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#006e2d]/5 border border-[#006e2d]/10">
-                        <Icon name="check_circle" size={13} color="#006e2d" />
-                        <span className="text-[10px] font-bold text-[#006e2d]">{topic}</span>
+                      <div key={topic} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#E8F5E9]/50 border border-[#81C784]/40 text-[#1B5E20] shadow-sm">
+                        <Icon name="check_circle" size={16} color="#2E7D32" />
+                        <span style={{ fontFamily: "Inter, sans-serif" }} className="text-[10px] font-bold tracking-tight">{topic}</span>
                       </div>
                     );
                   }
-                  if (status === "pending") {
+                  if (status === "pending" || topic === currentQ?.masteryTopic) {
                     return (
-                      <div key={topic} className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#630ed4]/5 border border-[#630ed4]/10">
-                        <Icon name="pending" size={13} color="#630ed4" />
-                        <span className="text-[10px] font-bold text-[#630ed4]">{topic}</span>
+                      <div key={topic} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#5521FF]/5 border border-[#5521FF]/20 text-[#5521FF] shadow-sm">
+                        <Icon name="pending" size={16} color="#5521FF" />
+                        <span style={{ fontFamily: "Inter, sans-serif" }} className="text-[10px] font-bold tracking-tight">{topic}</span>
                       </div>
                     );
                   }
                   return (
-                    <div key={topic} className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eae7ea] text-[#7b7487]">
-                      <Icon name="lock" size={12} />
-                      <span className="text-[10px] font-bold">{topic}</span>
+                    <div key={topic} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#F5F5F5] border border-[#E0E0E0] text-[#9E9E9E] shadow-sm opacity-60">
+                      <Icon name="lock" size={16} />
+                      <span style={{ fontFamily: "Inter, sans-serif" }} className="text-[10px] font-bold tracking-tight">{topic}</span>
                     </div>
                   );
                 })}

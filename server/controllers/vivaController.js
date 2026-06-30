@@ -163,7 +163,7 @@ const generateVivaQuestions = async (req, res) => {
     // At least one question per concept; minimum 5, cap at 20
     const numQuestions = Math.min(20, Math.max(5, allConcepts.length));
 
-    const prompt = `You are a college lab viva examiner. Generate exactly ${numQuestions} challenging, conceptually deep, and intermediate-to-advanced level viva questions for the subject: "${subject.name}" (${subject.description || ""}).
+    const prompt = `You are a friendly, conversational college lab assistant helping a student prepare. Generate exactly ${numQuestions} challenging, conceptually deep viva questions for the subject: "${subject.name}" (${subject.description || ""}).
 
 The student has completed the following practical experiments in the lab:
 ${experiments.map((exp) => `Experiment ${exp.experimentNumber}: ${exp.problemStatement}\nSub-parts:\n${exp.subExperiments.map(s => `- Title: "${s.title}", concepts: [${s.concepts.join(", ")}]`).join("\n")}`).join("\n\n")}
@@ -177,17 +177,18 @@ IMPORTANT RULES FOR QUESTIONS:
   1. Internal mechanics, logic flow, and execution behavior.
   2. Performance trade-offs (time vs. space complexity constraints).
   3. Edge cases, potential bugs, or failure states (e.g., buffer overflows, out-of-bounds, infinite loops).
+- Tone MUST be casual, conversational, and friendly. Avoid overly formal or robotic academic phrasing. Start occasionally with phrases like "So, let's talk about...", "Hey, what happens if...", "Can you explain why...".
 - Questions should require critical thinking and technical depth to answer, yet remain direct and concise (under 25 words).
 - Every concept in the list above must appear as a "masteryTopic" for exactly one question.
 
 For each question, provide:
 1. "id": integer (1 to ${numQuestions})
 2. "label": "Question X of ${numQuestions}"
-3. "question": The technical question text (under 25 words)
-4. "code": A short, realistic code snippet showing an implementation detail, trade-off, or bug related to the question. Double-escape any backslashes as '\\\\'.
+3. "question": The conversational, technical question text (under 25 words)
+4. "code": A multi-line C/C++/python/java/js code snippet representing a realistic scenario or bug. Use standard JSON formatting. Do not double-escape structural newlines.
 5. "hint": A deep conceptual clue pointing to underlying principles
 6. "masteryTopic": The concept name from the list above (must match exactly)
-7. "transcript": A highly professional model answer in 2-3 sentences explaining the mechanics, complexity, or logic clearly.
+7. "transcript": A conversational, clear model answer in 2-3 sentences explaining the mechanics, complexity, or logic.
 
 Output ONLY a valid JSON array. No markdown, no commentary.
 [
@@ -264,7 +265,7 @@ const evaluateVivaAnswer = async (req, res) => {
       return res.json({ score, feedback });
     }
 
-    const systemPrompt = `You are a strict computer science viva examiner. Evaluate the student's answer for accuracy and correctness relative to the expected model answer.
+    const systemPrompt = `You are a friendly and conversational college lab assistant evaluating a student's answer for accuracy and correctness relative to the expected model answer.
     
 SCORING CRITERIA:
 1. If the student's answer is empty, off-topic, nonsense, a greeting, or explicitly states they don't know (like "I don't know", "skip", "no idea"), you MUST award a score of EXACTLY 0. No exceptions.
@@ -274,12 +275,12 @@ SCORING CRITERIA:
 5. If the student's answer is mostly correct and matches the expected answer key points, you MUST award a score between 70 and 90.
 6. If the student's answer is exceptionally detailed, completely correct, and matches the expected answer perfectly, you MUST award a score between 90 and 100.
 
-CRITICAL: Do not be generous. If the student's answer is irrelevant or wrong, grade strictly and penalize heavily.
+CRITICAL: While you evaluate the score accurately and strictly based on technical correctness, your feedback MUST be given in a casual, conversational, and friendly tone (like a peer). Avoid overly formal phrasing.
 
 You must output a valid JSON object only. Do not include markdown code block formatting (like \`\`\`json) or any explanation. Output ONLY the JSON:
 {
   "score": <integer score from 0 to 100 based on the strict rules above>,
-  "feedback": "<a short, constructive, encouraging one-sentence feedback point explaining why they received this score and what to focus on>"
+  "feedback": "<a short, conversational, friendly one-sentence feedback explaining why they received this score and what to focus on. Use casual language like 'Hey', 'Good try', or 'Almost there!'>"
 }`;
 
     const userPrompt = `Question: "${question}"
