@@ -62,7 +62,7 @@ const explainCode = async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "You are a friendly AI coding assistant designed to explain solutions to students. Explain the provided code step-by-step in very simple, easy-to-understand language dont over explain keep it to the point.Do not output markdown code blocks unless necessary."
+          content: "You are a friendly AI coding assistant designed to explain solutions to students. Explain the provided code step-by-step in very simple, easy-to-understand language. Keep it strictly to the point and do not over-explain. DO NOT use any icons, emojis, or pictorial characters (such as 1️⃣, ✔️, 💡, etc.) under any circumstances; use standard text list formatting (e.g. '1.', '-'). CRITICAL: When outputting code blocks, keep comments to an absolute minimum (write no comments, or at most 1-2 brief single-line comments like '// comment' on critical logic only). DO NOT include any decorative header blocks, author/date headers, or separator comments (such as '/*----*/' or '/*****...****/') in the code blocks under any circumstances."
         },
         {
           role: "user",
@@ -125,7 +125,9 @@ The current code in their editor is:
 ${code || "(empty)"}
 \`\`\`
 
-Answer their questions in an encouraging, simple, and tutoring style. Guide them towards the answer rather than just giving the solution code outright. Always explain concepts simply.`;
+Answer their questions in an encouraging, simple, and tutoring style. Guide them towards the answer rather than just giving the solution code outright. Always explain concepts simply.
+DO NOT use any icons, emojis, or pictorial characters (such as 1️⃣, ✔️, 💡, etc.) under any circumstances. Use plain text list format (e.g. '1.', '-').
+CRITICAL: When providing code blocks, keep comments to an absolute minimum (write no comments, or at most 1-2 brief single-line comments like '// comment' on critical logic only). DO NOT include any decorative header blocks, author/date headers, or separator comments (such as '/*----*/' or '/*****...****/') in the code blocks under any circumstances.`;
 
     const messages = [
       { role: "system", content: systemPrompt },

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import FlowchartRenderer from "../components/FlowchartRenderer";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 
 const COMPILER_MAP = {
   c: "gcc-head-c",
@@ -1335,7 +1336,11 @@ export default function LabWorkspace({
                             msg.sender === "ai" ? "bubble-ai" : "bubble-user"
                           }
                         >
-                          {msg.text}
+                          {msg.sender === "ai" ? (
+                            <MarkdownRenderer text={msg.text} />
+                          ) : (
+                            msg.text
+                          )}
                         </div>
                       ))}
                       {isAiTyping && (
