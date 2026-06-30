@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import FlowchartRenderer from "../components/FlowchartRenderer";
 import MarkdownRenderer from "../components/MarkdownRenderer";
+import { Loader2, SendHorizontal } from "lucide-react";
 
 const COMPILER_MAP = {
   c: "gcc-head-c",
@@ -567,14 +568,19 @@ export default function LabWorkspace({
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-1.5 border-b border-[#E4E4E7] bg-white z-50 shrink-0 relative h-11">
         <div className="flex items-center gap-2">
-          <button className="text-[11px] font-semibold text-[#71717A] bg-none border-none cursor-pointer px-2 py-1 rounded-[6px] transition-colors duration-150 font-sans tracking-wide hover:bg-[#F4F4F5] hover:text-[#18181B]" onClick={onBack}>
+          <button
+            className="text-[11px] font-semibold text-[#71717A] bg-none border-none cursor-pointer px-2 py-1 rounded-[6px] transition-colors duration-150 font-sans tracking-wide hover:bg-[#F4F4F5] hover:text-[#18181B]"
+            onClick={onBack}
+          >
             ← Back
           </button>
           <div className="w-[1px] h-[18px] bg-[#E4E4E7] shrink-0" />
           <nav className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-[#71717A] uppercase">
             <span onClick={onBack}></span>
             <span className="text-[#D4D4D8] text-[10px]">›</span>
-            <span className="text-[#18181B] font-bold cursor-default">{subExp?.title || "Bubble Sort"}</span>
+            <span className="text-[#18181B] font-bold cursor-default">
+              {subExp?.title || "Bubble Sort"}
+            </span>
           </nav>
         </div>
 
@@ -599,7 +605,8 @@ export default function LabWorkspace({
 
         <div className="flex items-center gap-2.5">
           <div className="text-[10px] font-semibold text-[#71717A] uppercase tracking-wider flex items-center gap-1">
-            <span className="w-[5px] h-[5px] rounded-full bg-[#22C55E] shrink-0" /> {saveStatus}
+            <span className="w-[5px] h-[5px] rounded-full bg-[#22C55E] shrink-0" />{" "}
+            {saveStatus}
           </div>
           <div className="w-[1px] h-[18px] bg-[#E4E4E7] shrink-0" />
           <button
@@ -609,7 +616,10 @@ export default function LabWorkspace({
           >
             {isRunning ? "Running..." : "Run"}
           </button>
-          <button className="bg-[#5521FF]/10 text-[#5521FF] border border-[#5521FF]/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#5521FF]/20" onClick={handleSolveQuestion}>
+          <button
+            className="bg-[#5521FF]/10 text-[#5521FF] border border-[#5521FF]/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#5521FF]/20"
+            onClick={handleSolveQuestion}
+          >
             Solve Question
           </button>
           {completionKey && (
@@ -643,7 +653,7 @@ export default function LabWorkspace({
       {/* IDE body */}
       <div className="flex flex-1 overflow-hidden gap-[5px] p-[5px]">
         {/* LEFT */}
-        <aside className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] w-[calc(25%+4px)] shrink-0">
+        <aside className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] w-[calc(25%)] shrink-0">
           <div className="flex gap-[3px] p-1 bg-[#F4F4F5] border-b border-[#E4E4E7] shrink-0">
             {["theory", "algorithm", "flowchart"].map((t) => (
               <button
@@ -658,39 +668,61 @@ export default function LabWorkspace({
           <div className="flex-1 overflow-y-auto p-[18px] custom-scrollbar">
             {activeLeftTab === "theory" && (
               <>
-                <span className="inline-block px-1.75 py-[1px] rounded-[3px] mb-1.75 text-[9px] font-bold tracking-widest uppercase bg-[#5521FF]/10 text-[#5521FF] border border-[#5521FF]/20">BH.AI GENERATED</span>
+                <span className="inline-block px-1.75 py-[1px] rounded-[3px] mb-1.75 text-[9px] font-bold tracking-widest uppercase bg-[#5521FF]/10 text-[#5521FF] border border-[#5521FF]/20">
+                  BH.AI GENERATED
+                </span>
 
                 <h2 className="text-base font-extrabold text-[#1E293B] mt-2.5 mb-3.5 leading-[1.2]">
                   {subExp?.title || "Experiment"}
                 </h2>
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1.5 mb-5">
+                <div className="mb-5">
+                  {/* Difficulty */}
                   {subExp?.difficulty && (
-                    <span
-                      className={`text-[10px] font-bold px-2 py-[3px] rounded-[4px] uppercase tracking-wider inline-block ${
-                        subExp.difficulty.toLowerCase() === "easy"
-                          ? "bg-[#DCFCE7] text-[#166534]"
-                          : subExp.difficulty.toLowerCase() === "medium"
-                            ? "bg-[#FEF3C7] text-[#92400E]"
-                            : "bg-[#FEE2E2] text-[#991B1B]"
-                      }`}
-                    >
-                      {subExp.difficulty}
-                    </span>
-                  )}
-                  {subExp?.concepts &&
-                    subExp.concepts.map((concept, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[10px] font-bold px-2 py-[3px] rounded-[4px] uppercase tracking-wider inline-block bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]"
-                      >
-                        {concept}
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest">
+                        Difficulty
                       </span>
-                    ))}
+
+                      <span
+                        className={`text-[10px] font-bold px-2 py-[3px] rounded-[4px] uppercase tracking-wider ${
+                          subExp.difficulty.toLowerCase() === "easy"
+                            ? "bg-[#DCFCE7] text-[#166534]"
+                            : subExp.difficulty.toLowerCase() === "medium"
+                              ? "bg-[#FEF3C7] text-[#92400E]"
+                              : "bg-[#FEE2E2] text-[#991B1B]"
+                        }`}
+                      >
+                        {subExp.difficulty}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Concepts */}
+                  {subExp?.concepts?.length > 0 && (
+                    <div>
+                      <div className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest mb-1.5">
+                        Concepts
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {subExp.concepts.map((concept, idx) => (
+                          <span
+                            key={idx}
+                            className="text-[10px] font-bold px-2 py-[3px] rounded-[4px] uppercase tracking-wider bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]"
+                          >
+                            {concept}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest mb-1.5 mt-4.5">Problem Statement</div>
+                <div className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest mb-1.5 mt-4.5">
+                  Problem Statement
+                </div>
                 <p className="text-[11px] text-[#475569] leading-relaxed">
                   {subExp?.problemStatement ||
                     "Implement and analyze the algorithm."}
@@ -698,8 +730,12 @@ export default function LabWorkspace({
 
                 {subExp?.theory && (
                   <>
-                    <div className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest mb-1.5 mt-4.5">Theory</div>
-                    <p className="text-[11px] text-[#475569] leading-relaxed">{subExp.theory}</p>
+                    <div className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest mb-1.5 mt-4.5">
+                      Theory
+                    </div>
+                    <p className="text-[11px] text-[#475569] leading-relaxed">
+                      {subExp.theory}
+                    </p>
                   </>
                 )}
 
@@ -715,13 +751,17 @@ export default function LabWorkspace({
                           Example {idx + 1}
                         </div>
                         <div className="flex flex-col gap-[3px] py-1 mb-1.5">
-                          <span className="text-[#64748B] shrink-0">Input:</span>
+                          <span className="text-[#64748B] shrink-0">
+                            Input:
+                          </span>
                           <span className="font-mono font-medium text-[#0F172A] text-left whitespace-pre-wrap break-all text-[11px]">
                             {sample.input}
                           </span>
                         </div>
                         <div className="flex flex-col gap-[3px] py-1">
-                          <span className="text-[#64748B] shrink-0">Output:</span>
+                          <span className="text-[#64748B] shrink-0">
+                            Output:
+                          </span>
                           <span className="font-mono font-medium text-[#0F172A] text-left whitespace-pre-wrap break-all text-[11px]">
                             {sample.output}
                           </span>
@@ -833,9 +873,7 @@ export default function LabWorkspace({
               )}
               {consoleTab === "output" &&
                 (consoleOutput ? (
-                  <pre className="whitespace-pre-wrap m-0">
-                    {consoleOutput}
-                  </pre>
+                  <pre className="whitespace-pre-wrap m-0">{consoleOutput}</pre>
                 ) : (
                   <span className="italic text-[#A1A1AA]">
                     Click "Run" to compile and execute your code.
@@ -856,7 +894,7 @@ export default function LabWorkspace({
         </section>
 
         {/* RIGHT */}
-        <aside className="w-[24%] shrink-0 flex flex-col gap-[5px] max-[900px]:hidden">
+        <aside className="w-[25%] shrink-0 flex flex-col gap-[5px] max-[900px]:hidden">
           <div className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1">
             <div className="flex gap-[3px] p-1 bg-[#F4F4F5] border-b border-[#E4E4E7] shrink-0">
               {[
@@ -878,11 +916,16 @@ export default function LabWorkspace({
               {activeRightTab === "assistant" && (
                 <div className="flex flex-col h-full gap-2.5">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
-                    <div className="w-6.5 h-6.5 rounded-[6px] bg-[#5521FF] flex items-center justify-center text-white text-[12px] font-bold shrink-0">AI</div>
+                    <div className="w-6.5 h-6.5 rounded-[6px] bg-[#5521FF] flex items-center justify-center text-white text-[12px] font-bold shrink-0">
+                      AI
+                    </div>
                     <div>
-                      <div className="text-[11px] font-bold text-[#18181B]">Bh.AI Assistant</div>
+                      <div className="text-[11px] font-bold text-[#18181B]">
+                        Bh.AI Assistant
+                      </div>
                       <div className="text-[9px] text-[#22C55E] flex items-center gap-[3px]">
-                        <span className="w-1.25 h-1.25 rounded-full bg-[#22C55E] shrink-0" /> Online
+                        <span className="w-1.25 h-1.25 rounded-full bg-[#22C55E] shrink-0" />{" "}
+                        Online
                       </div>
                     </div>
                   </div>
@@ -904,11 +947,7 @@ export default function LabWorkspace({
                       </div>
                     ))}
                     {isAiTyping && (
-                      <div className="bg-[#F0ECFF] border border-[#5521FF]/10 rounded-[10px] rounded-tl-[2px] p-2 px-3 inline-flex items-center gap-[3px]">
-                        <div className="w-1.25 h-1.25 rounded-full bg-[#A78BFA] animate-tdot" />
-                        <div className="w-1.25 h-1.25 rounded-full bg-[#A78BFA] animate-tdot" style={{ animationDelay: "0.15s" }} />
-                        <div className="w-1.25 h-1.25 rounded-full bg-[#A78BFA] animate-tdot" style={{ animationDelay: "0.3s" }} />
-                      </div>
+                      <Loader2 className="h-4 w-4 text-[#7C3AED] animate-spin" />
                     )}
                   </div>
                   <div className="shrink-0">
@@ -945,7 +984,7 @@ export default function LabWorkspace({
                         className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center bg-none border-none cursor-pointer text-[#5521FF] rounded-full text-xs transition-colors hover:bg-[#5521FF]/10"
                         onClick={() => askAiMessage(inputValue)}
                       >
-                        ➤
+                        <SendHorizontal size={16} />
                       </button>
                     </div>
                   </div>
@@ -969,11 +1008,11 @@ export default function LabWorkspace({
                         key={idx}
                         className={`border border-[#E4E4E7] rounded-lg p-2.5 text-[11px] transition-colors duration-150 ${revealed ? "bg-[#F9F9FB] text-[#334155]" : "bg-[#FAFAFA] text-[#71717A]"}`}
                       >
-                        <div className="text-[10px] font-bold mb-1">Hint {idx + 1}</div>
+                        <div className="text-[10px] font-bold mb-1">
+                          Hint {idx + 1}
+                        </div>
                         {revealed ? (
-                          <p className="text-[11px] leading-relaxed">
-                            {hint}
-                          </p>
+                          <p className="text-[11px] leading-relaxed">{hint}</p>
                         ) : (
                           <button
                             className="bg-[#5521FF] text-white border-none rounded-[5px] px-2.5 py-1 text-[10px] font-bold cursor-pointer font-sans mt-1 hover:bg-[#5521FF]/85"
@@ -994,11 +1033,17 @@ export default function LabWorkspace({
                 <div className="flex flex-col gap-3">
                   <div className="bg-white border border-[#E4E4E7] rounded-[10px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all duration-200 hover:shadow-[0_6px_20px_rgba(85,33,255,0.08)] hover:border-[#5521FF]">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">Viva Prep</span>
-                      <span className="text-[10px] font-bold text-[#5521FF]">Latest Score</span>
+                      <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
+                        Viva Prep
+                      </span>
+                      <span className="text-[10px] font-bold text-[#5521FF]">
+                        Latest Score
+                      </span>
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <div className="text-[28px] font-black text-[#18181B] tracking-tighter shrink-0">86%</div>
+                      <div className="text-[28px] font-black text-[#18181B] tracking-tighter shrink-0">
+                        86%
+                      </div>
                       <div className="flex-1 h-1.5 bg-[#F4F4F5] rounded-full overflow-hidden">
                         <div
                           className="h-full bg-[#5521FF] rounded-full"
@@ -1020,12 +1065,12 @@ export default function LabWorkspace({
                     </button>
                   </div>
                   <div className="bg-[#F0ECFF] border border-[#5521FF]/10 rounded-lg p-2.5 text-[11px] text-[#52525B] leading-relaxed">
-                    <strong className="text-[#18181B] font-bold block mb-1.25">Why practice?</strong>
+                    <strong className="text-[#18181B] font-bold block mb-1.25">
+                      Why practice?
+                    </strong>
                     <span>1. Simulates actual oral exam questions.</span>
                     <br />
-                    <span>
-                      2. Analyzes verbal confidence and terminology.
-                    </span>
+                    <span>2. Analyzes verbal confidence and terminology.</span>
                     <br />
                     <span>3. Contributes up to 10 marks to your record.</span>
                   </div>
