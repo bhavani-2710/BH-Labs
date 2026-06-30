@@ -111,59 +111,13 @@ function VivaWrapper({ experiments, onCompleteViva }) {
  * Looks up the first experiment belonging to this subject and boots VivaPractice.
  * Falls back gracefully if no experiments are found yet.
  */
-function SubjectVivaWrapper({ experiments, onCompleteViva }) {
+function SubjectVivaWrapper({ onCompleteViva }) {
   const { subjectId } = useParams();
   const navigate = useNavigate();
 
-  const [subjectExperiments, setSubjectExperiments] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!subjectId) return;
-    const fetchExperiments = async () => {
-      try {
-        const res = await fetch(`${API}/experiments/subject/${subjectId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setSubjectExperiments(data);
-        }
-      } catch (err) {
-        console.error("SubjectVivaWrapper fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchExperiments();
-  }, [subjectId]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen text-gray-500">
-        Loading viva…
-      </div>
-    );
-  }
-
-  const firstExperiment = subjectExperiments[0];
-
-  if (!firstExperiment) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-gray-600">
-        <p className="text-lg font-medium">No experiments found for this subject.</p>
-        <button
-          onClick={() => navigate(`/subject/${subjectId}`)}
-          className="px-5 py-2.5 bg-[#5521FF] text-white rounded-xl text-sm font-semibold hover:bg-violet-700"
-        >
-          Back to Subject
-        </button>
-      </div>
-    );
-  }
-
   return (
     <VivaPractice
-      experiment={firstExperiment}
-      subPart="a"
+      subjectId={subjectId}
       onBack={() => navigate(`/subject/${subjectId}`)}
       onCompleteViva={onCompleteViva}
     />
@@ -291,7 +245,7 @@ export default function App() {
 
       {/* Viva from subjects list (subject-level → first experiment) */}
       <Route path="/viva/subject/:subjectId" element={
-        <SubjectVivaWrapper experiments={experiments} onCompleteViva={handleCompleteViva} />
+        <SubjectVivaWrapper onCompleteViva={handleCompleteViva} />
       } />
 
       <Route path="/journal/:experimentId/:part?" element={

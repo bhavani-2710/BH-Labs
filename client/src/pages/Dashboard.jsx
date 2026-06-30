@@ -53,20 +53,7 @@ export default function Dashboard({
               <BookOpen className="w-4 h-4" />
               <span>Subjects</span>
             </button>
-            <button 
-              onClick={() => navigate(`/viva/${experiments[0]?._id}/a`)}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all text-left"
-            >
-              <Mic2 className="w-4 h-4" />
-              <span>Viva Practice</span>
-            </button>
-            <button 
-              onClick={() => navigate(`/journal/${experiments[1]?._id}/a`)}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all text-left"
-            >
-              <FileSpreadsheet className="w-4 h-4" />
-              <span>Journals</span>
-            </button>
+
           </nav>
         </div>
 
