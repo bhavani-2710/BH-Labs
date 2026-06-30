@@ -122,13 +122,6 @@ export default function LabWorkspace({
     }
   };
 
-  const hintsList = [
-    "Identify the input variables: for sorting, we need an integer array.",
-    "Outer loop runs n-1 times; inner loop runs n-i-1 times.",
-    "Use precise terms in viva: 'time complexity', 'nested loop', 'auxiliary space'.",
-    "Always close files with fclose() to avoid memory leaks.",
-  ];
-
   // Runs when experiment/subPart changes — pre-fill starter code for all languages
   useEffect(() => {
     console.log(subExp);
@@ -997,11 +990,8 @@ export default function LabWorkspace({
                     <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
                       Available Hints
                     </span>
-                    <span className="text-[10px] bg-[#F0ECFF] border border-[#5521FF]/15 text-[#5521FF] font-bold px-1.75 py-[1px] rounded-[3px]">
-                      100 XP
-                    </span>
                   </div>
-                  {hintsList.map((hint, idx) => {
+                  {subExp?.hints.map((hint, idx) => {
                     const revealed = idx < revealedHints;
                     return (
                       <div
@@ -1020,7 +1010,7 @@ export default function LabWorkspace({
                               setRevealedHints((p) => Math.max(p, idx + 1))
                             }
                           >
-                            Reveal (−5 XP)
+                            Reveal Hint
                           </button>
                         )}
                       </div>
