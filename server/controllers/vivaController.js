@@ -34,10 +34,10 @@ function cleanRawJson(rawText) {
   let result = "";
   let inString = false;
   let escapeNext = false;
-  
+
   for (let i = 0; i < rawText.length; i++) {
     const char = rawText[i];
-    
+
     if (inString) {
       if (escapeNext) {
         const validEscapes = ['"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u'];
@@ -165,48 +165,28 @@ const generateVivaQuestions = async (req, res) => {
     // At least one question per concept; minimum 5, cap at 20
     const numQuestions = Math.min(20, Math.max(5, allConcepts.length));
 
-    const prompt = `You are a friendly, conversational college lab assistant helping a student prepare. Generate exactly ${numQuestions} challenging, conceptually deep viva questions for the subject: "${subject.name}" (${subject.description || ""}).
+    const prompt = `You are a university viva examiner. Generate ${numQuestions} deep conceptual questions for "${subject.name}".
 
-The student has completed the following practical experiments in the lab:
-${experiments.map((exp) => `Experiment ${exp.experimentNumber}: ${exp.problemStatement}\nSub-parts:\n${exp.subExperiments.map(s => `- Title: "${s.title}", concepts: [${s.concepts.join(", ")}]`).join("\n")}`).join("\n\n")}
+Experiments: ${experiments.map((exp) => `${exp.experimentNumber}. ${exp.problemStatement} [${exp.subExperiments.map(s => s.concepts.join(", ")).join("; ")}]`).join(" | ")}
 
-All concepts that MUST be covered (one question per concept at minimum):
-${allConcepts.map((c, i) => `${i + 1}. ${c}`).join("\n")}
+Concepts (one question each): ${allConcepts.join(", ")}
 
-IMPORTANT RULES FOR QUESTIONS:
-- Generate exactly ${numQuestions} questions — one for each concept listed above.
-- Questions must NOT be simple definitions (e.g., do NOT ask "What is X?"). Instead, ask about:
-  1. Internal mechanics, logic flow, and execution behavior.
-  2. Performance trade-offs (time vs. space complexity constraints).
-  3. Edge cases, potential bugs, or failure states (e.g., buffer overflows, out-of-bounds, infinite loops).
-- Tone MUST be casual, conversational, and friendly. Avoid overly formal or robotic academic phrasing. Start occasionally with phrases like "So, let's talk about...", "Hey, what happens if...", "Can you explain why...".
-- Questions should require critical thinking and technical depth to answer, yet remain direct and concise (under 25 words).
-- Every concept in the list above must appear as a "masteryTopic" for exactly one question.
+RULES:
+- NO code tracing ("what does this print?"), NO bare/trivial definitions ("what is X?"), NO trivial questions
+- Mix two question styles across the set, both rooted in the listed concepts:
+  1. Applied/mechanism questions — internal mechanisms, comparisons/tradeoffs, consequences of changes, design decisions, common misconceptions tied to what was implemented
+  2. Theoretical questions — the underlying theory, principles, or properties behind a concept (e.g. "Why does X theoretically guarantee Y?", "Under what conditions does X fail?", "What property makes X preferable to Y in general?", "How does the principle behind X generalize beyond this specific implementation?")
+- Theoretical questions must still require explanation/reasoning, not a one-line definition
+- Questions: 20-40 words, require deep understanding (either applied or theoretical)
+- Code: optional, only to illustrate a concept (not the focus)
+- Tone: direct examiner ("Explain why...", "What's the difference between...", "If you remove X, what happens?", "Why does X theoretically guarantee...")
 
-For each question, provide:
-1. "id": integer (1 to ${numQuestions})
-2. "label": "Question X of ${numQuestions}"
-3. "question": The conversational, technical question text (under 25 words)
-4. "code": A multi-line C/C++/python/java/js code snippet representing a realistic scenario or bug. Use standard JSON formatting. Do not double-escape structural newlines.
-5. "hint": A deep conceptual clue pointing to underlying principles
-6. "masteryTopic": The concept name from the list above (must match exactly)
-7. "transcript": A conversational, clear model answer in 2-3 sentences explaining the mechanics, complexity, or logic.
+JSON per question: id (int), label ("Question X of ${numQuestions}"), question (string), code (string or ""), hint (1 sentence), masteryTopic (exact concept name), transcript (3-4 sentence model answer)
 
-Output ONLY a valid JSON array. No markdown, no commentary.
-[
-  {
-    "id": 1,
-    "label": "Question 1 of ${numQuestions}",
-    "question": "...",
-    "code": "...",
-    "hint": "...",
-    "masteryTopic": "...",
-    "transcript": "..."
-  }
-]`;
+Output ONLY a JSON array. No markdown, no backticks.`;
 
     const response = await openai.chat.completions.create({
-      model: "openai/gpt-oss-120b",
+      model: "google/gemini-2.5-flash-lite",
       messages: [
         {
           role: "system",
@@ -221,11 +201,19 @@ Output ONLY a valid JSON array. No markdown, no commentary.
     });
 
     let rawText = response.choices?.[0]?.message?.content || "";
-    rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+    
+    // Extract JSON array robustly
+    const arrStart = rawText.indexOf('[');
+    const arrEnd = rawText.lastIndexOf(']');
+    if (arrStart !== -1 && arrEnd > arrStart) {
+      rawText = rawText.substring(arrStart, arrEnd + 1);
+    } else {
+      rawText = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
+    }
 
     const cleanedText = cleanRawJson(rawText);
     const parsedQuestions = JSON.parse(cleanedText);
-    
+
     res.json({ questions: parsedQuestions, subjectName: subject.name });
   } catch (error) {
     console.error("Generate viva questions error:", error);
@@ -244,11 +232,11 @@ const evaluateVivaAnswer = async (req, res) => {
     // 1. Fast-path local validation for obvious non-answers
     const cleanAns = studentAnswer.trim().toLowerCase();
     const nonAnswers = [
-      "i don't know", "i dont know", "dont know", "don't know", "no idea", 
-      "no clue", "skip", "hello", "hi", "hey", "test", "nothing", "pass", 
+      "i don't know", "i dont know", "dont know", "don't know", "no idea",
+      "no clue", "skip", "hello", "hi", "hey", "test", "nothing", "pass",
       "no", "yes", "i do not know", "do not know", "none"
     ];
-    
+
     if (cleanAns.length < 5 || nonAnswers.includes(cleanAns) || cleanAns.split(" ").length < 3) {
       return res.json({
         score: 0,
@@ -290,7 +278,7 @@ Expected Answer: "${modelAnswer || ""}"
 Student's Answer: "${studentAnswer}"`;
 
     const response = await openai.chat.completions.create({
-      model: "openai/gpt-oss-120b",
+      model: "google/gemini-2.5-flash-lite",
       messages: [
         {
           role: "system",
@@ -305,11 +293,19 @@ Student's Answer: "${studentAnswer}"`;
     });
 
     let rawText = response.choices?.[0]?.message?.content || "";
-    rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+    
+    // Extract JSON object robustly
+    const objStart = rawText.indexOf('{');
+    const objEnd = rawText.lastIndexOf('}');
+    if (objStart !== -1 && objEnd > objStart) {
+      rawText = rawText.substring(objStart, objEnd + 1);
+    } else {
+      rawText = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
+    }
 
     const cleanedText = cleanRawJson(rawText);
     const evaluation = JSON.parse(cleanedText);
-    
+
     res.json(evaluation);
   } catch (error) {
     console.error("Evaluate viva answer error:", error);
@@ -355,9 +351,9 @@ const transcribeAudio = async (req, res) => {
     console.error("Whisper transcription error:", error);
     // Clean up whichever file exists
     if (renamedPath) {
-      try { fs.unlinkSync(renamedPath); } catch (_) {}
+      try { fs.unlinkSync(renamedPath); } catch (_) { }
     } else if (req.file?.path) {
-      try { fs.unlinkSync(req.file.path); } catch (_) {}
+      try { fs.unlinkSync(req.file.path); } catch (_) { }
     }
     res.status(500).json({ error: error.message });
   }

@@ -50,7 +50,7 @@ Format:
 }`;
 
   const response = await openai.chat.completions.create({
-    model: "openai/gpt-oss-120b",
+    model: "openai/gpt-4o-mini",
     messages: [
       {
         role: "system",

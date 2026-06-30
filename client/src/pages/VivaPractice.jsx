@@ -494,7 +494,7 @@ export default function VivaPractice({ subjectId, experiment, onBack, onComplete
                 </button>
               </div>
 
-              <h2 style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", fontWeight: 700 }} className="text-slate-900 mb-6 leading-snug">
+              <h2 style={{ fontFamily: "Inter, sans-serif", fontSize: "15px", fontWeight: 700 }} className="text-slate-900 mb-6 leading-snug">
                 {currentQ?.question}
               </h2>
               {/* Code Snippet Context */}
