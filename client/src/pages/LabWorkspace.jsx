@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import FlowchartRenderer from "../components/FlowchartRenderer";
 import MarkdownRenderer from "../components/MarkdownRenderer";
+import { Loader2, SendHorizontal } from "lucide-react";
 
 const COMPILER_MAP = {
   c: "gcc-head-c",
@@ -26,373 +27,6 @@ const MONACO_LANG_MAP = {
   java: "java",
   javascript: "javascript",
 };
-
-const styles = `
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #FAFAFA;
-      color: #18181B;
-      overflow: hidden;
-      height: 100vh;
-      font-size: 13px;
-    }
-
-    ::selection { background: rgba(85,33,255,0.2); }
-
-    .custom-scrollbar::-webkit-scrollbar { width: 3px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E4E4E7; border-radius: 10px; }
-
-    /* ── Header ── */
-    .ws-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 6px 16px; border-bottom: 1px solid #E4E4E7;
-      background: #fff; z-index: 50; flex-shrink: 0; position: relative;
-      height: 44px;
-    }
-
-    .ws-breadcrumb {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
-      color: #71717A; text-transform: uppercase;
-    }
-    .ws-breadcrumb span { cursor: pointer; }
-    .ws-breadcrumb span:last-child { color: #18181B; font-weight: 700; cursor: default; }
-    .ws-breadcrumb-sep { color: #D4D4D8; font-size: 10px; }
-
-    .ws-lang-pill {
-      position: absolute; left: 50%; transform: translateX(-50%);
-      background: #F9F9FB; border: 1px solid #E4E4E7; border-radius: 999px;
-      padding: 3px 14px; font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: #71717A; text-transform: uppercase; letter-spacing: 0.1em;
-      white-space: nowrap;
-    }
-
-    .ws-lang-select {
-      position: absolute; left: 50%; transform: translateX(-50%);
-      background: #F9F9FB; border: 1px solid #E4E4E7; border-radius: 999px;
-      padding: 3px 14px; font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: #71717A; text-transform: uppercase; letter-spacing: 0.1em;
-      white-space: nowrap; cursor: pointer; outline: none;
-      transition: border-color 0.15s;
-    }
-    .ws-lang-select:hover { border-color: #5521FF; color: #5521FF; }
-    .ws-lang-select:focus { border-color: #5521FF; box-shadow: 0 0 0 2px rgba(85,33,255,0.15); }
-
-    @media (max-width: 900px) {
-      .ws-lang-pill, .ws-lang-select { display: none; }
-    }
-
-    .ws-header-right { display: flex; align-items: center; gap: 10px; }
-
-    .autosave-label { font-size: 10px; font-weight: 600; color: #71717A; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px; }
-    .autosave-dot { width: 5px; height: 5px; border-radius: 50%; background: #22C55E; flex-shrink: 0; }
-
-    .divider-v { width: 1px; height: 18px; background: #E4E4E7; flex-shrink: 0; }
-
-    .btn-back {
-      font-size: 11px; font-weight: 600; color: #71717A; background: none; border: none;
-      cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.15s, color 0.15s;
-      font-family: 'Inter', sans-serif; letter-spacing: 0.02em;
-    }
-    .btn-back:hover { background: #F4F4F5; color: #18181B; }
-
-    .btn-run {
-      background: rgba(34,197,94,0.1); color: #166534;
-      border: 1px solid rgba(34,197,94,0.3); padding: 5px 14px;
-      border-radius: 6px; font-size: 11px; font-weight: 700;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      cursor: pointer; transition: background 0.15s;
-      font-family: 'Inter', sans-serif;
-    }
-    .btn-run:hover { background: rgba(34,197,94,0.2); }
-    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .btn-journal {
-      background: #5521FF; color: #fff; border: none;
-      padding: 5px 14px; border-radius: 6px;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-      cursor: pointer; transition: filter 0.15s;
-      box-shadow: 0 2px 6px rgba(85,33,255,0.2);
-      font-family: 'Inter', sans-serif;
-    }
-    .btn-journal:hover { filter: brightness(1.1); }
-
-    .btn-solve {
-      background: rgba(85, 33, 255, 0.1); color: #5521FF;
-      border: 1px solid rgba(85, 33, 255, 0.3); padding: 5px 14px;
-      border-radius: 6px; font-size: 11px; font-weight: 700;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      cursor: pointer; transition: background 0.15s;
-      font-family: 'Inter', sans-serif;
-    }
-    .btn-solve:hover { background: rgba(85, 33, 255, 0.2); }
-
-    .btn-mark-completed {
-      background: #F4F4F5; color: #18181B;
-      border: 1px solid #E4E4E7; padding: 5px 14px;
-      border-radius: 6px; font-size: 11px; font-weight: 700;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      cursor: pointer; transition: all 0.15s ease;
-      font-family: 'Inter', sans-serif;
-    }
-    .btn-mark-completed.completed {
-      background: #10B981; color: #fff; border-color: #10B981;
-    }
-    .btn-mark-completed:hover {
-      background: #E4E4E7;
-    }
-    .btn-mark-completed.completed.hover-red:hover {
-      background: #EF4444 !important; border-color: #EF4444 !important; color: #fff !important;
-    }
-
-    /* ── IDE body ── */
-    .ws-body { display: flex; flex: 1; overflow: hidden; gap: 5px; padding: 5px; }
-
-    /* ── Panel ── */
-    .panel {
-      background: #fff; border: 1px solid #E4E4E7;
-      border-radius: 10px; overflow: hidden; display: flex; flex-direction: column;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-
-    /* ── Tab bar ── */
-    .tab-bar {
-      display: flex; gap: 3px; padding: 4px;
-      background: #F4F4F5; border-bottom: 1px solid #E4E4E7; flex-shrink: 0;
-    }
-    .tab-btn {
-      flex: 1; padding: 4px 0; border-radius: 5px; border: none; cursor: pointer;
-      font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-      background: transparent; color: #71717A;
-      transition: background 0.15s, color 0.15s;
-      font-family: 'Inter', sans-serif;
-    }
-    .tab-btn:hover { background: #EBEBEB; color: #18181B; }
-    .tab-btn.active { background: #5521FF; color: #fff; }
-
-    /* ── Left panel ── */
-    .left-panel { width: calc(25% + 4px); flex-shrink: 0; }
-
-    .panel-content { flex: 1; overflow-y: auto; padding: 18px; }
-
-    .theory-tag-easy { background: #DCFCE7; color: #166534; }
-    .theory-tag-medium { background: #FEF3C7; color: #92400E; }
-    .theory-tag-hard { background: #FEE2E2; color: #991B1B; }
-    .theory-tag-concept { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
-    .theory-tag { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em; display: inline-block; }
-
-    .theory-section-title { font-size: 12px; font-weight: 800; color: #1E293B; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; margin-top: 18px; }
-    .theory-body { font-size: 11px; color: #475569; line-height: 1.65; }
-
-    .example-box { background: #F8FAFC; border-radius: 14px; padding: 16px; margin-top: 8px; }
-    .example-box-title { font-size: 12px; font-weight: 700; color: #1E293B; margin-bottom: 10px; }
-    .example-row { display: flex; flex-direction: column; gap: 3px; padding: 4px 0; }
-    .example-label { color: #64748B; flex-shrink: 0; }
-    .example-value { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: #0F172A; text-align: left; white-space: pre-wrap; word-break: break-all; font-size: 11px; }
-
-    .ai-badge {
-      display: inline-block; padding: 1px 7px; border-radius: 3px; margin-bottom: 7px;
-      font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-      background: rgba(85,33,255,0.1); color: #5521FF; border: 1px solid rgba(85,33,255,0.2);
-    }
-
-    .theory-h2 { font-size: 15px; font-weight: 700; color: #18181B; margin-bottom: 8px; line-height: 1.3; }
-    .theory-p  { font-size: 12px; line-height: 1.6; color: #71717A; margin-bottom: 10px; }
-    .theory-quote {
-      padding: 8px 12px; background: #F0ECFF; border-radius: 8px;
-      border: 1px solid rgba(85,33,255,0.1); font-style: italic;
-      font-size: 12px; color: #5B21B6; margin-bottom: 12px; line-height: 1.5;
-    }
-
-    .key-concepts-label {
-      font-size: 10px; font-weight: 700; color: #5521FF;
-      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;
-    }
-    .concept-item {
-      display: flex; gap: 6px; align-items: flex-start;
-      font-size: 12px; color: #71717A; margin-bottom: 5px; line-height: 1.4;
-    }
-    .concept-check { color: #5521FF; flex-shrink: 0; font-size: 11px; }
-
-    .algo-box {
-      background: #F9F9FB; border: 1px solid #E4E4E7; border-radius: 8px;
-      padding: 12px; font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; line-height: 1.7; color: #334155; white-space: pre-line;
-    }
-
-    /* ── Center panel ── */
-    .center-panel { flex: 1; min-width: 0; }
-
-    .editor-tab-bar {
-      display: flex; align-items: center; background: #F4F4F5;
-      border-bottom: 1px solid #E4E4E7; height: 34px; flex-shrink: 0;
-    }
-    .editor-tab {
-      display: flex; align-items: center; gap: 5px;
-      padding: 0 14px; height: 100%;
-      background: #fff; border-right: 1px solid #E4E4E7;
-      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #18181B;
-    }
-    .editor-tab-dot { color: #5521FF; font-size: 12px; }
-
-    /* ── Console ── */
-    .console-wrap {
-      height: 26%; border-top: 1px solid #E4E4E7;
-      background: #F4F4F5; display: flex; flex-direction: column; flex-shrink: 0;
-    }
-    .console-tab-bar {
-      display: flex; align-items: center; gap: 12px;
-      padding: 0 12px; border-bottom: 1px solid #E4E4E7;
-      background: #F9F9FB; flex-shrink: 0;
-    }
-    .console-tab {
-      font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-      padding: 6px 2px; border: none; background: none; cursor: pointer;
-      color: #71717A; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
-      font-family: 'Inter', sans-serif;
-    }
-    .console-tab.active  { color: #5521FF; border-bottom-color: #5521FF; }
-    .console-tab:hover:not(.active) { color: #18181B; }
-
-    .console-body {
-      flex: 1; padding: 10px 12px;
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      color: #71717A; overflow-y: auto; line-height: 1.6;
-    }
-    .console-prompt { color: #5521FF; font-weight: 700; margin-right: 6px; }
-    .console-success { color: #16A34A; margin-top: 3px; }
-    .console-output  { color: #18181B; margin-top: 6px; }
-    .console-output span { color: #5521FF; font-weight: 700; }
-    .console-exit    { color: rgba(113,113,122,0.45); margin-top: 10px; }
-
-    /* ── Right panel ── */
-    .right-panel { width: 24%; flex-shrink: 0; display: flex; flex-direction: column; gap: 5px; }
-    @media (max-width: 900px) { .right-panel { display: none; } }
-
-    /* ── AI chat ── */
-    .ai-header  { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-shrink: 0; }
-    .ai-avatar  {
-      width: 26px; height: 26px; border-radius: 6px;
-      background: #5521FF; display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0;
-    }
-    .ai-name   { font-size: 11px; font-weight: 700; color: #18181B; }
-    .ai-status { font-size: 9px; color: #22C55E; display: flex; align-items: center; gap: 3px; }
-    .ai-dot    { width: 5px; height: 5px; border-radius: 50%; background: #22C55E; flex-shrink: 0; }
-
-    .chat-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
-
-    .bubble-ai {
-      background: #F0ECFF; border: 1px solid rgba(85,33,255,0.1);
-      border-radius: 10px; border-top-left-radius: 2px;
-      padding: 8px 10px; font-size: 11px; line-height: 1.6; color: #3730A3;
-      align-self: flex-start; max-width: 92%;
-      text-wrap: wrap;
-    }
-    .bubble-user {
-      background: #5521FF; color: #fff;
-      border-radius: 10px; border-top-right-radius: 2px;
-      padding: 8px 10px; font-size: 11px; line-height: 1.6;
-      align-self: flex-end; max-width: 85%;
-      box-shadow: 0 2px 6px rgba(85,33,255,0.2);
-      text-wrap: wrap;
-    }
-
-    .typing-bubble {
-      background: #F0ECFF; border: 1px solid rgba(85,33,255,0.1);
-      border-radius: 10px; border-top-left-radius: 2px;
-      padding: 8px 12px; display: inline-flex; align-items: center; gap: 3px;
-    }
-    .typing-dot {
-      width: 5px; height: 5px; border-radius: 50%; background: #A78BFA;
-      animation: tdot 1s infinite;
-    }
-    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes tdot {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-4px); }
-    }
-
-    .quick-chips { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 5px; }
-    .chip {
-      padding: 3px 8px; background: #F4F4F5; border: 1px solid #E4E4E7;
-      border-radius: 4px; font-size: 10px; color: #71717A; cursor: pointer;
-      transition: color 0.15s, border-color 0.15s; font-family: 'Inter', sans-serif; font-weight: 600;
-    }
-    .chip:hover { color: #5521FF; border-color: #5521FF; }
-
-    .ai-input-wrap { position: relative; }
-    .ai-input {
-      width: 100%; background: #F4F4F5; border: 1px solid #E4E4E7;
-      border-radius: 8px; padding: 8px 36px 8px 10px;
-      font-size: 11px; color: #18181B; outline: none;
-      font-family: 'Inter', sans-serif;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .ai-input:focus { border-color: #5521FF; box-shadow: 0 0 0 1px #5521FF; }
-    .ai-input::placeholder { color: #A1A1AA; }
-    .ai-send {
-      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
-      background: none; border: none; cursor: pointer; color: #5521FF;
-      border-radius: 50%; font-size: 12px; transition: background 0.15s;
-    }
-    .ai-send:hover { background: rgba(85,33,255,0.1); }
-
-    /* ── Hints ── */
-    .hint-card {
-      border: 1px solid #E4E4E7; border-radius: 8px; padding: 10px;
-      font-size: 11px; transition: background 0.15s;
-    }
-    .hint-card.revealed { background: #F9F9FB; color: #334155; }
-    .hint-card.locked   { background: #FAFAFA; color: #71717A; }
-    .hint-num  { font-size: 10px; font-weight: 700; margin-bottom: 4px; }
-    .hint-reveal-btn {
-      background: #5521FF; color: #fff; border: none; border-radius: 5px;
-      padding: 4px 10px; font-size: 10px; font-weight: 700; cursor: pointer;
-      font-family: 'Inter', sans-serif; margin-top: 4px;
-    }
-    .hint-reveal-btn:hover { background: rgba(85,33,255,0.85); }
-
-    /* ── Score / Viva card ── */
-    .score-card {
-      background: #fff; border: 1px solid #E4E4E7; border-radius: 10px; padding: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-      transition: box-shadow 0.2s, border-color 0.2s;
-    }
-    .score-card:hover { box-shadow: 0 6px 20px rgba(85,33,255,0.08); border-color: #5521FF; }
-
-    .score-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .score-label  { font-size: 10px; font-weight: 700; color: #71717A; text-transform: uppercase; letter-spacing: 0.05em; }
-    .score-latest { font-size: 10px; font-weight: 700; color: #5521FF; }
-
-    .score-row    { display: flex; align-items: center; gap: 10px; }
-    .score-pct    { font-size: 28px; font-weight: 900; color: #18181B; letter-spacing: -0.03em; flex-shrink: 0; }
-    .score-bar-wrap { flex: 1; height: 6px; background: #F4F4F5; border-radius: 999px; overflow: hidden; }
-    .score-bar-fill { height: 100%; background: #5521FF; border-radius: 999px; }
-
-    .btn-viva {
-      width: 100%; margin-top: 10px; padding: 8px 0;
-      background: #5521FF; color: #fff; border: none; border-radius: 8px;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-      cursor: pointer; box-shadow: 0 3px 10px rgba(85,33,255,0.2);
-      transition: transform 0.1s; font-family: 'Inter', sans-serif;
-    }
-    .btn-viva:hover  { transform: scale(1.02); }
-    .btn-viva:active { transform: scale(0.98); }
-
-    .viva-why {
-      background: #F0ECFF; border: 1px solid rgba(85,33,255,0.1);
-      border-radius: 8px; padding: 10px; font-size: 11px; color: #52525B; line-height: 1.7;
-    }
-    .viva-why strong { color: #18181B; font-weight: 700; display: block; margin-bottom: 5px; }
-  `;
 
 export default function LabWorkspace({
   onBack,
@@ -739,7 +373,6 @@ export default function LabWorkspace({
           "matplotlib",
           "scipy",
           "sklearn",
-          "sklearn",
           "tensorflow",
           "torch",
           "keras",
@@ -931,586 +564,522 @@ export default function LabWorkspace({
   };
 
   return (
-    <>
-      <style>{styles}</style>
-      <div
-        style={{
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          background: "#FAFAFA",
-        }}
-      >
-        {/* Header */}
-        <header className="ws-header">
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button className="btn-back" onClick={onBack}>
-              ← Back
-            </button>
-            <div className="divider-v" />
-            <nav className="ws-breadcrumb">
-              <span onClick={onBack}></span>
-              <span className="ws-breadcrumb-sep">›</span>
-              <span>{subExp?.title || "Bubble Sort"}</span>
-            </nav>
-          </div>
+    <div className="h-screen flex flex-col overflow-hidden bg-[#FAFAFA] selection:bg-[#5521FF]/20 font-sans text-[13px] text-[#18181B]">
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 py-1.5 border-b border-[#E4E4E7] bg-white z-50 shrink-0 relative h-11">
+        <div className="flex items-center gap-2">
+          <button
+            className="text-[11px] font-semibold text-[#71717A] bg-none border-none cursor-pointer px-2 py-1 rounded-[6px] transition-colors duration-150 font-sans tracking-wide hover:bg-[#F4F4F5] hover:text-[#18181B]"
+            onClick={onBack}
+          >
+            ← Back
+          </button>
+          <div className="w-[1px] h-[18px] bg-[#E4E4E7] shrink-0" />
+          <nav className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-[#71717A] uppercase">
+            <span onClick={onBack}></span>
+            <span className="text-[#D4D4D8] text-[10px]">›</span>
+            <span className="text-[#18181B] font-bold cursor-default">
+              {subExp?.title || "Bubble Sort"}
+            </span>
+          </nav>
+        </div>
 
-          {/* Language selector — dropdown if multiple, static pill if single */}
-          {supportedLanguages.length > 1 ? (
-            <select
-              className="ws-lang-select"
-              value={editorLanguage}
-              onChange={handleLanguageChange}
+        {/* Language selector — dropdown if multiple, static pill if single */}
+        {supportedLanguages.length > 1 ? (
+          <select
+            className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] border border-[#E4E4E7] rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] uppercase tracking-widest whitespace-nowrap cursor-pointer outline-none transition-colors duration-150 hover:border-[#5521FF] hover:text-[#5521FF] focus:border-[#5521FF] focus:ring-2 focus:ring-[#5521FF]/15 max-[900px]:hidden"
+            value={editorLanguage}
+            onChange={handleLanguageChange}
+          >
+            {supportedLanguages.map((lang) => (
+              <option key={lang} value={lang}>
+                {lang.toUpperCase()}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <div className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] border border-[#E4E4E7] rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] uppercase tracking-widest whitespace-nowrap hidden md:block">
+            {editorLanguage.toUpperCase()} Language
+          </div>
+        )}
+
+        <div className="flex items-center gap-2.5">
+          <div className="text-[10px] font-semibold text-[#71717A] uppercase tracking-wider flex items-center gap-1">
+            <span className="w-[5px] h-[5px] rounded-full bg-[#22C55E] shrink-0" />{" "}
+            {saveStatus}
+          </div>
+          <div className="w-[1px] h-[18px] bg-[#E4E4E7] shrink-0" />
+          <button
+            className="bg-[#22C55E]/10 text-[#166534] border border-[#22C55E]/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#22C55E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleRunCode}
+            disabled={isRunning}
+          >
+            {isRunning ? "Running..." : "Run"}
+          </button>
+          <button
+            className="bg-[#5521FF]/10 text-[#5521FF] border border-[#5521FF]/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#5521FF]/20"
+            onClick={handleSolveQuestion}
+          >
+            Solve Question
+          </button>
+          {completionKey && (
+            <button
+              onClick={toggleWorkspaceCompleted}
+              onMouseEnter={() => setIsDoneHovered(true)}
+              onMouseLeave={() => setIsDoneHovered(false)}
+              className={`border px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-all duration-150 font-sans ${isDone ? (isDoneHovered ? "bg-[#EF4444] border-[#EF4444] text-white" : "bg-[#10B981] border-[#10B981] text-white") : "bg-[#F4F4F5] text-[#18181B] border-[#E4E4E7] hover:bg-[#E4E4E7]"}`}
             >
-              {supportedLanguages.map((lang) => (
-                <option key={lang} value={lang}>
-                  {lang.toUpperCase()}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <div className="ws-lang-pill">
-              {editorLanguage.toUpperCase()} Language
-            </div>
+              {isDone
+                ? isDoneHovered
+                  ? "✖ Unmark Done"
+                  : "✓ Completed"
+                : "Mark Completed"}
+            </button>
           )}
+          <button
+            className="bg-[#5521FF] text-white border-none px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-all duration-150 shadow-[0_2px_6px_rgba(85,33,255,0.2)] font-sans hover:brightness-110"
+            onClick={() =>
+              onNavigate?.("journal-view", {
+                experimentId: experiment?._id,
+                subPart,
+              })
+            }
+          >
+            Generate Journal
+          </button>
+        </div>
+      </header>
 
-          <div className="ws-header-right">
-            <div className="autosave-label">
-              <span className="autosave-dot" /> {saveStatus}
-            </div>
-            <div className="divider-v" />
-            <button
-              className="btn-run"
-              onClick={handleRunCode}
-              disabled={isRunning}
-            >
-              {isRunning ? "Running..." : "Run"}
-            </button>
-            <button className="btn-solve" onClick={handleSolveQuestion}>
-              Solve Question
-            </button>
-            {completionKey && (
+      {/* IDE body */}
+      <div className="flex flex-1 overflow-hidden gap-[5px] p-[5px]">
+        {/* LEFT */}
+        <aside className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] w-[calc(25%)] shrink-0">
+          <div className="flex gap-[3px] p-1 bg-[#F4F4F5] border-b border-[#E4E4E7] shrink-0">
+            {["theory", "algorithm", "flowchart"].map((t) => (
               <button
-                onClick={toggleWorkspaceCompleted}
-                onMouseEnter={() => setIsDoneHovered(true)}
-                onMouseLeave={() => setIsDoneHovered(false)}
-                className={`btn-mark-completed${isDone ? " completed hover-red" : ""}`}
+                key={t}
+                className={`flex-1 py-1 px-0 rounded-[5px] border-none cursor-pointer text-[10px] font-bold tracking-wider uppercase transition-colors duration-150 font-sans ${activeLeftTab === t ? "bg-[#5521FF] text-white" : "bg-transparent text-[#71717A] hover:bg-[#EBEBEB] hover:text-[#18181B]"}`}
+                onClick={() => setActiveLeftTab(t)}
               >
-                {isDone
-                  ? isDoneHovered
-                    ? "✖ Unmark Done"
-                    : "✓ Completed"
-                  : "Mark Completed"}
+                {t.charAt(0).toUpperCase() + t.slice(1)}
               </button>
-            )}
-            <button
-              className="btn-journal"
-              onClick={() =>
-                onNavigate?.("journal-view", {
-                  experimentId: experiment?._id,
-                  subPart,
-                })
-              }
-            >
-              Generate Journal
-            </button>
+            ))}
           </div>
-        </header>
+          <div className="flex-1 overflow-y-auto p-[18px] custom-scrollbar">
+            {activeLeftTab === "theory" && (
+              <>
+                <span className="inline-block px-1.75 py-[1px] rounded-[3px] mb-1.75 text-[9px] font-bold tracking-widest uppercase bg-[#5521FF]/10 text-[#5521FF] border border-[#5521FF]/20">
+                  BH.AI GENERATED
+                </span>
 
-        {/* IDE body */}
-        <div className="ws-body">
-          {/* LEFT */}
-          <aside className="panel left-panel">
-            <div className="tab-bar">
-              {["theory", "algorithm", "flowchart"].map((t) => (
-                <button
-                  key={t}
-                  className={`tab-btn${activeLeftTab === t ? " active" : ""}`}
-                  onClick={() => setActiveLeftTab(t)}
-                >
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
-                </button>
-              ))}
-            </div>
-            <div className="panel-content custom-scrollbar">
-              {activeLeftTab === "theory" && (
-                <>
-                  <span className="ai-badge">BH.AI GENERATED</span>
+                <h2 className="text-base font-extrabold text-[#1E293B] mt-2.5 mb-3.5 leading-[1.2]">
+                  {subExp?.title || "Experiment"}
+                </h2>
 
-                  <h2
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 800,
-                      color: "#1E293B",
-                      marginTop: 10,
-                      marginBottom: 14,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {subExp?.title || "Experiment"}
-                  </h2>
+                {/* Tags */}
+                <div className="mb-5">
+                  {/* Difficulty */}
+                  {subExp?.difficulty && (
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest">
+                        Difficulty
+                      </span>
 
-                  {/* Tags */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 6,
-                      marginBottom: 20,
-                    }}
-                  >
-                    {subExp?.difficulty && (
                       <span
-                        className={`theory-tag ${
+                        className={`text-[10px] font-bold px-2 py-[3px] rounded-[4px] uppercase tracking-wider ${
                           subExp.difficulty.toLowerCase() === "easy"
-                            ? "theory-tag-easy"
+                            ? "bg-[#DCFCE7] text-[#166534]"
                             : subExp.difficulty.toLowerCase() === "medium"
-                              ? "theory-tag-medium"
-                              : "theory-tag-hard"
+                              ? "bg-[#FEF3C7] text-[#92400E]"
+                              : "bg-[#FEE2E2] text-[#991B1B]"
                         }`}
                       >
                         {subExp.difficulty}
                       </span>
-                    )}
-                    {subExp?.concepts &&
-                      subExp.concepts.map((concept, idx) => (
-                        <span
-                          key={idx}
-                          className="theory-tag theory-tag-concept"
-                        >
-                          {concept}
-                        </span>
-                      ))}
-                  </div>
-
-                  <div className="theory-section-title">Problem Statement</div>
-                  <p className="theory-body">
-                    {subExp?.problemStatement ||
-                      "Implement and analyze the algorithm."}
-                  </p>
-
-                  {subExp?.theory && (
-                    <>
-                      <div className="theory-section-title">Theory</div>
-                      <p className="theory-body">{subExp.theory}</p>
-                    </>
+                    </div>
                   )}
 
-                  {/* Example Blocks */}
-                  {subExp?.samples && subExp.samples.length > 0 && (
-                    <div style={{ marginTop: 24 }}>
-                      {subExp.samples.map((sample, idx) => (
-                        <div
-                          key={idx}
-                          className="example-box"
-                          style={{ marginBottom: 12 }}
-                        >
-                          <div className="example-box-title">
-                            Example {idx + 1}
-                          </div>
-                          <div
-                            className="example-row"
-                            style={{ marginBottom: 6 }}
+                  {/* Concepts */}
+                  {subExp?.concepts?.length > 0 && (
+                    <div>
+                      <div className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest mb-1.5">
+                        Concepts
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {subExp.concepts.map((concept, idx) => (
+                          <span
+                            key={idx}
+                            className="text-[10px] font-bold px-2 py-[3px] rounded-[4px] uppercase tracking-wider bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]"
                           >
-                            <span className="example-label">Input:</span>
-                            <span className="example-value">
-                              {sample.input}
-                            </span>
-                          </div>
-                          <div className="example-row">
-                            <span className="example-label">Output:</span>
-                            <span className="example-value">
-                              {sample.output}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                            {concept}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
-                </>
-              )}
-              {activeLeftTab === "algorithm" && (
-                <>
-                  <div
-                    className="key-concepts-label"
-                    style={{ marginBottom: 8 }}
-                  >
-                    Step-by-Step Logic
-                  </div>
-                  <div className="algo-box">
-                    {subExp?.algorithm ||
-                      `START\nStep 1: Read array of n elements\nStep 2: For i = 0 to n-2\n  For j = 0 to n-i-2\n    If arr[j] > arr[j+1]\n      Swap elements\nStep 3: Print sorted array\nEND`}
-                  </div>
-                </>
-              )}
-              {activeLeftTab === "flowchart" && (
-                <>
-                  <div
-                    className="key-concepts-label"
-                    style={{ marginBottom: 8 }}
-                  >
-                    Logic Flow
-                  </div>
-                  <div
-                    style={{
-                      background: "#F9F9FB",
-                      border: "1px solid #E4E4E7",
-                      borderRadius: 8,
-                      padding: 6,
-                      overflow: "auto",
-                    }}
-                  >
-                    <FlowchartRenderer
-                      nodes={subExp?.flowchart?.nodes}
-                      edges={subExp?.flowchart?.edges}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-          </aside>
+                </div>
 
-          {/* CENTER */}
-          <section className="panel center-panel">
-            <div className="editor-tab-bar">
-              <div className="editor-tab">
-                <span className="editor-tab-dot">◉</span>
-                <span>main.{EXTENSION_MAP[editorLanguage] || "c"}</span>
-              </div>
-            </div>
-            <div style={{ flex: 1, overflow: "hidden" }}>
-              <Editor
-                height="100%"
-                language={MONACO_LANG_MAP[editorLanguage] || "c"}
-                theme="light"
-                value={code}
-                onChange={(value) => {
-                  const newCode = value || "";
-                  setCode(newCode);
-                  setCodeByLang((prev) => ({
-                    ...prev,
-                    [editorLanguage]: newCode,
-                  }));
-                  setSaveStatus("Saving...");
-                  if (onSaveCode) {
-                    onSaveCode(experiment._id, subPart, newCode);
-                  }
-                  setTimeout(() => setSaveStatus("Saved"), 600);
-                }}
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 13,
-                  fontFamily: "JetBrains Mono, monospace",
-                  automaticLayout: true,
-                  padding: { top: 12 },
-                  scrollBeyondLastLine: false,
-                  lineNumbersMinChars: 3,
-                  lineHeight: 20,
-                  wordWrap: "on",
-                }}
-              />
-            </div>
-            <div className="console-wrap">
-              <div className="console-tab-bar">
-                <button
-                  className={`console-tab${consoleTab === "input" ? " active" : ""}`}
-                  onClick={() => setConsoleTab("input")}
-                >
-                  Input
-                </button>
-                <button
-                  className={`console-tab${consoleTab === "output" ? " active" : ""}`}
-                  onClick={() => setConsoleTab("output")}
-                >
-                  Output
-                </button>
-                <button
-                  className={`console-tab${consoleTab === "errors" ? " active" : ""}`}
-                  onClick={() => setConsoleTab("errors")}
-                >
-                  Errors{consoleErrors ? " (1)" : ""}
-                </button>
-              </div>
-              <div className="console-body custom-scrollbar">
-                {consoleTab === "input" && (
-                  <textarea
-                    value={stdinInput}
-                    onChange={(e) => setStdinInput(e.target.value)}
-                    placeholder={
-                      "Type program input here (one value per line)...\nExample:\n5\n64 25 12 22 11"
-                    }
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      background: "transparent",
-                      border: "none",
-                      resize: "none",
-                      outline: "none",
-                      fontFamily: "JetBrains Mono, monospace",
-                      fontSize: 12,
-                      color: "#18181B",
-                      lineHeight: 1.6,
-                    }}
+                <div className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest mb-1.5 mt-4.5">
+                  Problem Statement
+                </div>
+                <p className="text-[11px] text-[#475569] leading-relaxed">
+                  {subExp?.problemStatement ||
+                    "Implement and analyze the algorithm."}
+                </p>
+
+                {subExp?.theory && (
+                  <>
+                    <div className="text-[12px] font-extrabold text-[#1E293B] uppercase tracking-widest mb-1.5 mt-4.5">
+                      Theory
+                    </div>
+                    <p className="text-[11px] text-[#475569] leading-relaxed">
+                      {subExp.theory}
+                    </p>
+                  </>
+                )}
+
+                {/* Example Blocks */}
+                {subExp?.samples && subExp.samples.length > 0 && (
+                  <div className="mt-6">
+                    {subExp.samples.map((sample, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-[#F8FAFC] rounded-[14px] p-4 mt-2 mb-3"
+                      >
+                        <div className="text-[12px] font-bold text-[#1E293B] mb-2.5">
+                          Example {idx + 1}
+                        </div>
+                        <div className="flex flex-col gap-[3px] py-1 mb-1.5">
+                          <span className="text-[#64748B] shrink-0">
+                            Input:
+                          </span>
+                          <span className="font-mono font-medium text-[#0F172A] text-left whitespace-pre-wrap break-all text-[11px]">
+                            {sample.input}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-[3px] py-1">
+                          <span className="text-[#64748B] shrink-0">
+                            Output:
+                          </span>
+                          <span className="font-mono font-medium text-[#0F172A] text-left whitespace-pre-wrap break-all text-[11px]">
+                            {sample.output}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+            {activeLeftTab === "algorithm" && (
+              <>
+                <div className="text-[10px] font-bold text-[#5521FF] uppercase tracking-widest mb-2">
+                  Step-by-Step Logic
+                </div>
+                <div className="bg-[#F9F9FB] border border-[#E4E4E7] rounded-lg p-3 font-mono text-[11px] leading-relaxed text-[#334155] whitespace-pre-line">
+                  {subExp?.algorithm ||
+                    `START\nStep 1: Read array of n elements\nStep 2: For i = 0 to n-2\n  For j = 0 to n-i-2\n    If arr[j] > arr[j+1]\n      Swap elements\nStep 3: Print sorted array\nEND`}
+                </div>
+              </>
+            )}
+            {activeLeftTab === "flowchart" && (
+              <>
+                <div className="text-[10px] font-bold text-[#5521FF] uppercase tracking-widest mb-2">
+                  Logic Flow
+                </div>
+                <div className="bg-[#F9F9FB] border border-[#E4E4E7] rounded-lg p-1.5 overflow-auto">
+                  <FlowchartRenderer
+                    nodes={subExp?.flowchart?.nodes}
+                    edges={subExp?.flowchart?.edges}
                   />
-                )}
-                {consoleTab === "output" &&
-                  (consoleOutput ? (
-                    <pre style={{ whiteSpace: "pre-wrap", margin: 0 }}>
-                      {consoleOutput}
-                    </pre>
-                  ) : (
-                    <span style={{ fontStyle: "italic", color: "#A1A1AA" }}>
-                      Click "Run" to compile and execute your code.
-                    </span>
-                  ))}
-                {consoleTab === "errors" &&
-                  (consoleErrors ? (
-                    <pre
-                      style={{
-                        color: "#DC2626",
-                        whiteSpace: "pre-wrap",
-                        margin: 0,
-                      }}
-                    >
-                      {consoleErrors}
-                    </pre>
-                  ) : (
-                    <span style={{ fontStyle: "italic", color: "#A1A1AA" }}>
-                      No errors found.
-                    </span>
-                  ))}
-              </div>
+                </div>
+              </>
+            )}
+          </div>
+        </aside>
+
+        {/* CENTER */}
+        <section className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0">
+          <div className="flex items-center bg-[#F4F4F5] border-b border-[#E4E4E7] h-[34px] shrink-0">
+            <div className="flex items-center gap-1.25 px-3.5 h-full bg-white border-r border-[#E4E4E7] font-mono text-[11px] text-[#18181B]">
+              <span className="text-[#5521FF] text-xs">◉</span>
+              <span>main.{EXTENSION_MAP[editorLanguage] || "c"}</span>
             </div>
-          </section>
-
-          {/* RIGHT */}
-          <aside className="right-panel">
-            <div className="panel" style={{ flex: 1, overflow: "hidden" }}>
-              <div className="tab-bar">
-                {[
-                  ["assistant", "Assistant"],
-                  ["hints", "Hints"],
-                  ["viva", "Viva"],
-                ].map(([key, label]) => (
-                  <button
-                    key={key}
-                    className={`tab-btn${activeRightTab === key ? " active" : ""}`}
-                    onClick={() => setActiveRightTab(key)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-
-              <div
-                className="panel-content custom-scrollbar"
-                style={{ display: "flex", flexDirection: "column" }}
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <Editor
+              height="100%"
+              language={MONACO_LANG_MAP[editorLanguage] || "c"}
+              theme="light"
+              value={code}
+              onChange={(value) => {
+                const newCode = value || "";
+                setCode(newCode);
+                setCodeByLang((prev) => ({
+                  ...prev,
+                  [editorLanguage]: newCode,
+                }));
+                setSaveStatus("Saving...");
+                if (onSaveCode) {
+                  onSaveCode(experiment._id, subPart, newCode);
+                }
+                setTimeout(() => setSaveStatus("Saved"), 600);
+              }}
+              options={{
+                minimap: { enabled: false },
+                fontSize: 13,
+                fontFamily: "JetBrains Mono, monospace",
+                automaticLayout: true,
+                padding: { top: 12 },
+                scrollBeyondLastLine: false,
+                lineNumbersMinChars: 3,
+                lineHeight: 20,
+                wordWrap: "on",
+              }}
+            />
+          </div>
+          <div className="h-[26%] border-t border-[#E4E4E7] bg-[#F4F4F5] flex flex-col shrink-0">
+            <div className="flex items-center gap-3 px-3 border-b border-[#E4E4E7] bg-[#F9F9FB] shrink-0">
+              <button
+                className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "input" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                onClick={() => setConsoleTab("input")}
               >
-                {activeRightTab === "assistant" && (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "100%",
-                      gap: 10,
-                    }}
-                  >
-                    <div className="ai-header">
-                      <div className="ai-avatar">AI</div>
-                      <div>
-                        <div className="ai-name">Bh.AI Assistant</div>
-                        <div className="ai-status">
-                          <span className="ai-dot" /> Online
-                        </div>
-                      </div>
+                Input
+              </button>
+              <button
+                className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "output" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                onClick={() => setConsoleTab("output")}
+              >
+                Output
+              </button>
+              <button
+                className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "errors" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                onClick={() => setConsoleTab("errors")}
+              >
+                Errors{consoleErrors ? " (1)" : ""}
+              </button>
+            </div>
+            <div className="flex-1 p-2.5 px-3 font-mono text-[11px] text-[#71717A] overflow-y-auto leading-relaxed custom-scrollbar">
+              {consoleTab === "input" && (
+                <textarea
+                  value={stdinInput}
+                  onChange={(e) => setStdinInput(e.target.value)}
+                  placeholder={
+                    "Type program input here (one value per line)...\nExample:\n5\n64 25 12 22 11"
+                  }
+                  className="w-full h-full bg-transparent border-none resize-none outline-none font-mono text-[12px] text-[#18181B] leading-relaxed"
+                />
+              )}
+              {consoleTab === "output" &&
+                (consoleOutput ? (
+                  <pre className="whitespace-pre-wrap m-0">{consoleOutput}</pre>
+                ) : (
+                  <span className="italic text-[#A1A1AA]">
+                    Click "Run" to compile and execute your code.
+                  </span>
+                ))}
+              {consoleTab === "errors" &&
+                (consoleErrors ? (
+                  <pre className="text-[#DC2626] whitespace-pre-wrap m-0">
+                    {consoleErrors}
+                  </pre>
+                ) : (
+                  <span className="italic text-[#A1A1AA]">
+                    No errors found.
+                  </span>
+                ))}
+            </div>
+          </div>
+        </section>
+
+        {/* RIGHT */}
+        <aside className="w-[25%] shrink-0 flex flex-col gap-[5px] max-[900px]:hidden">
+          <div className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1">
+            <div className="flex gap-[3px] p-1 bg-[#F4F4F5] border-b border-[#E4E4E7] shrink-0">
+              {[
+                ["assistant", "Assistant"],
+                ["hints", "Hints"],
+                ["viva", "Viva"],
+              ].map(([key, label]) => (
+                <button
+                  key={key}
+                  className={`flex-1 py-1 px-0 rounded-[5px] border-none cursor-pointer text-[10px] font-bold tracking-wider uppercase transition-colors duration-150 font-sans ${activeRightTab === key ? "bg-[#5521FF] text-white" : "bg-transparent text-[#71717A] hover:bg-[#EBEBEB] hover:text-[#18181B]"}`}
+                  onClick={() => setActiveRightTab(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-[18px] custom-scrollbar flex flex-col">
+              {activeRightTab === "assistant" && (
+                <div className="flex flex-col h-full gap-2.5">
+                  <div className="flex items-center gap-2 mb-2 shrink-0">
+                    <div className="w-6.5 h-6.5 rounded-[6px] bg-[#5521FF] flex items-center justify-center text-white text-[12px] font-bold shrink-0">
+                      AI
                     </div>
-                    <div
-                      className="chat-scroll custom-scrollbar"
-                      style={{ flex: 1 }}
-                    >
-                      {chatMessages.map((msg, i) => (
-                        <div
-                          key={i}
-                          className={
-                            msg.sender === "ai" ? "bubble-ai" : "bubble-user"
-                          }
-                        >
-                          {msg.sender === "ai" ? (
-                            <MarkdownRenderer text={msg.text} />
-                          ) : (
-                            msg.text
-                          )}
-                        </div>
-                      ))}
-                      {isAiTyping && (
-                        <div className="typing-bubble">
-                          <div className="typing-dot" />
-                          <div className="typing-dot" />
-                          <div className="typing-dot" />
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ flexShrink: 0 }}>
-                      <div className="quick-chips">
-                        <button
-                          className="chip"
-                          onClick={() =>
-                            askAiMessage("Can you explain the swap logic?")
-                          }
-                        >
-                          Swap Logic?
-                        </button>
-                        <button
-                          className="chip"
-                          onClick={() =>
-                            askAiMessage("What is the time complexity?")
-                          }
-                        >
-                          Time Complexity?
-                        </button>
+                    <div>
+                      <div className="text-[11px] font-bold text-[#18181B]">
+                        Bh.AI Assistant
                       </div>
-                      <div className="ai-input-wrap">
-                        <input
-                          className="ai-input"
-                          type="text"
-                          placeholder="Ask Bh.AI..."
-                          value={inputValue}
-                          onChange={(e) => setInputValue(e.target.value)}
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && askAiMessage(inputValue)
-                          }
-                        />
-                        <button
-                          className="ai-send"
-                          onClick={() => askAiMessage(inputValue)}
-                        >
-                          ➤
-                        </button>
+                      <div className="text-[9px] text-[#22C55E] flex items-center gap-[3px]">
+                        <span className="w-1.25 h-1.25 rounded-full bg-[#22C55E] shrink-0" />{" "}
+                        Online
                       </div>
                     </div>
                   </div>
-                )}
-
-                {activeRightTab === "hints" && (
-                  <div
-                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        paddingBottom: 6,
-                        borderBottom: "1px solid #E4E4E7",
-                        marginBottom: 2,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: "#71717A",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        Available Hints
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 10,
-                          background: "#F0ECFF",
-                          border: "1px solid rgba(85,33,255,0.15)",
-                          color: "#5521FF",
-                          fontWeight: 700,
-                          padding: "1px 7px",
-                          borderRadius: 3,
-                        }}
-                      >
-                        100 XP
-                      </span>
-                    </div>
-                    {hintsList.map((hint, idx) => {
-                      const revealed = idx < revealedHints;
-                      return (
-                        <div
-                          key={idx}
-                          className={`hint-card ${revealed ? "revealed" : "locked"}`}
-                        >
-                          <div className="hint-num">Hint {idx + 1}</div>
-                          {revealed ? (
-                            <p style={{ fontSize: 11, lineHeight: 1.6 }}>
-                              {hint}
-                            </p>
-                          ) : (
-                            <button
-                              className="hint-reveal-btn"
-                              onClick={() =>
-                                setRevealedHints((p) => Math.max(p, idx + 1))
-                              }
-                            >
-                              Reveal (−5 XP)
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {activeRightTab === "viva" && (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 12,
-                    }}
-                  >
-                    <div className="score-card">
-                      <div className="score-label-row">
-                        <span className="score-label">Viva Prep</span>
-                        <span className="score-latest">Latest Score</span>
-                      </div>
-                      <div className="score-row">
-                        <div className="score-pct">86%</div>
-                        <div className="score-bar-wrap">
-                          <div
-                            className="score-bar-fill"
-                            style={{ width: "86%" }}
-                          />
-                        </div>
-                      </div>
-                      <button
-                        className="btn-viva"
-                        onClick={() =>
-                          onNavigate?.("viva-practice", {
-                            subjectId: experiment?.subjectId,
-                            experimentId: experiment?._id,
-                            part: subPart,
-                          })
+                  <div className="flex-1 overflow-y-auto flex flex-col gap-2 pr-0.5 custom-scrollbar">
+                    {chatMessages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={
+                          msg.sender === "ai"
+                            ? "bg-[#F0ECFF] border border-[#5521FF]/10 rounded-[10px] rounded-tl-[2px] p-2 px-2.5 text-[11px] leading-relaxed text-[#3730A3] self-start max-w-[92%] text-wrap"
+                            : "bg-[#5521FF] text-white rounded-[10px] rounded-tr-[2px] p-2 px-2.5 text-[11px] leading-relaxed self-end max-w-[85%] shadow-[0_2px_6px_rgba(85,33,255,0.2)] text-wrap"
                         }
                       >
-                        Start Viva Practice
+                        {msg.sender === "ai" ? (
+                          <MarkdownRenderer text={msg.text} />
+                        ) : (
+                          msg.text
+                        )}
+                      </div>
+                    ))}
+                    {isAiTyping && (
+                      <Loader2 className="h-4 w-4 text-[#7C3AED] animate-spin" />
+                    )}
+                  </div>
+                  <div className="shrink-0">
+                    <div className="flex flex-wrap gap-[3px] mb-1.25">
+                      <button
+                        className="px-2 py-[3px] bg-[#F4F4F5] border border-[#E4E4E7] rounded-[4px] text-[10px] text-[#71717A] cursor-pointer transition-colors duration-150 font-sans font-semibold hover:text-[#5521FF] hover:border-[#5521FF]"
+                        onClick={() =>
+                          askAiMessage("Can you explain the swap logic?")
+                        }
+                      >
+                        Swap Logic?
+                      </button>
+                      <button
+                        className="px-2 py-[3px] bg-[#F4F4F5] border border-[#E4E4E7] rounded-[4px] text-[10px] text-[#71717A] cursor-pointer transition-colors duration-150 font-sans font-semibold hover:text-[#5521FF] hover:border-[#5521FF]"
+                        onClick={() =>
+                          askAiMessage("What is the time complexity?")
+                        }
+                      >
+                        Time Complexity?
                       </button>
                     </div>
-                    <div className="viva-why">
-                      <strong>Why practice?</strong>
-                      <span>1. Simulates actual oral exam questions.</span>
-                      <br />
-                      <span>
-                        2. Analyzes verbal confidence and terminology.
-                      </span>
-                      <br />
-                      <span>3. Contributes up to 10 marks to your record.</span>
+                    <div className="relative">
+                      <input
+                        className="w-full bg-[#F4F4F5] border border-[#E4E4E7] rounded-lg py-2 pl-2.5 pr-9 text-[11px] text-[#18181B] outline-none font-sans transition-all focus:border-[#5521FF] focus:ring-1 focus:ring-[#5521FF] placeholder:text-[#A1A1AA]"
+                        type="text"
+                        placeholder="Ask Bh.AI..."
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && askAiMessage(inputValue)
+                        }
+                      />
+                      <button
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center bg-none border-none cursor-pointer text-[#5521FF] rounded-full text-xs transition-colors hover:bg-[#5521FF]/10"
+                        onClick={() => askAiMessage(inputValue)}
+                      >
+                        <SendHorizontal size={16} />
+                      </button>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              {activeRightTab === "hints" && (
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center pb-1.5 border-b border-[#E4E4E7] mb-0.5">
+                    <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
+                      Available Hints
+                    </span>
+                    <span className="text-[10px] bg-[#F0ECFF] border border-[#5521FF]/15 text-[#5521FF] font-bold px-1.75 py-[1px] rounded-[3px]">
+                      100 XP
+                    </span>
+                  </div>
+                  {hintsList.map((hint, idx) => {
+                    const revealed = idx < revealedHints;
+                    return (
+                      <div
+                        key={idx}
+                        className={`border border-[#E4E4E7] rounded-lg p-2.5 text-[11px] transition-colors duration-150 ${revealed ? "bg-[#F9F9FB] text-[#334155]" : "bg-[#FAFAFA] text-[#71717A]"}`}
+                      >
+                        <div className="text-[10px] font-bold mb-1">
+                          Hint {idx + 1}
+                        </div>
+                        {revealed ? (
+                          <p className="text-[11px] leading-relaxed">{hint}</p>
+                        ) : (
+                          <button
+                            className="bg-[#5521FF] text-white border-none rounded-[5px] px-2.5 py-1 text-[10px] font-bold cursor-pointer font-sans mt-1 hover:bg-[#5521FF]/85"
+                            onClick={() =>
+                              setRevealedHints((p) => Math.max(p, idx + 1))
+                            }
+                          >
+                            Reveal (−5 XP)
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {activeRightTab === "viva" && (
+                <div className="flex flex-col gap-3">
+                  <div className="bg-white border border-[#E4E4E7] rounded-[10px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all duration-200 hover:shadow-[0_6px_20px_rgba(85,33,255,0.08)] hover:border-[#5521FF]">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
+                        Viva Prep
+                      </span>
+                      <span className="text-[10px] font-bold text-[#5521FF]">
+                        Latest Score
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="text-[28px] font-black text-[#18181B] tracking-tighter shrink-0">
+                        86%
+                      </div>
+                      <div className="flex-1 h-1.5 bg-[#F4F4F5] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#5521FF] rounded-full"
+                          style={{ width: "86%" }}
+                        />
+                      </div>
+                    </div>
+                    <button
+                      className="w-full mt-2.5 py-2 bg-[#5521FF] text-white border-none rounded-lg text-[11px] font-bold tracking-wider uppercase cursor-pointer shadow-[0_3px_10px_rgba(85,33,255,0.2)] transition-transform duration-100 font-sans hover:scale-[1.02] active:scale-[0.98]"
+                      onClick={() =>
+                        onNavigate?.("viva-practice", {
+                          subjectId: experiment?.subjectId,
+                          experimentId: experiment?._id,
+                          part: subPart,
+                        })
+                      }
+                    >
+                      Start Viva Practice
+                    </button>
+                  </div>
+                  <div className="bg-[#F0ECFF] border border-[#5521FF]/10 rounded-lg p-2.5 text-[11px] text-[#52525B] leading-relaxed">
+                    <strong className="text-[#18181B] font-bold block mb-1.25">
+                      Why practice?
+                    </strong>
+                    <span>1. Simulates actual oral exam questions.</span>
+                    <br />
+                    <span>2. Analyzes verbal confidence and terminology.</span>
+                    <br />
+                    <span>3. Contributes up to 10 marks to your record.</span>
+                  </div>
+                </div>
+              )}
             </div>
-          </aside>
-        </div>
+          </div>
+        </aside>
       </div>
-    </>
+    </div>
   );
 }

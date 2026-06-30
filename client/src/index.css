@@ -17,4 +17,22 @@
 
   --color-violet-600: #522bff;
   --color-violet-700: #522cfe;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-tdot: tdot 1s infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-14px); }
+  }
+
+  @keyframes tdot {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
 }
+
+.custom-scrollbar::-webkit-scrollbar { width: 3px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #E4E4E7; border-radius: 10px; }
+

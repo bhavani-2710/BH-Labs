@@ -1,23 +1,16 @@
 import { useState, useMemo, useEffect } from "react";
 import {
-  LayoutDashboard,
-  BookOpen,
-  PenTool,
-  FileText,
-  Settings,
-  LogOut,
   Share2,
   Download,
   ArrowRight,
   ChevronRight,
-  Terminal,
   AlertCircle,
   ChevronDown,
-  GraduationCap,
   ExternalLink,
   CheckCircle2,
 } from "lucide-react";
 import muLogo from "../assets/mu-logo.png";
+import Sidebar from "../components/Sidebar";
 
 export default function SubjectPage({
   onNavigate,
@@ -66,18 +59,6 @@ export default function SubjectPage({
     }
   });
 
-  const toggleCompleted = (expId, subPart, e) => {
-    e.stopPropagation();
-    const key = `${expId}__${subPart}`;
-    setCompletedSet((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      localStorage.setItem(completionKey, JSON.stringify([...next]));
-      return next;
-    });
-  };
-
   const isCompleted = (expId, subPart) =>
     completedSet.has(`${expId}__${subPart}`);
 
@@ -104,52 +85,7 @@ export default function SubjectPage({
   return (
     <div className="bg-[#F8F9FB] flex min-h-screen text-slate-800">
       {/* Sidebar */}
-      <aside
-        className="w-64 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0"
-        data-purpose="main-navigation"
-      >
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-sm shrink-0">
-              <img
-                src="/logo.png"
-                alt="BH.Lab Logo"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="text-xl font-bold text-[#5521FF]">BH.Lab</span>
-          </div>
-          <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">
-            Engineering Portal
-          </p>
-        </div>
-        <nav className="flex-1 px-4 py-4 space-y-1">
-          <button
-            onClick={() => onNavigate?.("dashboard")}
-            className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all w-full text-left"
-          >
-            <LayoutDashboard className="w-5 h-5" />
-            <span className="font-medium text-sm">Dashboard</span>
-          </button>
-          <button className="flex items-center gap-3 px-4 py-3 bg-[#F0ECFF] text-[#5521FF] rounded-xl transition-all w-full text-left">
-            <BookOpen className="w-5 h-5" />
-            <span className="font-medium text-sm">My Subjects</span>
-          </button>
-        </nav>
-        <div className="p-4 border-t border-slate-100">
-          <button className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all w-full text-left">
-            <Settings className="w-5 h-5" />
-            <span className="font-medium text-sm">Settings</span>
-          </button>
-          <button
-            onClick={() => onNavigate?.("landing")}
-            className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-all w-full text-left"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium text-sm">Logout</span>
-          </button>
-        </div>
-      </aside>
+      <Sidebar activePage="subjects" onNavigate={onNavigate} experiments={experiments} />
 
       {/* Main Content Container */}
       <main className="flex-1 flex flex-col min-w-0">
@@ -160,27 +96,16 @@ export default function SubjectPage({
         >
           <nav className="flex items-center text-xs text-slate-500 gap-2">
             <button
-              onClick={() => onNavigate?.("dashboard")}
+              onClick={() => onNavigate?.("subjects")}
               className="hover:text-slate-700"
             >
-              Dashboard
+              Subjects
             </button>
             <ChevronRight className="w-3 h-3" />
             <span className="text-slate-900 font-semibold">
               {currentSubject?.name || "Subject Name"}
             </span>
           </nav>
-          <div className="flex items-center gap-4">
-            <button className="p-2 border border-slate-200 rounded-full hover:bg-white transition-colors bg-white">
-              <Share2 className="w-4 h-4 text-slate-600" />
-            </button>
-            <button
-              className="px-5 py-2 bg-slate-900 text-white text-xs font-bold rounded-full hover:bg-slate-800 transition-colors shadow-sm"
-              onClick={() => onNavigate?.("journals")}
-            >
-              Generate Journal
-            </button>
-          </div>
         </header>
 
         {/* Scrollable Content */}
