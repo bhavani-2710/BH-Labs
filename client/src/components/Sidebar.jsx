@@ -39,7 +39,8 @@ export default function Sidebar({ activePage, onNavigate, experiments = [] }) {
           </div>
           <div className="min-w-0">
             <h4 className="text-xs font-bold text-slate-800 truncate">Rahul Sharma</h4>
-            <p className="text-[10px] text-slate-500 font-medium truncate">Computer Engineering • SE</p>
+            <p className="text-[10px] text-slate-500 font-semibold">Computer Engineering</p>
+            <p className="text-[10px] text-slate-500 font-medium">Second Year</p>
           </div>
         </div>
 

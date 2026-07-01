@@ -12,7 +12,7 @@ import {
 import muLogo from "../assets/mu-logo.png";
 import Sidebar from "../components/Sidebar";
 
-export default function SubjectPage({
+export default function ExperimentListPage({
   onNavigate,
   subjectId,
   subjects = [],
@@ -156,7 +156,7 @@ export default function SubjectPage({
                             </span>
                           </div>
                           <div>
-                            <h3 className="font-bold text-slate-800 text-xs">
+                            <h3 className="font-medium text-slate-800 text-xs">
                               {exp.problemStatement ||
                                 exp.title ||
                                 `Experiment ${num}`}
@@ -178,7 +178,7 @@ export default function SubjectPage({
                             return (
                               <div className="text-right hidden sm:block">
                                 <span
-                                  className={`text-[10px] font-bold block uppercase tracking-tighter ${allDone ? "text-emerald-500" : "text-slate-400"}`}
+                                  className={`text-[10px] font-medium block uppercase tracking-tighter ${allDone ? "text-emerald-500" : "text-slate-400"}`}
                                 >
                                   {doneCount} / {subExperiments.length} Done
                                 </span>
@@ -200,15 +200,15 @@ export default function SubjectPage({
                       </div>
 
                       {isExpanded && hasSubs && (
-                        <div className="bg-slate-50/50 border-t border-slate-100">
-                          <div className="py-2 px-4">
+                        <div className="bg-slate-50/50 border-t border-slate-200">
+                          <div className="py-2 px-4 flex flex-col first:pt-0">
                             {subExperiments.map((sub, index) => (
                               <button
                                 key={index}
                                 onClick={() =>
                                   onSelectExperiment?.(exp._id, sub.part)
                                 }
-                                className={`flex items-center justify-between group py-1 w-full text-left ${index !== 0 ? "border-t border-slate-100/60 mt-0.5 pt-1.5" : ""}`}
+                                className={`flex items-center justify-between cursor-pointer group py-1 w-full text-left ${index !== 0 ? "border-t border-slate-200/70 mt-0.5 pt-1.5" : ""}`}
                               >
                                 <div className="flex items-center gap-2.5">
                                   {isCompleted(exp._id, sub.part) ? (
@@ -217,7 +217,7 @@ export default function SubjectPage({
                                     <div className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-[#5521FF] transition-colors"></div>
                                   )}
                                   <span
-                                    className={`text-[10px] font-medium transition-colors ${
+                                    className={`text-[11px] font-medium transition-colors ${
                                       isCompleted(exp._id, sub.part)
                                         ? "text-emerald-600 line-through"
                                         : "text-slate-700 group-hover:text-[#5521FF]"

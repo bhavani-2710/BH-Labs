@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import SubjectsListPage from "./pages/SubjectsListPage";
-import SubjectDetailPage from "./pages/SubjectPage";
+import SubjectDetailPage from "./pages/ExperimentListPage";
 import LabWorkspace from "./pages/LabWorkspace";
 import VivaPractice from "./pages/VivaPractice";
 import PracticalJournal from "./pages/PracticalJournal";
