@@ -1,4 +1,7 @@
 const OpenAI = require("openai");
+const {
+  EXPLAIN_CODE_SYSTEM_PROMPT,
+} = require("../prompts/explainCodeSystemPrompt");
 
 const getOpenAiClient = () => {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -7,19 +10,20 @@ const getOpenAiClient = () => {
     baseURL: "https://openrouter.ai/api/v1",
     apiKey: apiKey,
     defaultHeaders: {
-      "Authorization": `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       "HTTP-Referer": "http://localhost:5050",
       "X-Title": "BH Labs",
-    }
+    },
   });
 };
 
 // POST /api/explain (streams code explanation)
 const explainCode = async (req, res) => {
   try {
-    const { code, language } = req.body;
+    const { experimentTitle, problemStatement, algorithm, code, language } = req.body;
+    const SYSTEM_PROMPT = EXPLAIN_CODE_SYSTEM_PROMPT;
     if (!code) {
-      console.log('code is required');
+      console.log("code is required");
 
       return res.status(400).json({ error: "code is required" });
     }
@@ -33,7 +37,8 @@ const explainCode = async (req, res) => {
 
     if (!openai) {
       // Mock stream simulation when key is missing
-      const mockExplanation = `[BH.AI Assistant - Simulation Mode]\n\n` +
+      const mockExplanation =
+        `[BH.AI Assistant - Simulation Mode]\n\n` +
         `To enable live AI explanations, please add your OPENROUTER_API_KEY in the server/.env file.\n\n` +
         `Here is a simplified structural breakdown of the ${language.toUpperCase()} code:\n` +
         `1. **Imports/Includes**: The program includes standard libraries needed for standard input and output.\n` +
@@ -46,7 +51,9 @@ const explainCode = async (req, res) => {
       const interval = setInterval(() => {
         if (i < words.length) {
           const chunk = words.slice(i, i + 3).join(" ") + " ";
-          res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: chunk } }] })}\n\n`);
+          res.write(
+            `data: ${JSON.stringify({ choices: [{ delta: { content: chunk } }] })}\n\n`,
+          );
           i += 3;
         } else {
           res.write("data: [DONE]\n\n");
@@ -62,12 +69,30 @@ const explainCode = async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "You are a friendly AI coding assistant designed to explain solutions to students. Explain the provided code step-by-step in very simple, easy-to-understand language. Keep it strictly to the point and do not over-explain. DO NOT use any icons, emojis, or pictorial characters (such as 1️⃣, ✔️, 💡, etc.) under any circumstances; use standard text list formatting (e.g. '1.', '-'). CRITICAL: When outputting code blocks, keep comments to an absolute minimum (write no comments, or at most 1-2 brief single-line comments like '// comment' on critical logic only). DO NOT include any decorative header blocks, author/date headers, or separator comments (such as '/*----*/' or '/*****...****/') in the code blocks under any circumstances."
+          content: SYSTEM_PROMPT,
         },
         {
           role: "user",
-          content: `Explain this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\``
-        }
+          content: `Experiment Title:
+                    ${experimentTitle || "Not provided"}
+
+                    Problem Statement:
+                    ${problemStatement || "Not provided"}
+
+                    Algorithm:
+                    ${algorithm || "Not provided"}
+
+                    Programming Language:
+                    ${language}
+
+                    Code:
+                    \`\`\`${language}
+                    ${code}
+                    \`\`\`
+
+                    Explain this program to a student.
+          `,
+        },
       ],
       stream: true,
     });
@@ -79,7 +104,9 @@ const explainCode = async (req, res) => {
     res.end();
   } catch (err) {
     console.error("Explain controller error:", err);
-    res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: `Error: ${err.message}` } }] })}\n\n`);
+    res.write(
+      `data: ${JSON.stringify({ choices: [{ delta: { content: `Error: ${err.message}` } }] })}\n\n`,
+    );
     res.end();
   }
 };
@@ -107,7 +134,9 @@ const chatWithAssistant = async (req, res) => {
       const interval = setInterval(() => {
         if (i < words.length) {
           const chunk = words.slice(i, i + 3).join(" ") + " ";
-          res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: chunk } }] })}\n\n`);
+          res.write(
+            `data: ${JSON.stringify({ choices: [{ delta: { content: chunk } }] })}\n\n`,
+          );
           i += 3;
         } else {
           res.write("data: [DONE]\n\n");
@@ -131,8 +160,11 @@ CRITICAL: When providing code blocks, keep comments to an absolute minimum (writ
 
     const messages = [
       { role: "system", content: systemPrompt },
-      ...(history || []).map(h => ({ role: h.sender === "ai" ? "assistant" : "user", content: h.text })),
-      { role: "user", content: message }
+      ...(history || []).map((h) => ({
+        role: h.sender === "ai" ? "assistant" : "user",
+        content: h.text,
+      })),
+      { role: "user", content: message },
     ];
 
     const responseStream = await openai.chat.completions.create({
@@ -148,12 +180,14 @@ CRITICAL: When providing code blocks, keep comments to an absolute minimum (writ
     res.end();
   } catch (err) {
     console.error("Chat controller error:", err);
-    res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: `Error: ${err.message}` } }] })}\n\n`);
+    res.write(
+      `data: ${JSON.stringify({ choices: [{ delta: { content: `Error: ${err.message}` } }] })}\n\n`,
+    );
     res.end();
   }
 };
 
 module.exports = {
   explainCode,
-  chatWithAssistant
+  chatWithAssistant,
 };

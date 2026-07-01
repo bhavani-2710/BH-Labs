@@ -1,4 +1,7 @@
 const OpenAI = require("openai");
+const {
+  EXPERIMENT_VIVA_SYSTEM_PROMPT,
+} = require("../prompts/experimentVivaSystemPrompt");
 
 const getOpenAiClient = () => {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -26,37 +29,16 @@ const generateVivaQA = async (subExp) => {
     throw new Error("OPENROUTER_API_KEY is not configured.");
   }
 
-  const prompt = `You are an expert viva examiner for engineering lab practicals.
-
-Generate 7 to 9 short viva question-and-answer pairs for the following sub-experiment.
-
-Sub-Experiment Details:
-Title: ${subExp.title}
-Problem Statement: ${subExp.problemStatement || "N/A"}
-Theory: ${subExp.theory || "N/A"}
-Concepts: ${(subExp.concepts || []).join(", ") || "N/A"}
-
-Rules:
-- Questions must be concise and conceptual (not "what is X" definitions).
-- Answers must be 1–3 sentences maximum.
-- Cover fundamentals, working principle, output behaviour, and edge cases.
-- Output STRICT JSON only — no markdown fences, no commentary.
-
-Format:
-{
-  "qaPairs": [
-    { "question": "...", "answer": "..." }
-  ]
-}`;
+  const SYSTEM_PROMPT = EXPERIMENT_VIVA_SYSTEM_PROMPT(subExp);
 
   const response = await openai.chat.completions.create({
-    model: "openai/gpt-4o-mini",
+    model: "google/gemini-2.5-flash-lite",
     messages: [
       {
         role: "system",
         content: "You output only valid JSON. No markdown, no commentary.",
       },
-      { role: "user", content: prompt },
+      { role: "user", content: SYSTEM_PROMPT },
     ],
     temperature: 0.7,
   });

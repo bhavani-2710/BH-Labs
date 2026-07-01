@@ -41,9 +41,9 @@ const experiments = [
         problemStatement:
           "Write a program to demonstrate data input and output using getchar(), putchar(), scanf(), printf(), gets(), puts().",
         theory:
-          "Input and output functions in C are used to read data from the user and display results. getchar() reads a single character, putchar() prints a single character, scanf() reads formatted input, printf() prints formatted output, gets() reads a string (deprecated), and puts() prints a string with a newline.",
+          "Input and output functions in C are used to read data from the user and display results. getchar() reads a single character and putchar() displays it. scanf() reads formatted input such as integers or words, while printf() displays formatted output. gets() reads an entire line of text but is deprecated because it is unsafe; puts() prints a string followed by a newline. Modern C programs should use fgets() instead of gets().",
         algorithm:
-          "1. Start\n2. Use getchar() to read a character and putchar() to display it\n3. Use scanf() to read an integer and printf() to display it\n4. Use gets() to read a string and puts() to display it\n5. Stop",
+          "1. Start\n2. Read a character using getchar() and display it using putchar().\n3. Read an integer using scanf() and display it using printf().\n4. Read a string using gets() and display it using puts().\n5. Read another word using scanf() and display it using printf().\n6. Stop",
         flowchart: {
           nodes: [
             {
@@ -54,12 +54,12 @@ const experiments = [
             {
               id: "2",
               type: "input",
-              label: "Read char using getchar()",
+              label: "Read character using getchar()",
             },
             {
               id: "3",
               type: "output",
-              label: "Print char using putchar()",
+              label: "Display character using putchar()",
             },
             {
               id: "4",
@@ -69,7 +69,7 @@ const experiments = [
             {
               id: "5",
               type: "output",
-              label: "Print integer using printf()",
+              label: "Display integer using printf()",
             },
             {
               id: "6",
@@ -79,43 +79,34 @@ const experiments = [
             {
               id: "7",
               type: "output",
-              label: "Print string using puts()",
+              label: "Display string using puts()",
             },
             {
               id: "8",
+              type: "input",
+              label: "Read word using scanf()",
+            },
+            {
+              id: "9",
+              type: "output",
+              label: "Display word using printf()",
+            },
+            {
+              id: "10",
               type: "end",
               label: "Stop",
             },
           ],
           edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-            },
-            {
-              source: "4",
-              target: "5",
-            },
-            {
-              source: "5",
-              target: "6",
-            },
-            {
-              source: "6",
-              target: "7",
-            },
-            {
-              source: "7",
-              target: "8",
-            },
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4" },
+            { source: "4", target: "5" },
+            { source: "5", target: "6" },
+            { source: "6", target: "7" },
+            { source: "7", target: "8" },
+            { source: "8", target: "9" },
+            { source: "9", target: "10" },
           ],
         },
         referenceSolution: {
@@ -138,7 +129,8 @@ const experiments = [
           "Bitwise & Unary Operators",
         ],
         hints: [
-          "Recall that relational operators return 1 for true and 0 for false in C.",
+          "Relational operators return 1 for true and 0 for false in C.",
+          "Logical operators combine multiple conditions using &&, || and !.",
           "Use arithmetic operators (+, -, *, /, %) to perform mathematical calculations.",
           "Bitwise operators (&, |, ^, ~, <<, >>) operate on binary representation of values.",
         ],
@@ -146,9 +138,9 @@ const experiments = [
         problemStatement:
           "Write a program to demonstrate Arithmetic, Relational, Logical, Assignment, Unary, Conditional, Bitwise, Comma, and other operators.",
         theory:
-          "Operators in C are symbols that perform operations on variables and values. Arithmetic operators perform math operations (+, -, *, /, %). Relational operators compare values (==, !=, <, >, <=, >=). Logical operators combine conditions (&&, ||, !). Assignment operators assign values (=, +=, -=). Unary operators work on a single operand (++, --). Conditional operator (?:) is a shorthand for if-else. Bitwise operators work on bits (&, |, ^, ~, <<, >>).",
+          "Operators in C are symbols that perform operations on variables and values. Arithmetic operators (+, -, *, /, %) perform mathematical calculations. Relational operators (==, !=, <, >, <=, >=) compare values and return either true (1) or false (0). Logical operators (&&, ||, !) combine or negate conditions. Assignment operators (=, +=, -=, *=, /=) assign or modify values. Unary operators (++, --, +, -) operate on a single operand. The conditional operator (?:) provides a compact alternative to an if-else statement. Bitwise operators (&, |, ^, ~, <<, >>) manipulate the binary representation of integers. The comma operator evaluates multiple expressions from left to right and returns the value of the last expression. The sizeof operator returns the memory occupied by a data type or variable in bytes.",
         algorithm:
-          "1. Start\n2. Declare variables a and b\n3. Demonstrate arithmetic operators: +, -, *, /, %\n4. Demonstrate relational operators: ==, !=, <, >, <=, >=\n5. Demonstrate logical operators: &&, ||, !\n6. Demonstrate assignment operators: =, +=, -=, *=, /=\n7. Demonstrate unary operators: ++, --\n8. Demonstrate conditional operator: ?:\n9. Demonstrate bitwise operators: &, |, ^, ~, <<, >>\n10. Display results\n11. Stop",
+          "1. Start\n2. Read two integers.\n3. Demonstrate arithmetic operators.\n4. Demonstrate relational operators.\n5. Demonstrate logical operators.\n6. Demonstrate assignment operators.\n7. Demonstrate unary operators.\n8. Demonstrate conditional operator.\n9. Demonstrate bitwise operators.\n10. Demonstrate comma operator.\n11. Demonstrate sizeof operator.\n12. Display all results.\n13. Stop",
         flowchart: {
           nodes: [
             {
@@ -164,63 +156,72 @@ const experiments = [
             {
               id: "3",
               type: "process",
-              label: "Arithmetic: a+b, a-b, a*b, a/b, a%b",
+              label: "Arithmetic Operators",
             },
             {
               id: "4",
               type: "process",
-              label: "Relational: a==b, a!=b, a<b, a>b",
+              label: "Relational Operators",
             },
             {
               id: "5",
               type: "process",
-              label: "Logical: a&&b, a||b, !a",
+              label: "Logical Operators",
             },
             {
               id: "6",
               type: "process",
-              label: "Bitwise: a&b, a|b, a^b, a<<1, a>>1",
+              label: "Assignment Operators",
             },
             {
               id: "7",
+              type: "process",
+              label: "Unary Operators",
+            },
+            {
+              id: "8",
+              type: "process",
+              label: "Conditional Operator",
+            },
+            {
+              id: "9",
+              type: "process",
+              label: "Bitwise Operators",
+            },
+            {
+              id: "10",
+              type: "process",
+              label: "Comma Operator",
+            },
+            {
+              id: "11",
+              type: "process",
+              label: "sizeof Operator",
+            },
+            {
+              id: "12",
               type: "output",
               label: "Display all results",
             },
             {
-              id: "8",
+              id: "13",
               type: "end",
               label: "Stop",
             },
           ],
           edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-            },
-            {
-              source: "4",
-              target: "5",
-            },
-            {
-              source: "5",
-              target: "6",
-            },
-            {
-              source: "6",
-              target: "7",
-            },
-            {
-              source: "7",
-              target: "8",
-            },
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4" },
+            { source: "4", target: "5" },
+            { source: "5", target: "6" },
+            { source: "6", target: "7" },
+            { source: "7", target: "8" },
+            { source: "8", target: "9" },
+            { source: "9", target: "10" },
+            { source: "10", target: "11" },
+            { source: "11", target: "12" },
+            { source: "12", target: "13" },
           ],
         },
         referenceSolution: {
@@ -253,19 +254,22 @@ const experiments = [
         concepts: [
           "Conditional Logic",
           "If-Else Statements",
-          "Multiway Decision Making",
+          "Switch Statement",
+          "Conditional Logic",
         ],
         hints: [
-          "Use 'if' for a single condition, 'else if' for additional conditional branches, and 'else' for default branch.",
-          "Ensure that each condition evaluates to a boolean value (non-zero is true, zero is false).",
+          "Use the if statement to execute code only when a condition is true.",
+          "Use the if-else statement to choose between two alternative blocks.",
+          "Use the switch statement for multiway selection based on an integral value.",
+          "Remember to include a break statement after each switch case to avoid fall-through.",
         ],
         difficulty: "Easy",
         problemStatement:
           "Write a program to demonstrate If statement, If-else statement, and Multiway decision.",
         theory:
-          "Branching statements control the flow of execution based on conditions. The if statement executes a block only if the condition is true. The if-else statement executes one block if true and another if false. The multiway decision (if-else if-else or switch) allows choosing among multiple alternatives based on a value or condition.",
+          "Branching statements control the flow of execution based on conditions. The if statement executes a block only when its condition is true. The if-else statement provides two alternative execution paths depending on whether the condition is true or false. The switch statement performs multiway selection by comparing an expression against multiple constant case values and executes the matching case. The default case is executed when none of the cases match.",
         algorithm:
-          "1. Start\n2. Read a number n\n3. If n > 0, print Positive\n4. Else if n < 0, print Negative\n5. Else print Zero\n6. Stop",
+          "1. Start\n2. Read a number.\n3. Demonstrate the if statement by checking whether the number is positive and whether it is even.\n4. Demonstrate the if-else statement by checking voting eligibility.\n5. Read a menu choice.\n6. Use the switch statement to display the selected option.\n7. Stop",
         flowchart: {
           nodes: [
             {
@@ -276,12 +280,12 @@ const experiments = [
             {
               id: "2",
               type: "input",
-              label: "Read n",
+              label: "Read number",
             },
             {
               id: "3",
               type: "decision",
-              label: "n > 0?",
+              label: "Number > 0?",
             },
             {
               id: "4",
@@ -291,65 +295,52 @@ const experiments = [
             {
               id: "5",
               type: "decision",
-              label: "n < 0?",
+              label: "Number Even?",
             },
             {
               id: "6",
               type: "output",
-              label: "Print Negative",
+              label: "Print Even",
             },
             {
               id: "7",
-              type: "output",
-              label: "Print Zero",
+              type: "decision",
+              label: "Age >= 18?",
             },
             {
               id: "8",
+              type: "output",
+              label: "Print Eligibility",
+            },
+            {
+              id: "9",
+              type: "input",
+              label: "Read Choice",
+            },
+            {
+              id: "10",
+              type: "process",
+              label: "Execute Switch Case",
+            },
+            {
+              id: "11",
               type: "end",
               label: "Stop",
             },
           ],
           edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-              label: "Yes",
-            },
-            {
-              source: "3",
-              target: "5",
-              label: "No",
-            },
-            {
-              source: "4",
-              target: "8",
-            },
-            {
-              source: "5",
-              target: "6",
-              label: "Yes",
-            },
-            {
-              source: "5",
-              target: "7",
-              label: "No",
-            },
-            {
-              source: "6",
-              target: "8",
-            },
-            {
-              source: "7",
-              target: "8",
-            },
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4", label: "Yes" },
+            { source: "3", target: "5", label: "No" },
+            { source: "4", target: "5" },
+            { source: "5", target: "6", label: "Yes" },
+            { source: "5", target: "7", label: "No" },
+            { source: "6", target: "7" },
+            { source: "7", target: "8" },
+            { source: "8", target: "9" },
+            { source: "9", target: "10" },
+            { source: "10", target: "11" },
           ],
         },
         referenceSolution: {
@@ -377,21 +368,24 @@ const experiments = [
         part: "b",
         title: "Looping Statements",
         concepts: [
-          "Iteration & Loops",
-          "Pre-test vs Post-test Loops",
-          "Loop Control Variables",
+          "While Loop",
+          "Do-While Loop",
+          "Entry-Controlled Loop",
+          "Exit-Controlled Loop",
         ],
         hints: [
-          "A while loop checks the condition first, so it might not run even once.",
-          "A do-while loop executes the body first and checks the condition at the end, guaranteeing at least one run.",
+          "The while loop checks its condition before executing the loop body.",
+          "The do-while loop executes its body once before checking the condition.",
+          "Initialize loop control variables before entering the loop.",
+          "Update the loop control variable to avoid infinite loops.",
         ],
         difficulty: "Easy",
         problemStatement:
           "Write a program to demonstrate while and do-while loops.",
         theory:
-          "Loops are used to execute a block of code repeatedly. The while loop checks the condition before executing the body — if the condition is false initially, the body never executes. The do-while loop executes the body at least once before checking the condition, making it useful when the loop must run at least once regardless of the condition.",
+          "Loops execute a block of code repeatedly while a condition is satisfied. The while loop is an entry-controlled loop because the condition is evaluated before the loop body executes, so it may not execute even once. The do-while loop is an exit-controlled loop because the condition is evaluated after the loop body executes, guaranteeing at least one execution. These loops are commonly used for repetitive tasks and counting operations.",
         algorithm:
-          "1. Start\n2. Read n\n3. Initialize i = 1\n4. While i <= n, print i and increment i\n5. Initialize j = 1\n6. Do: print j and increment j, while j <= n\n7. Stop",
+          "1. Start\n2. Read n.\n3. Initialize i = 1.\n4. Use a while loop to print numbers from 1 to n.\n5. Initialize i = n.\n6. Use a do-while loop to print numbers from n down to 1.\n7. Demonstrate that a do-while loop executes at least once even when its condition is false.\n8. Stop",
         flowchart: {
           nodes: [
             {
@@ -427,82 +421,48 @@ const experiments = [
             {
               id: "7",
               type: "process",
-              label: "j = 1",
+              label: "i = n",
             },
             {
               id: "8",
               type: "output",
-              label: "Print j",
+              label: "Print i",
             },
             {
               id: "9",
               type: "process",
-              label: "j++",
+              label: "i--",
             },
             {
               id: "10",
               type: "decision",
-              label: "j <= n?",
+              label: "i >= 1?",
             },
             {
               id: "11",
+              type: "process",
+              label: "Demonstrate do-while executes once",
+            },
+            {
+              id: "12",
               type: "end",
               label: "Stop",
             },
           ],
           edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-            },
-            {
-              source: "4",
-              target: "5",
-              label: "Yes",
-            },
-            {
-              source: "5",
-              target: "6",
-            },
-            {
-              source: "6",
-              target: "4",
-            },
-            {
-              source: "4",
-              target: "7",
-              label: "No",
-            },
-            {
-              source: "7",
-              target: "8",
-            },
-            {
-              source: "8",
-              target: "9",
-            },
-            {
-              source: "9",
-              target: "10",
-            },
-            {
-              source: "10",
-              target: "8",
-              label: "Yes",
-            },
-            {
-              source: "10",
-              target: "11",
-              label: "No",
-            },
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4" },
+            { source: "4", target: "5", label: "Yes" },
+            { source: "5", target: "6" },
+            { source: "6", target: "4" },
+            { source: "4", target: "7", label: "No" },
+            { source: "7", target: "8" },
+            { source: "8", target: "9" },
+            { source: "9", target: "10" },
+            { source: "10", target: "8", label: "Yes" },
+            { source: "10", target: "11", label: "No" },
+            { source: "11", target: "12" },
           ],
         },
         referenceSolution: {
@@ -527,19 +487,27 @@ const experiments = [
       {
         part: "a",
         title: "Switch, Continue, Break, Goto",
-        concepts: ["Switch Case Selection", "Jump Statements", "Loop Control"],
+        concepts: [
+          "Switch Statement",
+          "Break Statement",
+          "Continue Statement",
+          "Goto Statement",
+          "Loop Control",
+        ],
         hints: [
-          "Always use a 'break' statement at the end of each switch case to prevent fall-through.",
-          "Use 'continue' to skip the rest of the current iteration and go to the next iteration of the loop.",
-          "Avoid overuse of the 'goto' statement as it can make control flow hard to follow.",
+          "Use the switch statement to perform multiway selection based on an integral expression.",
+          "Include a break statement after each switch case to prevent fall-through.",
+          "Use continue to skip the remaining statements in the current loop iteration.",
+          "Use break to terminate a loop immediately when a condition is met.",
+          "Use goto only when absolutely necessary, as it can make programs difficult to understand and maintain.",
         ],
         difficulty: "Easy",
         problemStatement:
           "Write a program to demonstrate Switch statement, Continue statement, Break statement, and Goto statement.",
         theory:
-          "Switch statement selects one of many code blocks to execute based on a variable's value. Break exits the nearest loop or switch. Continue skips the rest of the current loop iteration and moves to the next. Goto transfers control unconditionally to a labeled statement — though its use is generally discouraged as it makes code harder to read.",
+          "The switch statement performs multiway selection by executing one of several code blocks based on the value of an expression. The break statement immediately terminates the nearest enclosing loop or switch statement. The continue statement skips the remaining statements in the current loop iteration and proceeds with the next iteration. The goto statement transfers control unconditionally to a labeled statement within the same function. Although goto is supported in C, it is generally discouraged because it can reduce program readability and maintainability.",
         algorithm:
-          "1. Start\n2. Read choice\n3. Switch on choice: case 1 print Monday, case 2 print Tuesday, default print Invalid\n4. Demonstrate break by exiting a loop early\n5. Demonstrate continue by skipping even numbers in a loop\n6. Demonstrate goto by jumping to a label\n7. Stop",
+          "1. Start\n2. Read a choice.\n3. Use a switch statement to display the selected case or an invalid choice message.\n4. Use a for loop to demonstrate the continue statement by skipping the value 5.\n5. Demonstrate the break statement by terminating the loop when the value becomes 8.\n6. Demonstrate the goto statement by repeatedly jumping to a labeled statement until a condition becomes false.\n7. Stop",
         flowchart: {
           nodes: [
             {
@@ -550,80 +518,74 @@ const experiments = [
             {
               id: "2",
               type: "input",
-              label: "Read choice",
+              label: "Read Choice",
             },
             {
               id: "3",
-              type: "decision",
-              label: "choice == 1?",
+              type: "process",
+              label: "Execute Switch Statement",
             },
             {
               id: "4",
-              type: "output",
-              label: "Print Monday",
+              type: "process",
+              label: "Initialize Loop (i = 1)",
             },
             {
               id: "5",
               type: "decision",
-              label: "choice == 2?",
+              label: "i <= 10?",
             },
             {
               id: "6",
-              type: "output",
-              label: "Print Tuesday",
+              type: "decision",
+              label: "i == 5?",
             },
             {
               id: "7",
-              type: "output",
-              label: "Print Invalid",
+              type: "process",
+              label: "Continue",
             },
             {
               id: "8",
+              type: "decision",
+              label: "i == 8?",
+            },
+            {
+              id: "9",
+              type: "process",
+              label: "Break",
+            },
+            {
+              id: "10",
+              type: "output",
+              label: "Print i",
+            },
+            {
+              id: "11",
+              type: "process",
+              label: "Goto Demonstration",
+            },
+            {
+              id: "12",
               type: "end",
               label: "Stop",
             },
           ],
           edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-              label: "Yes",
-            },
-            {
-              source: "3",
-              target: "5",
-              label: "No",
-            },
-            {
-              source: "4",
-              target: "8",
-            },
-            {
-              source: "5",
-              target: "6",
-              label: "Yes",
-            },
-            {
-              source: "5",
-              target: "7",
-              label: "No",
-            },
-            {
-              source: "6",
-              target: "8",
-            },
-            {
-              source: "7",
-              target: "8",
-            },
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4" },
+            { source: "4", target: "5" },
+            { source: "5", target: "6", label: "Yes" },
+            { source: "5", target: "11", label: "No" },
+            { source: "6", target: "7", label: "Yes" },
+            { source: "7", target: "5" },
+            { source: "6", target: "8", label: "No" },
+            { source: "8", target: "9", label: "Yes" },
+            { source: "9", target: "11" },
+            { source: "8", target: "10", label: "No" },
+            { source: "10", target: "5" },
+            { source: "11", target: "12" },
           ],
         },
         referenceSolution: {
@@ -650,21 +612,23 @@ const experiments = [
         part: "a",
         title: "Functions with Argument Passing",
         concepts: [
-          "Function Definition & Prototypes",
+          "Function Definition and Prototype",
+          "Function Call",
           "Call by Value",
           "Call by Reference",
         ],
         hints: [
-          "In Call by Value, modifications made to parameters inside the function do not affect the original variables.",
-          "In Call by Reference, pass the addresses of variables using the address-of operator (&) and receive them using pointers (*).",
+          "Define a function to perform a specific task and call it from main().",
+          "In Call by Value, a copy of the argument is passed, so changes inside the function do not affect the original variable.",
+          "In Call by Reference, pass the address of a variable using the address-of operator (&) and receive it using a pointer (*), allowing the function to modify the original variable.",
         ],
         difficulty: "Medium",
         problemStatement:
           "Write a program to demonstrate Function definition, call by value, and call by reference.",
         theory:
-          "A function is a block of code that performs a specific task. In call by value, a copy of the argument is passed so the original variable is not modified. In call by reference, the address of the variable is passed using pointers, so changes inside the function affect the original variable.",
+          "A function is a reusable block of code that performs a specific task. Functions improve modularity, readability, and code reuse. In call by value, a copy of the actual argument is passed to the function, so modifications made inside the function do not affect the original variable. In call by reference, the address of the variable is passed using pointers, allowing the function to modify the original variable directly.",
         algorithm:
-          "1. Start\n2. Define a function swap_by_value(a, b) that swaps copies\n3. Define a function swap_by_reference(a, b) using pointers\n4. Read two numbers x and y\n5. Call swap_by_value(x, y) and show x, y are unchanged\n6. Call swap_by_reference(&x, &y) and show x, y are swapped\n7. Stop",
+          "1. Start\n2. Define a function to add two numbers and return their sum.\n3. Define a function to demonstrate call by value.\n4. Define a function to demonstrate call by reference using pointers.\n5. Read two numbers.\n6. Call the addition function and display the sum.\n7. Call the call by value function and observe that the original variable remains unchanged.\n8. Call the call by reference function and observe that the original variable is modified.\n9. Stop",
         flowchart: {
           nodes: [
             {
@@ -675,30 +639,40 @@ const experiments = [
             {
               id: "2",
               type: "input",
-              label: "Read x, y",
+              label: "Read a, b",
             },
             {
               id: "3",
               type: "process",
-              label: "Call swap_by_value(x, y)",
+              label: "Call add(a, b)",
             },
             {
               id: "4",
               type: "output",
-              label: "Print x, y (unchanged)",
+              label: "Display Sum",
             },
             {
               id: "5",
               type: "process",
-              label: "Call swap_by_reference(&x, &y)",
+              label: "Call callByValue(a)",
             },
             {
               id: "6",
               type: "output",
-              label: "Print x, y (swapped)",
+              label: "Display a (Unchanged)",
             },
             {
               id: "7",
+              type: "process",
+              label: "Call callByReference(&b)",
+            },
+            {
+              id: "8",
+              type: "output",
+              label: "Display b (Modified)",
+            },
+            {
+              id: "9",
               type: "end",
               label: "Stop",
             },
@@ -727,6 +701,14 @@ const experiments = [
             {
               source: "6",
               target: "7",
+            },
+            {
+              source: "7",
+              target: "8",
+            },
+            {
+              source: "8",
+              target: "9",
             },
           ],
         },
@@ -768,7 +750,7 @@ const experiments = [
         theory:
           "An iterative function uses loops to repeat operations. Factorial of n (n!) is the product of all positive integers from 1 to n. Fibonacci series is a sequence where each number is the sum of the two preceding ones: 0, 1, 1, 2, 3, 5, 8... Iterative approaches use for or while loops and are generally more memory efficient than recursion.",
         algorithm:
-          "1. Start\n2. Read n\n3. For factorial: initialize fact = 1, loop from i = 1 to n, multiply fact = fact * i\n4. Display factorial\n5. For Fibonacci: initialize a = 0, b = 1, loop n times, print a, then next = a + b, a = b, b = next\n6. Display Fibonacci series\n7. Stop",
+          "1. Start\n 2. Read integer n\n 3. Initialize fact = 1\n 4. Repeat from i = 1 to n and compute fact = fact × i\n 5. Display factorial\n 6. Initialize a = 0 and b = 1\n 7. Repeat n times:\n      a. Display a\n      b. next = a + b\n       c. a = b\n       d. b = next\n 8. Stop",
         flowchart: {
           nodes: [
             {
@@ -907,7 +889,7 @@ const experiments = [
         theory:
           "Recursion is when a function calls itself to solve smaller instances of the same problem. Every recursive function has a base case (stopping condition) and a recursive case. For factorial: fact(n) = n * fact(n-1), base case fact(0) = 1. For Fibonacci: fib(n) = fib(n-1) + fib(n-2), base cases fib(0) = 0, fib(1) = 1. Recursion uses the call stack and can be less efficient than iteration for large inputs.",
         algorithm:
-          "1. Start\n2. Read n\n3. For factorial: if n == 0 return 1, else return n * factorial(n-1)\n4. For Fibonacci: if n == 0 return 0, if n == 1 return 1, else return fib(n-1) + fib(n-2)\n5. Display results\n6. Stop",
+          "1. Start\n 2. Read integer n\n 3. Call recursive factorial function\n 4. If n is 0 or 1, return 1\n 5. Otherwise return n × factorial(n−1)\n 6. Display factorial\n 7. Display Fibonacci series by calling fibonacci(i) recursively for i = 0 to n−1\n 8. Stop",
         flowchart: {
           nodes: [
             {
@@ -922,23 +904,23 @@ const experiments = [
             },
             {
               id: "3",
-              type: "decision",
-              label: "n == 0?",
+              type: "process",
+              label: "Call factorial(n)",
             },
             {
               id: "4",
               type: "output",
-              label: "Return 1",
+              label: "Display factorial",
             },
             {
               id: "5",
               type: "process",
-              label: "Return n * factorial(n-1)",
+              label: "Call fibonacci(i) for i = 0 to n-1",
             },
             {
               id: "6",
               type: "output",
-              label: "Print factorial",
+              label: "Display Fibonacci series",
             },
             {
               id: "7",
@@ -958,16 +940,10 @@ const experiments = [
             {
               source: "3",
               target: "4",
-              label: "Yes",
-            },
-            {
-              source: "3",
-              target: "5",
-              label: "No",
             },
             {
               source: "4",
-              target: "6",
+              target: "5",
             },
             {
               source: "5",

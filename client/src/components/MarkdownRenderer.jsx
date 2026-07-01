@@ -4,7 +4,7 @@ import { Copy, Check } from "lucide-react";
 // Lightweight dark-themed syntax highlighter for code blocks using single-pass tokenization
 const highlightCode = (code, language) => {
   if (!code) return "";
-  
+
   // Escape HTML tags to prevent XSS
   const escaped = code
     .replace(/&/g, "&amp;")
@@ -13,19 +13,56 @@ const highlightCode = (code, language) => {
 
   const lang = (language || "").toLowerCase();
 
-  if (lang === "c" || lang === "cpp" || lang === "java" || lang === "javascript" || lang === "js" || lang === "csharp") {
+  if (
+    lang === "c" ||
+    lang === "cpp" ||
+    lang === "java" ||
+    lang === "javascript" ||
+    lang === "js" ||
+    lang === "csharp"
+  ) {
     const patterns = [
-      { name: "comment-multi", regex: /(\/\*[\s\S]*?\*\/)/g, color: "#94A3B8", italic: true },
-      { name: "comment-single", regex: /(\/\/.*)/g, color: "#94A3B8", italic: true },
-      { name: "string", regex: /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, color: "#FBBF24" },
-      { name: "preprocessor", regex: /(#\w+\b(?:\s*&lt;[^&]*&gt;|\s*\w+)?)/g, color: "#34D399" },
-      { name: "keyword", regex: /\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|default|class|export|import|from|new|this|typeof|instanceof|void|int|char|float|double|struct|typedef|union|enum|unsigned|long|short|signed|sizeof|static|extern|auto|register|volatile|public|private|protected|interface|package|throws|throw|try|catch|finally|true|false|null)\b/g, color: "#F43F5E", bold: true },
-      { name: "function", regex: /\b(printf|scanf|getchar|putchar|gets|puts|fgets|strlen|strcmp|strcpy|malloc|calloc|realloc|free|exit|main)\b/g, color: "#60A5FA", bold: true }
+      {
+        name: "comment-multi",
+        regex: /(\/\*[\s\S]*?\*\/)/g,
+        color: "#94A3B8",
+        italic: true,
+      },
+      {
+        name: "comment-single",
+        regex: /(\/\/.*)/g,
+        color: "#94A3B8",
+        italic: true,
+      },
+      {
+        name: "string",
+        regex: /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,
+        color: "#FBBF24",
+      },
+      {
+        name: "preprocessor",
+        regex: /(#\w+\b(?:\s*&lt;[^&]*&gt;|\s*\w+)?)/g,
+        color: "#34D399",
+      },
+      {
+        name: "keyword",
+        regex:
+          /\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|default|class|export|import|from|new|this|typeof|instanceof|void|int|char|float|double|struct|typedef|union|enum|unsigned|long|short|signed|sizeof|static|extern|auto|register|volatile|public|private|protected|interface|package|throws|throw|try|catch|finally|true|false|null)\b/g,
+        color: "#F43F5E",
+        bold: true,
+      },
+      {
+        name: "function",
+        regex:
+          /\b(printf|scanf|getchar|putchar|gets|puts|fgets|strlen|strcmp|strcpy|malloc|calloc|realloc|free|exit|main)\b/g,
+        color: "#60A5FA",
+        bold: true,
+      },
     ];
 
     const combinedRegex = new RegExp(
-      patterns.map(p => p.regex.source).join("|"),
-      "g"
+      patterns.map((p) => p.regex.source).join("|"),
+      "g",
     );
 
     return escaped.replace(combinedRegex, (match) => {
@@ -44,14 +81,30 @@ const highlightCode = (code, language) => {
   } else if (lang === "python" || lang === "py") {
     const patterns = [
       { name: "comment", regex: /(#.*)/g, color: "#94A3B8", italic: true },
-      { name: "string", regex: /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, color: "#FBBF24" },
-      { name: "keyword", regex: /\b(def|class|return|if|elif|else|for|while|break|continue|import|from|as|in|is|not|and|or|try|except|finally|raise|assert|with|lambda|pass|global|nonlocal|True|False|None)\b/g, color: "#F43F5E", bold: true },
-      { name: "function", regex: /\b(print|input|len|range|str|int|float|list|dict|set|tuple|open|abs|max|min|sum|sorted|enumerate|zip)\b/g, color: "#60A5FA", bold: true }
+      {
+        name: "string",
+        regex: /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,
+        color: "#FBBF24",
+      },
+      {
+        name: "keyword",
+        regex:
+          /\b(def|class|return|if|elif|else|for|while|break|continue|import|from|as|in|is|not|and|or|try|except|finally|raise|assert|with|lambda|pass|global|nonlocal|True|False|None)\b/g,
+        color: "#F43F5E",
+        bold: true,
+      },
+      {
+        name: "function",
+        regex:
+          /\b(print|input|len|range|str|int|float|list|dict|set|tuple|open|abs|max|min|sum|sorted|enumerate|zip)\b/g,
+        color: "#60A5FA",
+        bold: true,
+      },
     ];
 
     const combinedRegex = new RegExp(
-      patterns.map(p => p.regex.source).join("|"),
-      "g"
+      patterns.map((p) => p.regex.source).join("|"),
+      "g",
     );
 
     return escaped.replace(combinedRegex, (match) => {
@@ -85,12 +138,8 @@ const CodeBlock = ({ language, code }) => {
   const highlightedHtml = highlightCode(code, language);
 
   return (
-    <div 
-      className="bg-[#1E293B] text-[#F8FAFC] rounded-lg px-3 py-2.5 font-mono text-[10px] overflow-x-auto my-2 leading-normal border border-[#334155] relative shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]"
-    >
-      <div 
-        className="flex justify-between items-center mb-1.5 border-b border-[#334155] pb-1 text-[8.5px] text-[#94A3B8] font-bold select-none"
-      >
+    <div className="bg-[#1E293B] text-[#F8FAFC] rounded-lg px-3 py-2.5 font-mono text-[10px] overflow-x-auto my-2 leading-normal border border-[#334155] relative shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]">
+      <div className="flex justify-between items-center mb-1.5 border-b border-[#334155] pb-1 text-[8.5px] text-[#94A3B8] font-bold select-none">
         <span>{language ? language.toUpperCase() : "CODE"}</span>
         <button
           onClick={handleCopy}
@@ -153,7 +202,7 @@ const renderTable = (tableLines, key) => {
     let text = rowText.trim();
     if (text.startsWith("|")) text = text.slice(1);
     if (text.endsWith("|")) text = text.slice(0, -1);
-    return text.split("|").map(cell => cell.trim());
+    return text.split("|").map((cell) => cell.trim());
   };
 
   const headerCells = parseRow(tableLines[0]);
@@ -162,18 +211,18 @@ const renderTable = (tableLines, key) => {
     bodyStartIndex = 2;
   }
 
-  const bodyRows = tableLines.slice(bodyStartIndex).map(line => parseRow(line));
+  const bodyRows = tableLines
+    .slice(bodyStartIndex)
+    .map((line) => parseRow(line));
 
   return (
     <div key={`table-container-${key}`} className="overflow-x-auto my-2 w-full">
-      <table 
-        className="w-full border-collapse text-[10px] leading-[1.4] border border-[#E4E4E7] bg-white rounded-[6px] overflow-hidden"
-      >
+      <table className="w-full border-collapse text-[10px] leading-[1.4] border border-[#E4E4E7] bg-white rounded-[6px] overflow-hidden">
         <thead>
           <tr className="bg-[#F4F4F5] border-b-2 border-b-[#E4E4E7]">
             {headerCells.map((cell, idx) => (
-              <th 
-                key={idx} 
+              <th
+                key={idx}
                 className="px-2 py-1.5 text-left font-bold text-[#18181B] border-r border-[#E4E4E7]"
               >
                 {renderTextWithInlineFormatting(cell)}
@@ -183,13 +232,13 @@ const renderTable = (tableLines, key) => {
         </thead>
         <tbody>
           {bodyRows.map((row, rowIdx) => (
-            <tr 
-              key={rowIdx} 
+            <tr
+              key={rowIdx}
               className={`border-b border-[#E4E4E7] ${rowIdx % 2 === 0 ? "bg-white" : "bg-[#FAF9FF]"}`}
             >
               {row.map((cell, cellIdx) => (
-                <td 
-                  key={cellIdx} 
+                <td
+                  key={cellIdx}
                   className="px-2 py-1.5 text-[#3F3F46] border-r border-[#E4E4E7]"
                 >
                   {renderTextWithInlineFormatting(cell)}
@@ -217,13 +266,13 @@ export default function MarkdownRenderer({ text }) {
     if (match.index > lastIndex) {
       blocks.push({
         type: "text",
-        content: text.slice(lastIndex, match.index)
+        content: text.slice(lastIndex, match.index),
       });
     }
     blocks.push({
       type: "code",
       language: match[1] || "c",
-      content: match[2]
+      content: match[2],
     });
     lastIndex = codeBlockRegex.lastIndex;
   }
@@ -231,7 +280,7 @@ export default function MarkdownRenderer({ text }) {
   if (lastIndex < text.length) {
     blocks.push({
       type: "text",
-      content: text.slice(lastIndex)
+      content: text.slice(lastIndex),
     });
   }
 
@@ -240,10 +289,10 @@ export default function MarkdownRenderer({ text }) {
       {blocks.map((block, idx) => {
         if (block.type === "code") {
           return (
-            <CodeBlock 
-              key={idx} 
-              language={block.language} 
-              code={block.content} 
+            <CodeBlock
+              key={idx}
+              language={block.language}
+              code={block.content}
             />
           );
         }
@@ -259,23 +308,29 @@ export default function MarkdownRenderer({ text }) {
           if (currentList.length === 0) return;
           if (listType === "bullet") {
             renderedLines.push(
-              <ul key={`ul-${key}`} className="pl-4 my-1 list-disc flex flex-col gap-[3px]">
+              <ul
+                key={`ul-${key}`}
+                className="pl-4 my-1 list-disc flex flex-col gap-[3px]"
+              >
                 {currentList.map((item, i) => (
                   <li key={i} className="m-0">
                     {renderTextWithInlineFormatting(item)}
                   </li>
                 ))}
-              </ul>
+              </ul>,
             );
           } else if (listType === "number") {
             renderedLines.push(
-              <ol key={`ol-${key}`} className="pl-4 my-1 list-decimal flex flex-col gap-[3px]">
+              <ol
+                key={`ol-${key}`}
+                className="pl-4 my-1 list-decimal flex flex-col gap-[3px]"
+              >
                 {currentList.map((item, i) => (
                   <li key={i} className="m-0">
                     {renderTextWithInlineFormatting(item)}
                   </li>
                 ))}
-              </ol>
+              </ol>,
             );
           }
           currentList = [];
@@ -326,20 +381,33 @@ export default function MarkdownRenderer({ text }) {
           // Flush any active table before parsing other elements
           flushTable(i);
 
+          // Horizontal rule (---, ***, ___)
+          if (/^(\*{3,}|-{3,}|_{3,})$/.test(trimmed)) {
+            flushTable(i);
+            flushList(i);
+
+            continue; //skip it
+          }
+
           // Headers: # Header
           const headerMatch = line.match(/^(#{1,6})\s+(.*)$/);
           if (headerMatch) {
             flushList(i);
             const level = headerMatch[1].length;
             const content = headerMatch[2];
-            const fontSizeClass = level === 1 ? "text-[13px]" : level === 2 ? "text-[12px]" : "text-[11px]";
+            const fontSizeClass =
+              level === 1
+                ? "text-[13px]"
+                : level === 2
+                  ? "text-[12px]"
+                  : "text-[11px]";
             renderedLines.push(
-              <div 
-                key={`h-${i}`} 
-                className={`font-black text-[#1E1B4B] mt-2 mb-1 ${fontSizeClass} leading-[1.4]`}
+              <div
+                key={`h-${i}`}
+                className={`font-bold text-[#1E1B4B] mt-2 mb-1 ${fontSizeClass} leading-[1.4]`}
               >
                 {renderTextWithInlineFormatting(content)}
-              </div>
+              </div>,
             );
             continue;
           }
@@ -371,7 +439,7 @@ export default function MarkdownRenderer({ text }) {
           renderedLines.push(
             <p key={`p-${i}`} className="my-[3px] leading-[1.5]">
               {renderTextWithInlineFormatting(line)}
-            </p>
+            </p>,
           );
         }
 

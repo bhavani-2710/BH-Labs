@@ -260,10 +260,11 @@ export default function LabWorkspace({
     setIsAiTyping(true);
 
     try {
+      console.log("/explain\n", subExp)
       const res = await fetch(`${apiBase}/explain`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: refSol, language: editorLanguage }),
+        body: JSON.stringify({ experimentTitle: subExp?.title, problemStatement: subExp?.problemStatement, algorithm: subExp?.algorithm, code: refSol, language: editorLanguage }),
       });
 
       if (!res.ok) {
