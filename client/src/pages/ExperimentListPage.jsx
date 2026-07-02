@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ExternalLink,
   CheckCircle2,
+  X,
 } from "lucide-react";
 import muLogo from "../assets/mu-logo.png";
 import Sidebar from "../components/Sidebar";
@@ -21,6 +22,7 @@ export default function ExperimentListPage({
 }) {
   const [filter, setFilter] = useState("all");
   const [expandedExperiments, setExpandedExperiments] = useState(new Set());
+  const [isSyllabusOpen, setIsSyllabusOpen] = useState(false);
 
   const currentSubject =
     subjects.find((s) => s._id === subjectId) || subjects[0];
@@ -349,21 +351,57 @@ export default function ExperimentListPage({
                     Content is verified and structured according to the latest
                     semester syllabus.
                   </p>
-                  <a
-                    className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-[#5521FF] text-white rounded-xl font-bold text-xs hover:bg-[#5521FF]/90 hover:scale-[1.02] active:scale-95 transition-all"
-                    href={currentSubject?.syllabusPdf || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-[#5521FF] text-white rounded-xl font-bold text-xs hover:bg-[#5521FF]/90 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+                    onClick={() => setIsSyllabusOpen(true)}
                   >
                     View Syllabus
                     <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                  </button>
                 </div>
               </div>
             </aside>
           </div>
         </div>
       </main>
+
+      {isSyllabusOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm"
+          onClick={() => setIsSyllabusOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 transition-all"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-4 flex items-center justify-between border-b border-slate-200 bg-slate-50">
+              <div>
+                <h3 className="text-sm font-bold text-slate-800">
+                  {currentSubject?.name || "Subject"} - Syllabus Preview
+                </h3>
+                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                  Mumbai University Curriculum
+                </p>
+              </div>
+              <button
+                onClick={() => setIsSyllabusOpen(false)}
+                className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 hover:text-slate-900 text-slate-400 font-bold transition-all cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {/* Modal Body / PDF Preview */}
+            <div className="flex-1 bg-slate-100 relative">
+              <iframe
+                src={currentSubject?.syllabusPdf ? `${currentSubject.syllabusPdf}#navpanes=0` : ""}
+                title="Syllabus PDF Preview"
+                className="w-full h-full border-0"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
