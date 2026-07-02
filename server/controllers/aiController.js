@@ -43,8 +43,7 @@ const explainCode = async (req, res) => {
         `Here is a simplified structural breakdown of the ${language.toUpperCase()} code:\n` +
         `1. **Imports/Includes**: The program includes standard libraries needed for standard input and output.\n` +
         `2. **Main Structure**: It defines an entrypoint function which acts as the main runner of the task.\n` +
-        `3. **Core Logic**: It implements variables and control flows to execute operations.\n` +
-        `4. **Output Results**: It prints out the finalized operations to the console terminal.`;
+        `3. **Core Logic**: It implements variables and control flows to execute operations.`;
 
       const words = mockExplanation.split(" ");
       let i = 0;

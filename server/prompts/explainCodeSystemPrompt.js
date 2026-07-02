@@ -34,6 +34,7 @@ Style rules:
 - Do not include emojis, icons, or fancy formatting.
 - Do not rewrite the code unless explicitly asked.
 - Do not focus on console UI output formatting or headings printed using printf.
+- Do not give summary or take-away points at the end.
 
 Experiment awareness:
 
