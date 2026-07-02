@@ -134,7 +134,7 @@ export default function TestInstruction({
       <div className="min-h-screen bg-[#F6F7FB] flex flex-col items-center justify-center gap-4">
         <div className="w-12 h-12 rounded-full border-4 border-violet-200 border-t-[#5521FF] animate-spin" />
         <p className="text-sm font-semibold text-slate-500 animate-pulse text-center px-4">
-          Building your customized aptitude test...
+          Building your customized practical test...
         </p>
       </div>
     );
