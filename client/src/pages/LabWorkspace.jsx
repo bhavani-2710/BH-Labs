@@ -4,6 +4,7 @@ import FlowchartRenderer from "../components/FlowchartRenderer";
 import MarkdownRenderer from "../components/MarkdownRenderer";
 import { Panel, Group, Separator } from "react-resizable-panels";
 import { Loader2, SendHorizontal, X } from "lucide-react";
+import monacoCustomTheme from "../utils/monacoCustomTheme";
 
 const COMPILER_MAP = {
   c: "gcc-head-c",
@@ -910,163 +911,164 @@ export default function LabWorkspace({
               minSize={"50%"}
               className="flex flex-col min-h-0"
             >
-          <div className="flex items-center bg-[#F4F4F5] border-b border-[#E4E4E7] h-[34px] shrink-0">
-            <div className="flex items-center gap-1.25 px-3.5 h-full bg-white border-r border-[#E4E4E7] font-mono text-[11px] text-[#18181B]">
-              <span className="text-[#5521FF] text-xs">◉</span>
-              <span>main.{EXTENSION_MAP[editorLanguage] || "c"}</span>
-            </div>
-          </div>
+              <div className="flex items-center bg-[#F4F4F5] border-b border-[#E4E4E7] h-[34px] shrink-0">
+                <div className="flex items-center gap-1.25 px-3.5 h-full bg-white border-r border-[#E4E4E7] font-mono text-[11px] text-[#18181B]">
+                  <span className="text-[#5521FF] text-xs">◉</span>
+                  <span>main.{EXTENSION_MAP[editorLanguage] || "c"}</span>
+                </div>
+              </div>
               <div className="flex-1 min-h-0 overflow-hidden">
-            <Editor
-              height="100%"
-              language={MONACO_LANG_MAP[editorLanguage] || "c"}
-              theme="light"
-              value={code}
-              onChange={(value) => {
-                const newCode = value || "";
-                setCode(newCode);
-                setCodeByLang((prev) => ({
-                  ...prev,
-                  [editorLanguage]: newCode,
-                }));
-                setSaveStatus("Saving...");
-                if (onSaveCode) {
-                  onSaveCode(experiment._id, subPart, newCode);
-                }
-                setTimeout(() => setSaveStatus("Saved"), 600);
-              }}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 13,
+                <Editor
+                  beforeMount={monacoCustomTheme}
+                  theme="bh-light"
+                  height="100%"
+                  language={MONACO_LANG_MAP[editorLanguage] || "c"}
+                  value={code}
+                  onChange={(value) => {
+                    const newCode = value || "";
+                    setCode(newCode);
+                    setCodeByLang((prev) => ({
+                      ...prev,
+                      [editorLanguage]: newCode,
+                    }));
+                    setSaveStatus("Saving...");
+                    if (onSaveCode) {
+                      onSaveCode(experiment._id, subPart, newCode);
+                    }
+                    setTimeout(() => setSaveStatus("Saved"), 600);
+                  }}
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 13,
                     fontFamily: "Cascadia Code",
-                automaticLayout: true,
-                padding: { top: 12 },
-                scrollBeyondLastLine: false,
-                lineNumbersMinChars: 3,
-                lineHeight: 20,
-                wordWrap: "on",
+                    automaticLayout: true,
+                    padding: { top: 12 },
+                    scrollBeyondLastLine: false,
+                    lineNumbersMinChars: 3,
+                    lineHeight: 20,
+                    wordWrap: "on",
                     overviewRulerLanes: 0,
                     hideCursorInOverviewRuler: true,
-              }}
-            />
-          </div>
+                  }}
+                />
+              </div>
             </Panel>
 
             <Separator className="group relative h-1 cursor-row-resize">
               <div className="absolute inset-0 bg-[#E4E4E7] group-hover:bg-[#5521FF] transition-colors" />
             </Separator>
 
-          {/* CONSOLE SECTION */}
+            {/* CONSOLE SECTION */}
             <Panel
               defaultSize={"28%"}
               minSize={"5%"}
               maxSize={"50%"}
               className="flex flex-col min-h-0 border-t border-[#E4E4E7] bg-[#F4F4F5]"
             >
-            <div className="flex items-center gap-3 px-3 border-b border-[#E4E4E7] bg-[#F9F9FB] shrink-0">
-              <button
-                className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "input" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
-                onClick={() => setConsoleTab("input")}
-              >
-                Input
-              </button>
-              <button
-                className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "output" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
-                onClick={() => setConsoleTab("output")}
-              >
-                Output
-              </button>
-              <button
-                className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "errors" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
-                onClick={() => setConsoleTab("errors")}
-              >
-                Errors{consoleErrors ? " (1)" : ""}
-              </button>
-            </div>
+              <div className="flex items-center gap-3 px-3 border-b border-[#E4E4E7] bg-[#F9F9FB] shrink-0">
+                <button
+                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "input" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                  onClick={() => setConsoleTab("input")}
+                >
+                  Input
+                </button>
+                <button
+                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "output" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                  onClick={() => setConsoleTab("output")}
+                >
+                  Output
+                </button>
+                <button
+                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "errors" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                  onClick={() => setConsoleTab("errors")}
+                >
+                  Errors{consoleErrors ? " (1)" : ""}
+                </button>
+              </div>
               <div className="flex-1 min-h-0 p-2.5 px-3 font-mono text-[11px] text-[#71717A] overflow-auto leading-relaxed custom-scrollbar">
-              {consoleTab === "input" && (
-                <div className="flex flex-col h-full gap-2.5">
-                  {/* Test Case Selector Tabs */}
-                  <div className="flex flex-wrap items-center gap-1.5 shrink-0 select-none pb-1 border-b border-[#E4E4E7]/40">
-                    {testCases.map((tc, idx) => (
-                      <div
-                        key={idx}
+                {consoleTab === "input" && (
+                  <div className="flex flex-col h-full gap-2.5">
+                    {/* Test Case Selector Tabs */}
+                    <div className="flex flex-wrap items-center gap-1.5 shrink-0 select-none pb-1 border-b border-[#E4E4E7]/40">
+                      {testCases.map((tc, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => {
+                            setActiveTestCaseIdx(idx);
+                            setStdinInput(tc);
+                          }}
+                          className={`group relative flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] border text-[11px] font-semibold transition-all duration-150 cursor-pointer ${
+                            activeTestCaseIdx === idx
+                              ? "bg-white border-[#E4E4E7] text-[#5521FF] shadow-[0_1px_2px_rgba(0,0,0,0.05)] font-bold"
+                              : "bg-transparent border-transparent text-[#71717A] hover:bg-[#E4E4E7]/40 hover:text-[#18181B]"
+                          }`}
+                        >
+                          <span className="p-[3px] rounded-full bg-[#5521ff]"></span>
+                          <span>Case {idx + 1}</span>
+                          {testCases.length > 1 && (
+                            <button
+                              onClick={(e) => deleteTestCase(idx, e)}
+                              className="opacity-0 group-hover:opacity-100 text-[#A1A1AA] hover:text-red-500 font-bold transition-all duration-150 p-0 text-[12px] leading-none shrink-0"
+                              title="Delete this test case"
+                            >
+                              <X size={12} />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <button
                         onClick={() => {
-                          setActiveTestCaseIdx(idx);
-                          setStdinInput(tc);
+                          const nextIdx = testCases.length;
+                          setTestCases([...testCases, ""]);
+                          setActiveTestCaseIdx(nextIdx);
+                          setStdinInput("");
                         }}
-                        className={`group relative flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] border text-[11px] font-semibold transition-all duration-150 cursor-pointer ${
-                          activeTestCaseIdx === idx
-                            ? "bg-white border-[#E4E4E7] text-[#5521FF] shadow-[0_1px_2px_rgba(0,0,0,0.05)] font-bold"
-                            : "bg-transparent border-transparent text-[#71717A] hover:bg-[#E4E4E7]/40 hover:text-[#18181B]"
-                        }`}
+                        className="px-2 py-1 rounded-[6px] border border-dashed border-[#D4D4D8] hover:border-[#5521FF] hover:text-[#5521FF] text-[#71717A] text-[10px] font-semibold transition-all duration-150 cursor-pointer flex items-center justify-center gap-0.5"
                       >
-                        <span className="p-[3px] rounded-full bg-[#5521ff]"></span>
-                        <span>Case {idx + 1}</span>
-                        {testCases.length > 1 && (
-                          <button
-                            onClick={(e) => deleteTestCase(idx, e)}
-                            className="opacity-0 group-hover:opacity-100 text-[#A1A1AA] hover:text-red-500 font-bold transition-all duration-150 p-0 text-[12px] leading-none shrink-0"
-                            title="Delete this test case"
-                          >
-                            <X size={12} />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    <button
-                      onClick={() => {
-                        const nextIdx = testCases.length;
-                        setTestCases([...testCases, ""]);
-                        setActiveTestCaseIdx(nextIdx);
-                        setStdinInput("");
-                      }}
-                      className="px-2 py-1 rounded-[6px] border border-dashed border-[#D4D4D8] hover:border-[#5521FF] hover:text-[#5521FF] text-[#71717A] text-[10px] font-semibold transition-all duration-150 cursor-pointer flex items-center justify-center gap-0.5"
-                    >
-                      + Add Case
-                    </button>
-                  </div>
+                        + Add Case
+                      </button>
+                    </div>
 
-                  {/* Textarea container */}
-                  <div className="flex-1 relative min-h-0">
-                    <textarea
-                      value={stdinInput}
-                      onChange={(e) => {
-                        const newVal = e.target.value;
-                        setStdinInput(newVal);
-                        setTestCases((prev) => {
-                          const next = [...prev];
-                          next[activeTestCaseIdx] = newVal;
-                          return next;
-                        });
-                      }}
-                      placeholder="Type program input here (one value per line)..."
-                      className="w-full h-full bg-transparent border-none resize-none outline-none font-mono text-[12px] text-[#18181B] leading-relaxed"
-                    />
+                    {/* Textarea container */}
+                    <div className="flex-1 relative min-h-0">
+                      <textarea
+                        value={stdinInput}
+                        onChange={(e) => {
+                          const newVal = e.target.value;
+                          setStdinInput(newVal);
+                          setTestCases((prev) => {
+                            const next = [...prev];
+                            next[activeTestCaseIdx] = newVal;
+                            return next;
+                          });
+                        }}
+                        placeholder="Type program input here (one value per line)..."
+                        className="w-full h-full bg-transparent border-none resize-none outline-none font-mono text-[12px] text-[#18181B] leading-relaxed"
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
-              {consoleTab === "output" &&
-                (consoleOutput ? (
+                )}
+                {consoleTab === "output" &&
+                  (consoleOutput ? (
                     <pre className="whitespace-pre-wrap m-0">
                       {consoleOutput}
                     </pre>
-                ) : (
-                  <span className="italic text-[#A1A1AA]">
-                    Click "Run" to compile and execute your code.
-                  </span>
-                ))}
-              {consoleTab === "errors" &&
-                (consoleErrors ? (
-                  <pre className="text-[#DC2626] whitespace-pre-wrap m-0">
-                    {consoleErrors}
-                  </pre>
-                ) : (
-                  <span className="italic text-[#A1A1AA]">
-                    No errors found.
-                  </span>
-                ))}
-            </div>
+                  ) : (
+                    <span className="italic text-[#A1A1AA]">
+                      Click "Run" to compile and execute your code.
+                    </span>
+                  ))}
+                {consoleTab === "errors" &&
+                  (consoleErrors ? (
+                    <pre className="text-[#DC2626] whitespace-pre-wrap m-0">
+                      {consoleErrors}
+                    </pre>
+                  ) : (
+                    <span className="italic text-[#A1A1AA]">
+                      No errors found.
+                    </span>
+                  ))}
+              </div>
             </Panel>
           </Group>
         </Panel>
