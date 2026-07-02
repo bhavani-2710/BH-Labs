@@ -26,7 +26,6 @@ Structure of explanation:
 1. **Goal of the Program**: Explain what the program demonstrates or solves.
 2. **Core Logic: Explain the** main programming concepts used.
 3. **Step-by-Step Explanation**  : Explain only meaningful code blocks (skip decorative print statements).
-4. **Key Takeaways**: Summarize what the student learns.
 
 Style rules:
 

@@ -19,10 +19,10 @@ const getOpenAiClient = () => {
 
 /**
  * generateVivaQA
- * Calls GPT-oss-120b to produce 7–9 short Q&A pairs for a sub-experiment.
+ * Calls google/gemini-2.5-flash-lite to produce 7–9 short Q&A pairs for a sub-experiment.
  * @param {Object} subExp  - a subExperiment document (title, problemStatement, theory, concepts)
  * @returns {Array}        - [{ question, answer }, ...]
-**/
+ **/
 const generateVivaQA = async (subExp) => {
   const openai = getOpenAiClient();
   if (!openai) {
@@ -32,7 +32,7 @@ const generateVivaQA = async (subExp) => {
   const SYSTEM_PROMPT = EXPERIMENT_VIVA_SYSTEM_PROMPT(subExp);
 
   const response = await openai.chat.completions.create({
-    model: "google/gemini-2.5-flash",
+    model: "google/gemini-2.5-flash-lite",
     messages: [
       {
         role: "system",
