@@ -8,9 +8,10 @@ const connectDB = require("./config/db");
 const subjectRoutes = require("./routes/subjectRoutes");
 const experimentRoutes = require("./routes/experimentRoutes");
 const codeRoutes = require("./routes/codeRoutes");
-const vivaRoutes = require("./routes/vivaRoutes");
 const compilerRoutes = require("./routes/compilerRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const aptitudeRoutes = require("./routes/aptitudeRoutes");
+const vivaRoutes = require("./routes/vivaRoutes");   // <-- add this
 
 connectDB();
 
@@ -25,9 +26,10 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/codes", codeRoutes);
-app.use("/api/vivas", vivaRoutes);
 app.use("/api/run", compilerRoutes);
 app.use("/api", aiRoutes);
+app.use("/api/aptitude", aptitudeRoutes);
+app.use("/api/vivas", vivaRoutes);   // <-- add this
 
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/experiments", experimentRoutes);

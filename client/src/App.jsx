@@ -6,8 +6,10 @@ import Dashboard from "./pages/Dashboard";
 import SubjectsListPage from "./pages/SubjectsListPage";
 import SubjectDetailPage from "./pages/ExperimentListPage";
 import LabWorkspace from "./pages/LabWorkspace";
-import VivaPractice from "./pages/VivaPractice";
 import PracticalJournal from "./pages/PracticalJournal";
+import AptitudeTest from "./pages/AptitudeTest";
+import TestInstruction from "./pages/TestInstruction";
+import AssessmentResult from "./pages/AssessmentResult";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -19,8 +21,8 @@ function SubjectsListWrapper() {
     <SubjectsListPage
       onNavigate={(page, params) => {
         if (page === "subject-detail") navigate(`/subject/${params.subjectId}`);
-        else if (page === "viva-subject")
-          navigate(`/viva/subject/${params.subjectId}`);
+        else if (page === "test-instructions")
+          navigate(`/test-instructions/${params.subjectId}`);
         else navigate(`/${page}`);
       }}
       onSelectSubject={(subjectId) => navigate(`/subject/${subjectId}`)}
@@ -90,8 +92,6 @@ function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
         else navigate("/subjects");
       }}
       onNavigate={(page, params) => {
-        if (page === "viva")
-          navigate(`/viva/${params.experimentId}/${params.part || "a"}`);
         if (page === "journal")
           navigate(`/journal/${params.experimentId}/${params.part || "a"}`);
       }}
@@ -99,37 +99,58 @@ function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
   );
 }
 
-function VivaWrapper({ experiments, onCompleteViva }) {
-  const { experimentId, part } = useParams();
+function AptitudeTestWrapper({ subjects }) {
   const navigate = useNavigate();
-  const experiment = experiments.find((e) => e._id === experimentId);
+  const { subjectId } = useParams();
+  const subject = subjects.find((s) => s._id === subjectId);
+  const testTitle = subject ? subject.name : "C Programming";
 
   return (
-    <VivaPractice
-      experiment={experiment}
-      subPart={part || "a"}
-      onBack={() => navigate(`/workspace/${experimentId}/${part || "a"}`)}
-      onCompleteViva={onCompleteViva}
+    <AptitudeTest
+      testTitle={testTitle}
+      onNavigate={(page, params) => {
+        if (page === "subjects") navigate("/subjects");
+        else if (page === "dashboard") navigate("/dashboard");
+        else navigate(`/${page}`);
+      }}
+      onSubmit={(result) => {
+        navigate("/assessment-result", {
+          state: {
+            correct: result.stats.correct,
+            incorrect: result.stats.incorrect,
+            unanswered: result.stats.unanswered,
+            elapsed: result.elapsed,
+            testTitle: testTitle,
+            questions: result.questions,
+            answers: result.answers,
+          },
+        });
+      }}
     />
   );
 }
 
-/**
- * SubjectVivaWrapper — launched from the Subjects list page via "Take Viva".
- * Looks up the first experiment belonging to this subject and boots VivaPractice.
- * Falls back gracefully if no experiments are found yet.
- */
-function SubjectVivaWrapper({ onCompleteViva }) {
-  const { subjectId } = useParams();
+function TestInstructionWrapper({ subjects }) {
   const navigate = useNavigate();
+  const { subjectId } = useParams();
+  const subject = subjects.find((s) => s._id === subjectId);
+  const testTitle = subject ? subject.name : "C Programming";
 
   return (
-    <VivaPractice
-      subjectId={subjectId}
-      onBack={() => navigate(`/subject/${subjectId}`)}
-      onCompleteViva={onCompleteViva}
+    <TestInstruction
+      testTitle={testTitle}
+      onNavigate={(page) => {
+        if (page === "subjects") navigate("/subjects");
+        else if (page === "dashboard") navigate("/dashboard");
+        else navigate(`/${page}`);
+      }}
     />
   );
+}
+
+function AssessmentResultWrapper() {
+  const navigate = useNavigate();
+  return <AssessmentResult />;
 }
 
 function JournalWrapper({ experiments, codeStore }) {
@@ -157,7 +178,6 @@ export default function App() {
     [],
   );
   const [codeStore, setCodeStore] = useState({});
-  const [vivaScores, setVivaScores] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -196,20 +216,6 @@ export default function App() {
       console.log(JSON.stringify({ key, code: codeContent }));
     } catch (e) {
       console.error("Save failed", e);
-    }
-  };
-
-  const handleCompleteViva = async (score, experimentId, part) => {
-    const key = `${experimentId}_${part || "a"}`;
-    setVivaScores((prev) => ({ ...prev, [key]: score }));
-    try {
-      await fetch(`${API}/vivas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, score }),
-      });
-    } catch (e) {
-      console.error("Viva save failed", e);
     }
   };
 
@@ -268,28 +274,34 @@ export default function App() {
         }
       />
 
-      {/* Viva from workspace (experiment-level) */}
-      <Route
-        path="/viva/:experimentId/:part?"
-        element={
-          <VivaWrapper
-            experiments={experiments}
-            onCompleteViva={handleCompleteViva}
-          />
-        }
-      />
-
-      {/* Viva from subjects list (subject-level → first experiment) */}
-      <Route
-        path="/viva/subject/:subjectId"
-        element={<SubjectVivaWrapper onCompleteViva={handleCompleteViva} />}
-      />
-
       <Route
         path="/journal/:experimentId/:part?"
         element={
           <JournalWrapper experiments={experiments} codeStore={codeStore} />
         }
+      />
+
+      <Route
+        path="/aptitude-test"
+        element={<AptitudeTestWrapper subjects={subjects} />}
+      />
+      <Route
+        path="/aptitude-test/:subjectId"
+        element={<AptitudeTestWrapper subjects={subjects} />}
+      />
+
+      <Route
+        path="/test-instructions"
+        element={<TestInstructionWrapper subjects={subjects} />}
+      />
+      <Route
+        path="/test-instructions/:subjectId"
+        element={<TestInstructionWrapper subjects={subjects} />}
+      />
+
+      <Route
+        path="/assessment-result"
+        element={<AssessmentResultWrapper />}
       />
 
       <Route

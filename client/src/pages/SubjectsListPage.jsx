@@ -183,15 +183,15 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
 
-                    {/* Take Viva */}
+                    {/* Take Test */}
                     <button
                       onClick={() =>
-                        onNavigate?.("viva-subject", { subjectId: subject._id })
+                        onNavigate?.("test-instructions", { subjectId: subject._id })
                       }
-                      className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-violet-200 text-[#5521FF] hover:bg-violet-50 transition-all active:scale-[0.98]"
+                      className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-violet-200 text-[#5521FF] hover:bg-violet-50 transition-all active:scale-[0.98] cursor-pointer"
                     >
-                      <Mic className="w-3.5 h-3.5" />
-                      Take Viva
+                      <FileText className="w-3.5 h-3.5" />
+                      Take Test
                     </button>
                   </div>
                 </div>

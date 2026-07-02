@@ -1,4 +1,5 @@
 const OpenAI = require("openai");
+const { jsonrepair } = require("jsonrepair");
 const {
   EXPERIMENT_VIVA_SYSTEM_PROMPT,
 } = require("../prompts/experimentVivaSystemPrompt");
@@ -15,6 +16,12 @@ const getOpenAiClient = () => {
       "X-Title": "BH Labs",
     },
   });
+};
+
+// Escape backslashes that aren't part of a valid JSON escape sequence
+// (e.g. LaTeX-style \%, \_, \d from regex snippets, stray Windows paths, etc.)
+const sanitizeJsonString = (str) => {
+  return str.replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\");
 };
 
 /**
@@ -50,8 +57,23 @@ const generateVivaQA = async (subExp) => {
     .replace(/```/g, "")
     .trim();
 
-  const parsed = JSON.parse(raw);
-  if (!Array.isArray(parsed.qaPairs)) {
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (parseErr) {
+    // Fall back: fix bad escapes, then let jsonrepair patch any remaining
+    // structural issues (trailing commas, unbalanced brackets, etc.)
+    try {
+      const sanitized = sanitizeJsonString(raw);
+      const repaired = jsonrepair(sanitized);
+      parsed = JSON.parse(repaired);
+    } catch (repairErr) {
+      console.error("generateVivaQA: failed to parse AI response even after repair", repairErr);
+      throw new Error("AI returned malformed JSON that could not be repaired.");
+    }
+  }
+
+  if (!parsed || !Array.isArray(parsed.qaPairs)) {
     throw new Error("AI did not return a valid qaPairs array.");
   }
   return parsed.qaPairs;
