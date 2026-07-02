@@ -1,8 +1,3 @@
-const OpenAI = require("openai");
-const fs = require("fs");
-const path = require("path");
-const { jsonrepair } = require("jsonrepair");
-const Subject = require("../models/Subject");
 const Experiment = require("../models/Experiment");
 const VivaQA = require("../models/VivaQA");
 const { generateVivaQA } = require("../services/vivaServices");

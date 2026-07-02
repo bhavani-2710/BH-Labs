@@ -1,6 +1,12 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Clock, Cloud, AlertTriangle, X, HelpCircle } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  ArrowRight,
+  Clock,
+  AlertTriangle,
+  X,
+  HelpCircle,
+} from "lucide-react";
 // ── Helper: format elapsed seconds as HH:MM:SS ────────────────────────
 function formatTime(totalSeconds) {
   const h = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
@@ -15,9 +21,15 @@ function renderQuestionText(text) {
   const parts = text.split(/(```[\s\S]*?```)/g);
   return parts.map((part, idx) => {
     if (part.startsWith("```")) {
-      const content = part.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "").trim();
+      const content = part
+        .replace(/^```[a-zA-Z]*\n?/, "")
+        .replace(/```$/, "")
+        .trim();
       return (
-        <pre key={idx} className="my-4 p-4 bg-slate-50 border border-slate-200 rounded-xl overflow-x-auto text-xs font-mono text-violet-800 leading-relaxed max-w-full text-left">
+        <pre
+          key={idx}
+          className="my-4 p-4 bg-slate-50 border border-slate-200 rounded-xl overflow-x-auto text-xs font-mono text-violet-800 leading-relaxed max-w-full text-left"
+        >
           <code>{content}</code>
         </pre>
       );
@@ -29,7 +41,10 @@ function renderQuestionText(text) {
         {inlineParts.map((subPart, sIdx) => {
           if (subPart.startsWith("`") && subPart.endsWith("`")) {
             return (
-              <code key={sIdx} className="px-1.5 py-0.5 mx-0.5 bg-slate-100 border border-slate-200 text-violet-700 rounded font-mono text-xs">
+              <code
+                key={sIdx}
+                className="px-1.5 py-0.5 mx-0.5 bg-slate-100 border border-slate-200 text-violet-700 rounded font-mono text-xs"
+              >
                 {subPart.slice(1, -1)}
               </code>
             );
@@ -41,13 +56,6 @@ function renderQuestionText(text) {
   });
 }
 
-// ── Question Status Enum ──────────────────────────────────────────────
-const STATUS = {
-  UNANSWERED: "unanswered",
-  CORRECT: "correct",
-  INCORRECT: "incorrect",
-};
-
 // =====================================================================
 // AptitudeTest  –  main page component
 // =====================================================================
@@ -58,44 +66,99 @@ export default function AptitudeTest({
   onSubmit,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { subjectId } = useParams();
+  const storageKey = `aptitude_test_${subjectId}`;
 
-  // ── State ───────────────────────────────────────────────────────────
-  const [questionsList, setQuestionsList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(null);
+  // Helper to load initial state from localStorage
+  const getInitialState = () => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.questions && parsed.questions.length > 0) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error("Error parsing saved test state", e);
+      }
+    }
+    return null;
+  };
+
+  const savedState = getInitialState();
+
+  const [questionsList] = useState(() => {
+    if (savedState) return savedState.questions;
+    return location.state?.questions || [];
+  });
 
   useEffect(() => {
-    const loadQuestions = async () => {
-      try {
-        setLoading(true);
-        if (!subjectId) {
-          throw new Error("No subject ID provided in route parameters.");
-        }
-        const res = await fetch(`/api/aptitude/questions/${subjectId}`);
-        if (!res.ok) throw new Error("Failed to load questions from server API.");
-        const data = await res.json();
-        setQuestionsList(data);
-      } catch (err) {
-        console.error("Load questions error:", err);
-        setFetchError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadQuestions();
-  }, [subjectId]);
+    if (!questionsList.length) {
+      navigate(`/test-instructions/${subjectId}`);
+    }
+  }, [questionsList.length, navigate, subjectId]);
 
+  // ── State ───────────────────────────────────────────────────────────
   const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState({}); // committed answers (determines grid colors)
-  const [tempAnswers, setTempAnswers] = useState({}); // temporary selections before save and next
-  const [markedForReview, setMarkedForReview] = useState({}); // { [qIndex]: boolean }
-  const [remaining, setRemaining] = useState(TOTAL_TIME);
-  const [submitted, setSubmitted] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    if (savedState) return savedState.currentIndex ?? 0;
+    return 0;
+  });
+  const [answers, setAnswers] = useState(() => {
+    if (savedState) return savedState.answers ?? {};
+    return {};
+  }); // committed answers (determines grid colors)
+  const [tempAnswers, setTempAnswers] = useState(() => {
+    if (savedState) return savedState.tempAnswers ?? {};
+    return {};
+  }); // temporary selections before save and next
+  const [markedForReview, setMarkedForReview] = useState(() => {
+    if (savedState) return savedState.markedForReview ?? {};
+    return {};
+  }); // { [qIndex]: boolean }
+  const [visited, setVisited] = useState(() => {
+    if (savedState) return savedState.visited ?? { 0: true };
+    return { 0: true };
+  });
+  const [remaining, setRemaining] = useState(() => {
+    if (savedState) return savedState.remaining ?? TOTAL_TIME;
+    return TOTAL_TIME;
+  });
+  const [submitted, setSubmitted] = useState(() => {
+    if (savedState) return savedState.submitted ?? false;
+    return false;
+  });
   const elapsed = TOTAL_TIME - remaining;
   const timerRef = useRef(null);
   const submittedRef = useRef(false); // avoid double-submit from auto-submit
+
+  // Set current index as visited
+  useEffect(() => {
+    if (questionsList.length > 0) {
+      setVisited((prev) => {
+        if (prev[currentIndex]) return prev;
+        return { ...prev, [currentIndex]: true };
+      });
+    }
+  }, [currentIndex, questionsList.length]);
+
+  // Sync test state to localStorage
+  useEffect(() => {
+    if (questionsList.length > 0 && !submitted) {
+      const stateToSave = {
+        questions: questionsList,
+        currentIndex,
+        answers,
+        tempAnswers,
+        markedForReview,
+        visited,
+        remaining,
+        submitted,
+      };
+      localStorage.setItem(storageKey, JSON.stringify(stateToSave));
+    }
+  }, [questionsList, currentIndex, answers, tempAnswers, markedForReview, visited, remaining, submitted, storageKey]);
 
   // ── Countdown Timer ─────────────────────────────────────────────────
   useEffect(() => {
@@ -147,27 +210,20 @@ export default function AptitudeTest({
   const currentQuestion = questionsList[currentIndex];
   const totalQuestions = questionsList.length;
 
-  const getQuestionStatus = useCallback(
-    (idx) => {
-      if (answers[idx] === undefined || !questionsList[idx]) return STATUS.UNANSWERED;
-      return answers[idx] === questionsList[idx].correctIndex
-        ? STATUS.CORRECT
-        : STATUS.INCORRECT;
-    },
-    [answers, questionsList],
-  );
-
-  const stats = {
-    correct: Object.keys(answers).filter(
-      (i) => questionsList[i] && answers[i] === questionsList[i].correctIndex,
-    ).length,
-    incorrect: Object.keys(answers).filter(
-      (i) => questionsList[i] && answers[i] !== questionsList[i].correctIndex,
-    ).length,
-    unanswered:
-      totalQuestions -
-      Object.keys(answers).filter((i) => answers[i] !== undefined).length,
-  };
+  const stats = useMemo(() => {
+    const finalAnswers = { ...answers, ...tempAnswers };
+    const correct = Object.keys(finalAnswers).filter(
+      (i) =>
+        questionsList[i] && finalAnswers[i] === questionsList[i].correctIndex,
+    ).length;
+    const answered = Object.keys(finalAnswers).length;
+    return {
+      answered,
+      unanswered: totalQuestions - answered,
+      correct,
+      incorrect: answered - correct,
+    };
+  }, [answers, tempAnswers, questionsList, totalQuestions]);
 
   const initials = studentName
     .split(" ")
@@ -207,22 +263,37 @@ export default function AptitudeTest({
     submittedRef.current = true;
     clearInterval(timerRef.current);
     setSubmitted(true);
-    
+
     // Merge any uncommitted temp selections
     const finalAnswers = { ...answers, ...tempAnswers };
     const finalStats = {
       correct: Object.keys(finalAnswers).filter(
-        (i) => questionsList[i] && finalAnswers[i] === questionsList[i].correctIndex,
+        (i) =>
+          questionsList[i] && finalAnswers[i] === questionsList[i].correctIndex,
       ).length,
       incorrect: Object.keys(finalAnswers).filter(
-        (i) => questionsList[i] && finalAnswers[i] !== questionsList[i].correctIndex,
+        (i) =>
+          questionsList[i] && finalAnswers[i] !== questionsList[i].correctIndex,
       ).length,
       unanswered:
         totalQuestions -
-        Object.keys(finalAnswers).filter((i) => finalAnswers[i] !== undefined).length,
+        Object.keys(finalAnswers).filter((i) => finalAnswers[i] !== undefined)
+          .length,
     };
 
-    if (onSubmit) onSubmit({ answers: finalAnswers, elapsed, stats: finalStats, questions: questionsList });
+    // Clear localStorage for this subject
+    localStorage.removeItem(storageKey);
+    // Store subjectId for retake navigation
+    localStorage.setItem("aptitude_last_subject_id", subjectId);
+
+    if (onSubmit)
+      onSubmit({
+        answers: finalAnswers,
+        elapsed,
+        stats: finalStats,
+        questions: questionsList,
+        subjectId,
+      });
   };
 
   // ── Auto-submit when time runs out ──────────────────────────────────
@@ -234,29 +305,13 @@ export default function AptitudeTest({
 
   const jumpToQuestion = (idx) => {
     if (submitted) return;
-    const isAllowed = idx === currentIndex || markedForReview[idx];
-    if (isAllowed) {
-      setCurrentIndex(idx);
+    // Auto-save current temp selection if any before jumping
+    const currentTemp = tempAnswers[currentIndex];
+    if (currentTemp !== undefined) {
+      setAnswers((prev) => ({ ...prev, [currentIndex]: currentTemp }));
     }
+    setCurrentIndex(idx);
   };
-
-  // ── Last-saved timestamp ────────────────────────────────────────────
-  const lastSavedTime = new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F6F7FB] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-violet-200 border-t-[#5521FF] animate-spin" />
-        <p className="text-sm font-semibold text-slate-500 animate-pulse text-center px-4">
-          Generating fresh test questions from subexperiments...
-        </p>
-      </div>
-    );
-  }
 
   // ── Render ──────────────────────────────────────────────────────────
   return (
@@ -274,11 +329,7 @@ export default function AptitudeTest({
         </header>
 
         {/* Scrollable Content */}
-        <div className="p-8 overflow-y-auto flex-1">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-800">{testTitle}</h2>
-          </div>
-
+        <div className="pb-8 px-8 h-fit overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* ── Question Card ─────────────────────────────────── */}
             <div className="flex-1 bg-white shadow-sm border border-slate-100 p-8 min-h-[600px] relative rounded-3xl">
@@ -324,7 +375,9 @@ export default function AptitudeTest({
                           <div className="w-2.5 h-2.5 bg-[#5521FF] rounded-full" />
                         )}
                       </div>
-                      <span className="text-sm text-slate-700">{renderQuestionText(opt)}</span>
+                      <span className="text-sm text-slate-700">
+                        {renderQuestionText(opt)}
+                      </span>
                     </label>
                   );
                 })}
@@ -340,7 +393,9 @@ export default function AptitudeTest({
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                   }`}
                 >
-                  {markedForReview[currentIndex] ? "Marked for Review" : "Mark for Review"}
+                  {markedForReview[currentIndex]
+                    ? "Marked for Review"
+                    : "Mark for Review"}
                 </button>
                 {currentIndex < totalQuestions - 1 ? (
                   <button
@@ -388,27 +443,25 @@ export default function AptitudeTest({
                   </p>
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center space-x-1.5">
-                      <div className="w-3 h-3 bg-emerald-500 rounded-sm" />
+                      <div className="w-3 h-3 bg-blue-600 rounded-sm" />
                       <span className="text-[10px] text-slate-500">
-                        Correct
+                        Answered
                       </span>
                     </div>
                     <div className="flex items-center space-x-1.5">
                       <div className="w-3 h-3 bg-red-600 rounded-sm" />
                       <span className="text-[10px] text-slate-500">
-                        Incorrect
+                        Not Answered
                       </span>
                     </div>
                     <div className="flex items-center space-x-1.5">
-                      <div className="w-3 h-3 bg-amber-500 rounded-sm" />
-                      <span className="text-[10px] text-slate-500">
-                        Review
-                      </span>
+                      <div className="w-3 h-3 bg-purple-800 rounded-sm" />
+                      <span className="text-[10px] text-slate-500">Review</span>
                     </div>
                     <div className="flex items-center space-x-1.5">
                       <div className="w-3 h-3 bg-slate-100 border border-slate-200 rounded-sm" />
                       <span className="text-[10px] text-slate-500">
-                        Unanswered
+                        Not Visited
                       </span>
                     </div>
                   </div>
@@ -417,16 +470,18 @@ export default function AptitudeTest({
                 {/* Question Grid */}
                 <div className="grid grid-cols-4 gap-3 mb-8">
                   {questionsList.map((_, idx) => {
-                    const status = getQuestionStatus(idx);
                     const isMarked = markedForReview[idx];
-                    const isAllowed = idx === currentIndex || isMarked;
-                    
-                    let bgClass = "bg-slate-100 text-slate-500";
+                    const isAnswered = answers[idx] !== undefined || tempAnswers[idx] !== undefined;
+                    const isVisited = visited[idx];
+                    const isAllowed = isVisited || idx === currentIndex;
+
+                    let bgClass = "bg-slate-100 text-slate-500 border border-slate-200";
+
                     if (isMarked) {
-                      bgClass = "bg-amber-500 text-white";
-                    } else if (status === STATUS.CORRECT) {
-                      bgClass = "bg-emerald-500 text-white";
-                    } else if (status === STATUS.INCORRECT) {
+                      bgClass = "bg-purple-800 text-white";
+                    } else if (isAnswered) {
+                      bgClass = "bg-blue-600 text-white";
+                    } else if (isVisited) {
                       bgClass = "bg-red-600 text-white";
                     }
 
@@ -508,37 +563,26 @@ export default function AptitudeTest({
       </main>
 
       {/* ── Floating Countdown Timer (bottom-right) ─────────────────── */}
-      <div className={`fixed bottom-6 right-6 shadow-lg border p-4 rounded-xl z-50 flex flex-col items-end transition-colors ${
-        remaining <= 120 ? "bg-red-50 border-red-200" : "bg-white border-slate-100"
-      }`}>
+      <div
+        className={`fixed bottom-6 right-6 shadow-lg border p-4 rounded-xl z-50 flex flex-col items-end transition-colors ${
+          remaining <= 120
+            ? "bg-red-50 border-red-200"
+            : "bg-white border-slate-100"
+        }`}
+      >
         <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
           Time Remaining
         </p>
         <div className="flex items-center space-x-2">
-          <Clock className={`w-5 h-5 ${remaining <= 120 ? "text-red-600" : "text-[#5521FF]"}`} />
-          <span className={`text-2xl font-bold font-mono tracking-tight ${
-            remaining <= 120 ? "text-red-600" : "text-[#5521FF]"
-          }`}>
+          <Clock
+            className={`w-5 h-5 ${remaining <= 120 ? "text-red-600" : "text-[#5521FF]"}`}
+          />
+          <span
+            className={`text-2xl font-bold font-mono tracking-tight ${
+              remaining <= 120 ? "text-red-600" : "text-[#5521FF]"
+            }`}
+          >
             {formatTime(remaining)}
-          </span>
-        </div>
-      </div>
-
-      {/* ── Floating System Status (bottom-left) ─────────────────── */}
-      <div className="fixed bottom-6 left-6 bg-white shadow-lg border border-slate-100 p-4 rounded-xl z-50 flex flex-col items-start w-64">
-        <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
-          System Status
-        </p>
-        <div className="flex items-center space-x-2 mb-1">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-          <span className="text-sm font-medium text-slate-800">
-            Internet connection stable
-          </span>
-        </div>
-        <div className="flex items-center space-x-1.5 text-slate-500">
-          <Cloud className="w-3.5 h-3.5" />
-          <span className="text-[10px]">
-            Last answer saved at {lastSavedTime}
           </span>
         </div>
       </div>
@@ -580,6 +624,8 @@ export default function AptitudeTest({
               <button
                 onClick={() => {
                   clearInterval(timerRef.current);
+                  // Clear localStorage
+                  localStorage.removeItem(storageKey);
                   // Allow navigation by bypassing blocker
                   submittedRef.current = true;
                   navigate(-1);

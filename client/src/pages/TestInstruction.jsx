@@ -8,7 +8,6 @@ import {
   Star,
   ListChecks,
   AlertTriangle,
-  Wifi,
   Timer,
   HelpCircle,
 } from "lucide-react";
@@ -26,7 +25,8 @@ const INSTRUCTIONS = [
   {
     text: (
       <>
-        Use the <span className="font-bold text-slate-900">"Mark for Review"</span>{" "}
+        Use the{" "}
+        <span className="font-bold text-slate-900">"Mark for Review"</span>{" "}
         button to flag questions you want to revisit later.
       </>
     ),
@@ -34,8 +34,8 @@ const INSTRUCTIONS = [
   {
     text: (
       <>
-        You can only navigate freely to questions which are marked for review using the question palette provided
-        on the right side of the test screen.
+        You can navigate freely to already visited questions using the question
+        palette provided on the right side of the test screen.
       </>
     ),
   },
@@ -64,7 +64,7 @@ const INSTRUCTIONS = [
 // =====================================================================
 export default function TestInstruction({
   testTitle = "C Programming",
-  totalQuestions = 15,
+  totalQuestions = 10,
   durationMinutes = 20,
   markingScheme = "+4 / -1",
   format = "MCQ",
@@ -73,14 +73,34 @@ export default function TestInstruction({
   const navigate = useNavigate();
   const { subjectId } = useParams();
   const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleStartTest = () => {
+  const handleStartTest = async () => {
     if (!agreed) return;
-    // Navigate to the aptitude test page
-    if (subjectId) {
-      navigate(`/aptitude-test/${subjectId}`);
-    } else {
-      navigate("/aptitude-test");
+    setLoading(true);
+
+    try {
+      // optional: show loader state
+      const res = await fetch(`/api/aptitude/questions/${subjectId}`);
+
+      if (!res.ok) {
+        throw new Error("Failed to generate test questions");
+      }
+
+      const questions = await res.json();
+
+      navigate(`/aptitude-test/${subjectId}`, {
+        state: {
+          questions,
+          testTitle,
+          durationMinutes,
+        },
+      });
+
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate test. Please try again.");
     }
   };
 
@@ -109,6 +129,17 @@ export default function TestInstruction({
   ];
 
   // ── Render ──────────────────────────────────────────────────────────
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F6F7FB] flex flex-col items-center justify-center gap-4">
+        <div className="w-12 h-12 rounded-full border-4 border-violet-200 border-t-[#5521FF] animate-spin" />
+        <p className="text-sm font-semibold text-slate-500 animate-pulse text-center px-4">
+          Building your customized aptitude test...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F6F7FB] relative">
       {/* ── Background blobs ──────────────────────────────────────── */}
@@ -203,8 +234,9 @@ export default function TestInstruction({
                     Important: Negative Marking Active
                   </h4>
                   <p className="text-amber-800 text-sm leading-relaxed">
-                    For every incorrect answer, 1 mark will be deducted from your
-                    total score. Unattempted questions will not be penalized.
+                    For every incorrect answer, 1 mark will be deducted from
+                    your total score. Unattempted questions will not be
+                    penalized.
                   </p>
                 </div>
               </div>

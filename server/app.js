@@ -9,7 +9,7 @@ const subjectRoutes = require("./routes/subjectRoutes");
 const experimentRoutes = require("./routes/experimentRoutes");
 const codeRoutes = require("./routes/codeRoutes");
 const compilerRoutes = require("./routes/compilerRoutes");
-const aiRoutes = require("./routes/aiRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 const aptitudeRoutes = require("./routes/aptitudeRoutes");
 const vivaRoutes = require("./routes/vivaRoutes");   // <-- add this
 
@@ -27,7 +27,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/codes", codeRoutes);
 app.use("/api/run", compilerRoutes);
-app.use("/api", aiRoutes);
+app.use("/api", chatRoutes);
 app.use("/api/aptitude", aptitudeRoutes);
 app.use("/api/vivas", vivaRoutes);   // <-- add this
 

@@ -110,8 +110,22 @@ export default function AssessmentResult({
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ── Get state from location (from AptitudeTest submit flow) ──────────
-  const state = location.state || {};
+  // ── Get state from location (from AptitudeTest submit flow) or localStorage ──────────
+  const state = useMemo(() => {
+    if (location.state && Object.keys(location.state).length > 0) {
+      return location.state;
+    }
+    const saved = localStorage.getItem("aptitude_last_result");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error parsing saved result", e);
+      }
+    }
+    return {};
+  }, [location.state]);
+
   const correct = correctCount ?? state.correct ?? 13;
   const incorrect = incorrectCount ?? state.incorrect ?? 1;
   const unanswered = unansweredCount ?? state.unanswered ?? 1;
@@ -119,6 +133,7 @@ export default function AssessmentResult({
 
   const questions = state.questions || [];
   const answers = state.answers || {};
+  const displayTitle = state.testTitle || testTitle;
 
   // Mock fallback questions for visual excellence if visited directly
   const mockQuestions = [
@@ -219,9 +234,8 @@ export default function AssessmentResult({
       {/* ── Top Navigation Bar ────────────────────────────────────────── */}
       <nav className="fixed top-0 w-full h-16 z-50 flex justify-between items-center px-6 md:px-10 bg-white border-b border-slate-200/80 shadow-sm">
         <div className="flex items-center gap-4">
-          <Terminal className="w-6 h-6 text-[#3525cd]" />
           <h1 className="text-lg font-bold text-[#1b1b24] tracking-tight">
-            {testTitle}
+            {displayTitle}
           </h1>
           <span className="px-3 py-1 bg-[#3525cd]/10 text-[#3525cd] font-semibold text-xs rounded-full">
             Submitted
@@ -508,7 +522,10 @@ export default function AssessmentResult({
         {/* Action Footer */}
         <footer className="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
           <button
-            onClick={() => navigate("/test-instructions")}
+            onClick={() => {
+              const subId = state.subjectId || localStorage.getItem("aptitude_last_subject_id") || "";
+              navigate(`/test-instructions/${subId}`);
+            }}
             className="w-full md:w-64 py-3.5 rounded-xl bg-[#3525cd] text-white font-bold text-sm shadow-md shadow-[#3525cd]/20 hover:bg-[#3525cd]/90 active:scale-95 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />

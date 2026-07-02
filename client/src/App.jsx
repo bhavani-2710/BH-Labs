@@ -87,10 +87,7 @@ function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
       subPart={part || "a"}
       savedCode={codeStore[`${experimentId}_${part || "a"}`] || ""}
       onSaveCode={onSaveCode}
-      onBack={() => {
-        if (experiment?.subjectId) navigate(`/subject/${experiment.subjectId}`);
-        else navigate("/subjects");
-      }}
+      onBack={() => navigate(-1)}
       onNavigate={(page, params) => {
         if (page === "journal")
           navigate(`/journal/${params.experimentId}/${params.part || "a"}`);
@@ -114,16 +111,18 @@ function AptitudeTestWrapper({ subjects }) {
         else navigate(`/${page}`);
       }}
       onSubmit={(result) => {
+        const resultState = {
+          correct: result.stats.correct,
+          incorrect: result.stats.incorrect,
+          unanswered: result.stats.unanswered,
+          elapsed: result.elapsed,
+          testTitle: testTitle,
+          questions: result.questions,
+          answers: result.answers,
+        };
+        localStorage.setItem("aptitude_last_result", JSON.stringify(resultState));
         navigate("/assessment-result", {
-          state: {
-            correct: result.stats.correct,
-            incorrect: result.stats.incorrect,
-            unanswered: result.stats.unanswered,
-            elapsed: result.elapsed,
-            testTitle: testTitle,
-            questions: result.questions,
-            answers: result.answers,
-          },
+          state: resultState,
         });
       }}
     />
@@ -164,7 +163,7 @@ function JournalWrapper({ experiments, codeStore }) {
       experiment={experiment}
       subPart={part || "a"}
       codeText={codeStore[key] || ""}
-      onBack={() => navigate(`/workspace/${experimentId}/${part || "a"}`)}
+      onBack={() => navigate(-1)}
     />
   );
 }

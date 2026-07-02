@@ -1,22 +1,8 @@
-const OpenAI = require("openai");
 const { jsonrepair } = require("jsonrepair");
 const {
   EXPERIMENT_VIVA_SYSTEM_PROMPT,
 } = require("../prompts/experimentVivaSystemPrompt");
-
-const getOpenAiClient = () => {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) return null;
-  return new OpenAI({
-    baseURL: "https://openrouter.ai/api/v1",
-    apiKey: apiKey,
-    defaultHeaders: {
-      Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": "http://localhost:5050",
-      "X-Title": "BH Labs",
-    },
-  });
-};
+const { getOpenAiClient } = require("../config/openrouter");
 
 // Escape backslashes that aren't part of a valid JSON escape sequence
 // (e.g. LaTeX-style \%, \_, \d from regex snippets, stray Windows paths, etc.)
