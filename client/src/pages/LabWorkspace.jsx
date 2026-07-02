@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import FlowchartRenderer from "../components/FlowchartRenderer";
 import MarkdownRenderer from "../components/MarkdownRenderer";
+import { Panel, Group, Separator } from "react-resizable-panels";
 import { Loader2, SendHorizontal, X } from "lucide-react";
 
 const COMPILER_MAP = {
@@ -739,9 +740,14 @@ export default function LabWorkspace({
       </header>
 
       {/* IDE body */}
-      <div className="flex flex-1 overflow-hidden gap-[5px] p-[5px]">
+      <Group className="flex flex-1 overflow-hidden gap-[5px] p-[5px]">
         {/* LEFT */}
-        <aside className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] w-[calc(25%)] shrink-0">
+        <Panel
+          defaultSize={"25%"}
+          minSize={"25%"}
+          maxSize={"35%"}
+          className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] w-[calc(25%)] shrink-0"
+        >
           <div className="flex gap-[3px] p-1 bg-[#F4F4F5] border-b border-[#E4E4E7] shrink-0">
             {["theory", "algorithm", "flowchart"].map((t) => (
               <button
@@ -885,17 +891,32 @@ export default function LabWorkspace({
               </>
             )}
           </div>
-        </aside>
+        </Panel>
+
+        <Separator className="group relative w-1 cursor-col-resize">
+          <div className="absolute inset-0 bg-[#E4E4E7] group-hover:bg-[#5521FF] transition-colors" />
+        </Separator>
 
         {/* CENTER */}
-        <section className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0">
+        <Panel
+          defaultSize={"50%"}
+          minSize={"30%"}
+          maxSize={"60%"}
+          className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0"
+        >
+          <Group orientation="vertical">
+            <Panel
+              defaultSize={"72%"}
+              minSize={"50%"}
+              className="flex flex-col min-h-0"
+            >
           <div className="flex items-center bg-[#F4F4F5] border-b border-[#E4E4E7] h-[34px] shrink-0">
             <div className="flex items-center gap-1.25 px-3.5 h-full bg-white border-r border-[#E4E4E7] font-mono text-[11px] text-[#18181B]">
               <span className="text-[#5521FF] text-xs">◉</span>
               <span>main.{EXTENSION_MAP[editorLanguage] || "c"}</span>
             </div>
           </div>
-          <div className="flex-1 overflow-hidden">
+              <div className="flex-1 min-h-0 overflow-hidden">
             <Editor
               height="100%"
               language={MONACO_LANG_MAP[editorLanguage] || "c"}
@@ -917,19 +938,31 @@ export default function LabWorkspace({
               options={{
                 minimap: { enabled: false },
                 fontSize: 13,
-                fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "Cascadia Code",
                 automaticLayout: true,
                 padding: { top: 12 },
                 scrollBeyondLastLine: false,
                 lineNumbersMinChars: 3,
                 lineHeight: 20,
                 wordWrap: "on",
+                    overviewRulerLanes: 0,
+                    hideCursorInOverviewRuler: true,
               }}
             />
           </div>
+            </Panel>
+
+            <Separator className="group relative h-1 cursor-row-resize">
+              <div className="absolute inset-0 bg-[#E4E4E7] group-hover:bg-[#5521FF] transition-colors" />
+            </Separator>
 
           {/* CONSOLE SECTION */}
-          <div className="h-[32%] border-t border-[#E4E4E7] bg-[#F4F4F5] flex flex-col shrink-0">
+            <Panel
+              defaultSize={"28%"}
+              minSize={"5%"}
+              maxSize={"50%"}
+              className="flex flex-col min-h-0 border-t border-[#E4E4E7] bg-[#F4F4F5]"
+            >
             <div className="flex items-center gap-3 px-3 border-b border-[#E4E4E7] bg-[#F9F9FB] shrink-0">
               <button
                 className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "input" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
@@ -950,7 +983,7 @@ export default function LabWorkspace({
                 Errors{consoleErrors ? " (1)" : ""}
               </button>
             </div>
-            <div className="flex-1 p-2.5 px-3 font-mono text-[11px] text-[#71717A] overflow-y-auto leading-relaxed custom-scrollbar">
+              <div className="flex-1 min-h-0 p-2.5 px-3 font-mono text-[11px] text-[#71717A] overflow-auto leading-relaxed custom-scrollbar">
               {consoleTab === "input" && (
                 <div className="flex flex-col h-full gap-2.5">
                   {/* Test Case Selector Tabs */}
@@ -1011,21 +1044,13 @@ export default function LabWorkspace({
                       className="w-full h-full bg-transparent border-none resize-none outline-none font-mono text-[12px] text-[#18181B] leading-relaxed"
                     />
                   </div>
-
-                  {/* Expected Output indicator if available
-                  {subExp?.samples?.[activeTestCaseIdx]?.output && (
-                    <div className="text-[10px] border-t border-[#E4E4E7]/60 pt-1.5 text-[#71717A] flex items-center gap-1.5 shrink-0 select-text">
-                      <span className="font-bold text-[#5521FF]/90">Expected Output:</span>
-                      <code className="font-mono bg-[#E4E4E7]/30 px-1 py-0.5 rounded text-[#27272A] max-w-[250px] truncate" title={subExp.samples[activeTestCaseIdx].output}>
-                        {subExp.samples[activeTestCaseIdx].output.trim()}
-                      </code>
-                    </div> */}
-                  {/* )} */}
                 </div>
               )}
               {consoleTab === "output" &&
                 (consoleOutput ? (
-                  <pre className="whitespace-pre-wrap m-0">{consoleOutput}</pre>
+                    <pre className="whitespace-pre-wrap m-0">
+                      {consoleOutput}
+                    </pre>
                 ) : (
                   <span className="italic text-[#A1A1AA]">
                     Click "Run" to compile and execute your code.
@@ -1042,11 +1067,21 @@ export default function LabWorkspace({
                   </span>
                 ))}
             </div>
-          </div>
-        </section>
+            </Panel>
+          </Group>
+        </Panel>
+
+        <Separator className="group relative w-1 cursor-col-resize">
+          <div className="absolute inset-0 bg-[#E4E4E7] group-hover:bg-[#5521FF] transition-colors" />
+        </Separator>
 
         {/* RIGHT */}
-        <aside className="w-[25%] shrink-0 flex flex-col gap-[5px] max-[900px]:hidden">
+        <Panel
+          defaultSize={"25%"}
+          minSize={"25%"}
+          maxSize={"35%"}
+          className="w-[25%] shrink-0 flex flex-col gap-[5px] max-[900px]:hidden"
+        >
           <div className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1">
             <div className="flex gap-[3px] p-1 bg-[#F4F4F5] border-b border-[#E4E4E7] shrink-0">
               {[
@@ -1266,8 +1301,8 @@ export default function LabWorkspace({
               )}
             </div>
           </div>
-        </aside>
-      </div>
+        </Panel>
+      </Group>
     </div>
   );
 }
