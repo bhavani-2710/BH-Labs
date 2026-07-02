@@ -65,7 +65,7 @@ const explainCode = async (req, res) => {
     }
 
     const responseStream = await openai.chat.completions.create({
-      model: "openai/gpt-oss-120b",
+      model: "google/gemini-2.5-flash",
       messages: [
         {
           role: "system",
@@ -168,7 +168,7 @@ CRITICAL: When providing code blocks, keep comments to an absolute minimum (writ
     ];
 
     const responseStream = await openai.chat.completions.create({
-      model: "openai/gpt-oss-120b",
+      model: "google/gemini-2.5-flash",
       messages,
       stream: true,
     });
