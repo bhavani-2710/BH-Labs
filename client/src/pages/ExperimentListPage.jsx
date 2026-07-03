@@ -20,7 +20,6 @@ export default function ExperimentListPage({
   experiments = [],
   onSelectExperiment,
 }) {
-  const [filter, setFilter] = useState("all");
   const [expandedExperiments, setExpandedExperiments] = useState(new Set());
   const [isSyllabusOpen, setIsSyllabusOpen] = useState(false);
 
@@ -367,11 +366,11 @@ export default function ExperimentListPage({
 
       {isSyllabusOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40"
           onClick={() => setIsSyllabusOpen(false)}
         >
           <div 
-            className="bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 transition-all"
+            className="bg-white rounded-sm shadow-xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden transition-all"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -386,7 +385,7 @@ export default function ExperimentListPage({
               </div>
               <button
                 onClick={() => setIsSyllabusOpen(false)}
-                className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 hover:text-slate-900 text-slate-400 font-bold transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-slate-50 hover:text-slate-900 hover:bg-slate-100 font-bold transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
