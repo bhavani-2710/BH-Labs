@@ -19,6 +19,7 @@ import {
   Info,
   ArrowLeft,
   ArrowRight,
+  House,
 } from "lucide-react";
 import { renderQuestionText } from "../utils/renderQuestionText";
 
@@ -118,18 +119,18 @@ export default function AssessmentResult({
     {
       text: "Which of the following is the correct syntax to define a pointer to an integer?",
       options: ["int p;", "int *p;", "int &p;", "ptr int p;"],
-      correctIndex: 1
+      correctIndex: 1,
     },
     {
-      text: "What will be the output of the following C code snippet?\n```c\nint a = 10;\nint b = 20;\nprintf(\"%d\", a > b ? a : b);\n```",
+      text: 'What will be the output of the following C code snippet?\n```c\nint a = 10;\nint b = 20;\nprintf("%d", a > b ? a : b);\n```',
       options: ["10", "20", "compile error", "runtime error"],
-      correctIndex: 1
+      correctIndex: 1,
     },
     {
       text: "Which sorting algorithm partition strategy uses a pivot to divide elements into smaller and larger subarrays?",
       options: ["Merge Sort", "Quick Sort", "Bubble Sort", "Insertion Sort"],
-      correctIndex: 1
-    }
+      correctIndex: 1,
+    },
   ];
 
   const finalQuestions = questions.length > 0 ? questions : mockQuestions;
@@ -160,28 +161,27 @@ export default function AssessmentResult({
       }
     });
 
-    return Object.entries(statsMap)
-      .map(([name, data]) => {
-        const pct = Math.round((data.correctCount / data.total) * 100);
-        let status = `Developing (${pct}%)`;
-        let statusColor = "text-amber-600 font-bold";
-        let barColor = "bg-amber-500";
+    return Object.entries(statsMap).map(([name, data]) => {
+      const pct = Math.round((data.correctCount / data.total) * 100);
+      let status = `Developing (${pct}%)`;
+      let statusColor = "text-amber-600 font-bold";
+      let barColor = "bg-amber-500";
 
-        if (pct >= 85) {
-          status = `Mastered (${pct}%)`;
-          statusColor = "text-emerald-600 font-bold";
-          barColor = "bg-emerald-500";
-        } else if (pct >= 60) {
-          status = `Strong (${pct}%)`;
-          statusColor = "text-[#3525cd] font-bold";
-          barColor = "bg-[#3525cd]";
-        } else if (pct === 0) {
-          status = `Needs Review (${pct}%)`;
-          statusColor = "text-red-500 font-bold";
-          barColor = "bg-red-400";
-        }
-        return { name, percentage: pct, status, statusColor, barColor };
-      });
+      if (pct >= 85) {
+        status = `Mastered (${pct}%)`;
+        statusColor = "text-emerald-600 font-bold";
+        barColor = "bg-emerald-500";
+      } else if (pct >= 60) {
+        status = `Strong (${pct}%)`;
+        statusColor = "text-[#3525cd] font-bold";
+        barColor = "bg-[#3525cd]";
+      } else if (pct === 0) {
+        status = `Needs Review (${pct}%)`;
+        statusColor = "text-red-500 font-bold";
+        barColor = "bg-red-400";
+      }
+      return { name, percentage: pct, status, statusColor, barColor };
+    });
   }, [finalQuestions, finalAnswers]);
 
   // Performance assessment text and rank placement
@@ -248,7 +248,12 @@ export default function AssessmentResult({
 
       {/* ── Main content area ─────────────────────────────────────────── */}
       <main className="pt-24 pb-16 px-4 md:px-10 max-w-[1280px] mx-auto space-y-8">
-
+        <button
+          className="flex items-center justify-center cursor-pointer text-[#522bff] border border-[#522bff] -mt-2 mb-4 gap-2 py-2 px-5 rounded-lg bg-white"
+          onClick={() => navigate("/subjects")}
+        >
+          <ArrowLeft size={18} /> <span>Back to Subjects</span>
+        </button>
         {/* Hero Section: Score & Peer Comparison */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Score display card */}
@@ -271,12 +276,16 @@ export default function AssessmentResult({
           {/* Peer Comparison Card */}
           <div className="lg:col-span-4 bg-[#3525cd] text-white rounded-2xl p-8 shadow-md flex flex-col justify-between relative overflow-hidden">
             <div className="relative z-10 space-y-6 w-full">
-              <h3 className="text-lg font-bold text-white/80">Peer Comparison</h3>
+              <h3 className="text-lg font-bold text-white/80">
+                Peer Comparison
+              </h3>
               <div className="space-y-6">
                 <div>
                   <div className="flex justify-between items-end mb-2">
                     <span className="text-sm font-medium">Your Score</span>
-                    <span className="text-2xl font-bold">{Math.round(percentage)}%</span>
+                    <span className="text-2xl font-bold">
+                      {Math.round(percentage)}%
+                    </span>
                   </div>
                   <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
                     <div
@@ -362,9 +371,12 @@ export default function AssessmentResult({
                   <Zap className="w-4.5 h-4.5" />
                 </div>
                 <div className="text-left">
-                  <p className="font-bold text-sm text-slate-800">High Velocity</p>
+                  <p className="font-bold text-sm text-slate-800">
+                    High Velocity
+                  </p>
                   <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                    Your response time was 15% faster than the top decile of candidates.
+                    Your response time was 15% faster than the top decile of
+                    candidates.
                   </p>
                 </div>
               </div>
@@ -374,9 +386,16 @@ export default function AssessmentResult({
                   <Zap className="w-4.5 h-4.5" />
                 </div>
                 <div className="text-left">
-                  <p className="font-bold text-sm text-slate-800">Speed Efficiency</p>
+                  <p className="font-bold text-sm text-slate-800">
+                    Speed Efficiency
+                  </p>
                   <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                    Average: <strong className="text-slate-700">{avgTimePerQuestion}s/q</strong>. Total duration: {Math.floor(elapsed / 60)}m {elapsed % 60}s.
+                    Average:{" "}
+                    <strong className="text-slate-700">
+                      {avgTimePerQuestion}s/q
+                    </strong>
+                    . Total duration: {Math.floor(elapsed / 60)}m {elapsed % 60}
+                    s.
                   </p>
                 </div>
               </div>
@@ -386,9 +405,12 @@ export default function AssessmentResult({
                   <Lightbulb className="w-4.5 h-4.5" />
                 </div>
                 <div className="text-left">
-                  <p className="font-bold text-sm text-slate-800">Conceptual Strength</p>
+                  <p className="font-bold text-sm text-slate-800">
+                    Conceptual Strength
+                  </p>
                   <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                    High confidence across tested subexperiments on first attempt.
+                    High confidence across tested subexperiments on first
+                    attempt.
                   </p>
                 </div>
               </div>
@@ -404,7 +426,8 @@ export default function AssessmentResult({
                 Question-by-Question Analysis
               </h2>
               <p className="text-xs text-slate-400 mt-1">
-                Review the AI-generated questions from subexperiments, your answers, and the correct options.
+                Review the AI-generated questions from subexperiments, your
+                answers, and the correct options.
               </p>
             </div>
             <div className="flex items-center gap-4 text-xs font-semibold">
@@ -424,9 +447,12 @@ export default function AssessmentResult({
             {finalQuestions.map((q, idx) => {
               const userAnswerIdx = finalAnswers[idx];
               const isUnanswered = userAnswerIdx === undefined;
-              const isCorrect = !isUnanswered && userAnswerIdx === q.correctIndex;
+              const isCorrect =
+                !isUnanswered && userAnswerIdx === q.correctIndex;
 
-              let statusIcon = <MinusCircle className="w-5 h-5 text-slate-400 shrink-0 mt-1" />;
+              let statusIcon = (
+                <MinusCircle className="w-5 h-5 text-slate-400 shrink-0 mt-1" />
+              );
               if (!isUnanswered) {
                 statusIcon = isCorrect ? (
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-1" />
@@ -436,14 +462,21 @@ export default function AssessmentResult({
               }
 
               return (
-                <div key={idx} className={`pt-6 first:pt-0 ${idx > 0 ? "mt-6" : ""}`}>
+                <div
+                  key={idx}
+                  className={`pt-6 first:pt-0 ${idx > 0 ? "mt-6" : ""}`}
+                >
                   <div className="flex items-start gap-4">
                     {statusIcon}
                     <div className="flex-1 space-y-4">
                       <div className="flex items-start justify-between gap-4">
-                        <span className="font-bold text-slate-800 text-sm mt-0.5">Question {idx + 1}</span>
+                        <span className="font-bold text-slate-800 text-sm mt-0.5">
+                          Question {idx + 1}
+                        </span>
                         {!isUnanswered && (
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isCorrect ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isCorrect ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}
+                          >
                             {isCorrect ? "Correct" : "Incorrect"}
                           </span>
                         )}
@@ -462,15 +495,22 @@ export default function AssessmentResult({
                           const isCorrectOpt = optIdx === q.correctIndex;
                           const isUserSel = optIdx === userAnswerIdx;
 
-                          let optStyle = "border-slate-200 text-slate-600 bg-slate-50/40 hover:bg-slate-50/80";
+                          let optStyle =
+                            "border-slate-200 text-slate-600 bg-slate-50/40 hover:bg-slate-50/80";
                           let optIcon = null;
 
                           if (isCorrectOpt) {
-                            optStyle = "border-emerald-200 text-emerald-800 bg-emerald-50/50 font-medium";
-                            optIcon = <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />;
+                            optStyle =
+                              "border-emerald-200 text-emerald-800 bg-emerald-50/50 font-medium";
+                            optIcon = (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            );
                           } else if (isUserSel && !isCorrect) {
-                            optStyle = "border-red-200 text-red-800 bg-red-50/50 font-medium";
-                            optIcon = <XCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />;
+                            optStyle =
+                              "border-red-200 text-red-800 bg-red-50/50 font-medium";
+                            optIcon = (
+                              <XCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                            );
                           }
 
                           return (
@@ -501,7 +541,10 @@ export default function AssessmentResult({
         <footer className="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
           <button
             onClick={() => {
-              const subId = state.subjectId || localStorage.getItem("practical_test_last_subject_id") || "";
+              const subId =
+                state.subjectId ||
+                localStorage.getItem("practical_test_last_subject_id") ||
+                "";
               navigate(`/test-instructions/${subId}`);
             }}
             className="w-full md:w-64 py-3.5 rounded-xl bg-[#3525cd] text-white font-bold text-sm shadow-md shadow-[#3525cd]/20 hover:bg-[#3525cd]/90 active:scale-95 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer"
@@ -509,14 +552,14 @@ export default function AssessmentResult({
             <RefreshCw className="w-4 h-4" />
             Retake Practice Test
           </button>
-            <button 
+          <button
             onClick={() => window.print()}
             className="w-full md:w-64 py-3.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 active:scale-95 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer"
           >
             Download Detailed Report
           </button>
         </footer>
-  <style>{`
+        <style>{`
           @media print {
             nav, footer, button, .no-print {
               display: none !important;

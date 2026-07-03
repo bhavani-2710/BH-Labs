@@ -4,6 +4,7 @@ import FlowchartRenderer from "../components/FlowchartRenderer";
 import MarkdownRenderer from "../components/MarkdownRenderer";
 import { Panel, Group, Separator, usePanelRef } from "react-resizable-panels";
 import {
+  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -675,10 +676,10 @@ export default function LabWorkspace({
       <header className="flex items-center justify-between px-4 py-1.5 border-b border-[#E4E4E7] bg-white z-50 shrink-0 relative h-11">
         <div className="flex items-center gap-2">
           <button
-            className="text-[11px] font-semibold text-[#71717A] bg-none border-none cursor-pointer px-2 py-1 rounded-[6px] transition-colors duration-150 font-sans tracking-wide hover:bg-[#F4F4F5] hover:text-[#18181B]"
+            className="text-[11px] flex items-center justify-center gap-1 font-semibold text-[#71717A] bg-none border-none cursor-pointer px-2 py-1 rounded-[6px] transition-colors duration-150 font-sans tracking-wide hover:bg-[#F4F4F5] hover:text-[#18181B]"
             onClick={onBack}
           >
-            ← Back
+            <ArrowLeft size={16} /> <span>Back</span>
           </button>
           <div className="w-[1px] h-[18px] bg-[#E4E4E7] shrink-0" />
           <nav className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-[#71717A] uppercase">

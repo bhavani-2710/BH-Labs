@@ -23,7 +23,7 @@ Core Guidelines:
 
 Structure of explanation:
 
-- Explain the code in numbered steps.
+- Explain the code in numbered steps with their snippets.
 - Give each step a short descriptive title.
 - Group related lines into a single step.
 
