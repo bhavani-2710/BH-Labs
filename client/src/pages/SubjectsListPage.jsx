@@ -12,36 +12,8 @@ import {
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 
-export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
-  const [subjects, setSubjects] = useState([]);
-  const [experiments, setExperiments] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function SubjectsListPage({ experiments, subjects, onNavigate, onSelectSubject }) {
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const API = import.meta.env.VITE_API_URL;
-        const [subRes, expRes] = await Promise.all([
-          fetch(`${API}/subjects`),
-          fetch(`${API}/experiments`),
-        ]);
-        if (subRes.ok) {
-          const subData = await subRes.json();
-          setSubjects(subData);
-        }
-        if (expRes.ok) {
-          const expData = await expRes.json();
-          setExperiments(expData);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   const filteredSubjects = subjects.filter((s) =>
     s.name?.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -50,16 +22,6 @@ export default function SubjectsListPage({ onNavigate, onSelectSubject }) {
   const getProgressColor = (progress) => {
     return "bg-orange-500";
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f7f5fb] flex items-center justify-center">
-        <p className="text-lg text-gray-500 font-medium">
-          Loading your subjects…
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-[#f7f5fb] min-h-screen flex">

@@ -11,8 +11,6 @@ import PracticalTest from "./pages/PracticalTest";
 import TestInstruction from "./pages/TestInstruction";
 import AssessmentResult from "./pages/AssessmentResult";
 
-const API = import.meta.env.VITE_API_URL;
-
 // ====================== ROUTE WRAPPER COMPONENTS ======================
 // Each wrapper reads URL params, wires up navigation callbacks, and passes
 // clean props to the page component. This keeps page components free of
@@ -23,10 +21,12 @@ const API = import.meta.env.VITE_API_URL;
  * Wraps SubjectsListPage to inject navigate-based callbacks.
  * Handles navigation to subject detail, test instructions, and generic pages.
  */
-function SubjectsListWrapper() {
+function SubjectsListWrapper({ experiments, subjects }) {
   const navigate = useNavigate();
   return (
     <SubjectsListPage
+      experiments={experiments}
+      subjects={subjects}
       onNavigate={(page, params) => {
         if (page === "subject-detail") navigate(`/subject/${params.subjectId}`);
         else if (page === "test-instructions")
@@ -56,7 +56,7 @@ function SubjectDetailWrapper({
     if (!subjectId) return;
     const fetchSubjectExperiments = async () => {
       try {
-        const res = await fetch(`${API}/experiments/subject/${subjectId}`);
+        const res = await fetch(`/api/experiments/subject/${subjectId}`);
         if (res.ok) {
           const data = await res.json();
           setSubjectSpecificExperiments(data);
@@ -219,8 +219,8 @@ export default function App() {
     const fetchAll = async () => {
       try {
         const [subjectsRes, experimentsRes] = await Promise.all([
-          fetch(`${API}/subjects`),
-          fetch(`${API}/experiments`),
+          fetch(`/api/subjects`),
+          fetch(`/api/experiments`),
         ]);
         if (!subjectsRes.ok || !experimentsRes.ok)
           throw new Error("Failed to load data");
@@ -281,7 +281,12 @@ export default function App() {
         }
       />
 
-      <Route path="/subjects" element={<SubjectsListWrapper />} />
+      <Route
+        path="/subjects"
+        element={
+          <SubjectsListWrapper experiments={experiments} subjects={subjects} />
+        }
+      />
 
       <Route
         path="/subject/:subjectId"

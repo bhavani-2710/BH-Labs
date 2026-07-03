@@ -50,7 +50,6 @@ export default function LabWorkspace({
   onNavigate,
   onSaveCode,
   savedCode,
-  apiBase = "/api",
 }) {
   const subExp =
     experiment?.subExperiments?.find((s) => s.part === subPart) ||
@@ -188,7 +187,7 @@ export default function LabWorkspace({
         setVivaQALoading(true);
         setExpandedQA(null);
 
-        const response = await fetch(`${apiBase}/vivas/qa`, {
+        const response = await fetch(`/api/vivas/qa`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -302,7 +301,7 @@ export default function LabWorkspace({
 
     try {
       console.log("/explain\n", subExp);
-      const res = await fetch(`${apiBase}/explain`, {
+      const res = await fetch(`/api/explain`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -523,7 +522,7 @@ export default function LabWorkspace({
       let data;
 
       // Use Wandbox for all languages via our server
-      const res = await fetch(`${apiBase}/run`, {
+      const res = await fetch(`/api/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -591,7 +590,7 @@ export default function LabWorkspace({
     setChatMessages((prev) => [...prev, { sender: "ai", text: "" }]);
 
     try {
-      const res = await fetch(`${apiBase}/chat`, {
+      const res = await fetch(`/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
