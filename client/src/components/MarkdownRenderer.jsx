@@ -138,7 +138,7 @@ const CodeBlock = ({ language, code }) => {
   const highlightedHtml = highlightCode(code, language);
 
   return (
-    <div className="bg-[#1E293B] text-[#F8FAFC] rounded-lg px-3 py-2.5 font-mono text-[10px] overflow-x-auto my-2 leading-normal border border-[#334155] relative shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]">
+    <div className="bg-[#1E293B] text-[#F8FAFC] rounded-lg px-3 py-1.5 overflow-y-clip font-mono text-[10px] overflow-x-auto leading-normal border border-[#334155] relative shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]">
       <div className="flex justify-between items-center mb-1.5 border-b border-[#334155] pb-1 text-[8.5px] text-[#94A3B8] font-bold select-none">
         <span>{language ? language.toUpperCase() : "CODE"}</span>
         <button
