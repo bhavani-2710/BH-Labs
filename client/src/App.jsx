@@ -7,14 +7,22 @@ import SubjectsListPage from "./pages/SubjectsListPage";
 import SubjectDetailPage from "./pages/ExperimentListPage";
 import LabWorkspace from "./pages/LabWorkspace";
 import PracticalJournal from "./pages/PracticalJournal";
-import AptitudeTest from "./pages/AptitudeTest";
+import PracticalTest from "./pages/PracticalTest";
 import TestInstruction from "./pages/TestInstruction";
 import AssessmentResult from "./pages/AssessmentResult";
 
 const API = import.meta.env.VITE_API_URL;
 
-// ====================== WRAPPERS ======================
+// ====================== ROUTE WRAPPER COMPONENTS ======================
+// Each wrapper reads URL params, wires up navigation callbacks, and passes
+// clean props to the page component. This keeps page components free of
+// routing concerns.
 
+/**
+ * SubjectsListWrapper
+ * Wraps SubjectsListPage to inject navigate-based callbacks.
+ * Handles navigation to subject detail, test instructions, and generic pages.
+ */
 function SubjectsListWrapper() {
   const navigate = useNavigate();
   return (
@@ -30,6 +38,11 @@ function SubjectsListWrapper() {
   );
 }
 
+/**
+ * SubjectDetailWrapper
+ * Reads the subjectId URL param and fetches subject-specific experiments on
+ * mount. Passes them down to ExperimentListPage alongside navigation handlers.
+ */
 function SubjectDetailWrapper({
   subjects,
   experiments,
@@ -76,6 +89,12 @@ function SubjectDetailWrapper({
   );
 }
 
+/**
+ * WorkspaceWrapper
+ * Reads experimentId and part URL params, looks up the matching experiment
+ * from the global list, and provides the lab workspace with its code state
+ * and save handler.
+ */
 function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
   const { experimentId, part } = useParams();
   const navigate = useNavigate();
@@ -96,14 +115,20 @@ function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
   );
 }
 
-function AptitudeTestWrapper({ subjects }) {
+/**
+ * PracticalTestWrapper
+ * Reads the subjectId URL param to resolve the test title from the subjects
+ * list, serialises the result to localStorage for recovery, and navigates
+ * to the assessment result page on submit.
+ */
+function PracticalTestWrapper({ subjects }) {
   const navigate = useNavigate();
   const { subjectId } = useParams();
   const subject = subjects.find((s) => s._id === subjectId);
   const testTitle = subject ? subject.name : "C Programming";
 
   return (
-    <AptitudeTest
+    <PracticalTest
       testTitle={testTitle}
       onNavigate={(page, params) => {
         if (page === "subjects") navigate("/subjects");
@@ -120,7 +145,10 @@ function AptitudeTestWrapper({ subjects }) {
           questions: result.questions,
           answers: result.answers,
         };
-        localStorage.setItem("aptitude_last_result", JSON.stringify(resultState));
+        localStorage.setItem(
+          "practical_test_last_result",
+          JSON.stringify(resultState),
+        );
         navigate("/assessment-result", {
           state: resultState,
         });
@@ -129,6 +157,11 @@ function AptitudeTestWrapper({ subjects }) {
   );
 }
 
+/**
+ * TestInstructionWrapper
+ * Reads the subjectId URL param and resolves the subject name to display
+ * on the instructions screen.
+ */
 function TestInstructionWrapper({ subjects }) {
   const navigate = useNavigate();
   const { subjectId } = useParams();
@@ -147,11 +180,11 @@ function TestInstructionWrapper({ subjects }) {
   );
 }
 
-function AssessmentResultWrapper() {
-  const navigate = useNavigate();
-  return <AssessmentResult />;
-}
-
+/**
+ * JournalWrapper
+ * Reads experimentId and part URL params to identify the experiment and
+ * retrieve the saved code for the journal view.
+ */
 function JournalWrapper({ experiments, codeStore }) {
   const { experimentId, part } = useParams();
   const navigate = useNavigate();
@@ -203,19 +236,19 @@ export default function App() {
     fetchAll();
   }, []);
 
-  const handleSaveCode = async (expId, part, codeContent) => {
+  /**
+   * handleSaveCode
+   * Stores the latest editor code in component state keyed by `${expId}_${part}`.
+   * Code is held in local state only; API persistence is not yet enabled.
+   *
+   * @param {string} expId       - The experiment MongoDB _id.
+   * @param {string} part        - Sub-experiment part (e.g. "a", "b").
+   * @param {string} codeContent - The full code string from the editor.
+   */
+  const handleSaveCode = (expId, part, codeContent) => {
     const key = `${expId}_${part}`;
     setCodeStore((prev) => ({ ...prev, [key]: codeContent }));
-    try {
-      // await fetch(`${API}/codes`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ key, code: codeContent }),
-      // });
-      console.log(JSON.stringify({ key, code: codeContent }));
-    } catch (e) {
-      console.error("Save failed", e);
-    }
+    // Code is stored in local state; persistence via API is not yet enabled.
   };
 
   if (loading)
@@ -281,12 +314,12 @@ export default function App() {
       />
 
       <Route
-        path="/aptitude-test"
-        element={<AptitudeTestWrapper subjects={subjects} />}
+        path="/practical-test"
+        element={<PracticalTestWrapper subjects={subjects} />}
       />
       <Route
-        path="/aptitude-test/:subjectId"
-        element={<AptitudeTestWrapper subjects={subjects} />}
+        path="/practical-test/:subjectId"
+        element={<PracticalTestWrapper subjects={subjects} />}
       />
 
       <Route
@@ -298,10 +331,7 @@ export default function App() {
         element={<TestInstructionWrapper subjects={subjects} />}
       />
 
-      <Route
-        path="/assessment-result"
-        element={<AssessmentResultWrapper />}
-      />
+      <Route path="/assessment-result" element={<AssessmentResult />} />
 
       <Route
         path="*"

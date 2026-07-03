@@ -20,8 +20,18 @@ import {
   ArrowLeft,
   ArrowRight,
 } from "lucide-react";
+import { renderQuestionText } from "../utils/renderQuestionText";
 
-// ── Circular Gauge component ─────────────────────────────────────────
+/**
+ * CircularGauge
+ * SVG-based circular progress indicator used to display the final test score
+ * as a percentage. Animates the arc stroke on mount via CSS transition.
+ *
+ * @param {object} props
+ * @param {number} props.percentage   - Score value between 0 and 100.
+ * @param {number} [props.size=200]   - Diameter of the SVG in pixels.
+ * @param {number} [props.strokeWidth=14] - Width of the progress arc stroke.
+ */
 function CircularGauge({ percentage, size = 200, strokeWidth = 14 }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -66,38 +76,6 @@ function CircularGauge({ percentage, size = 200, strokeWidth = 14 }) {
   );
 }
 
-// ── Helper: parse and render code snippets dynamically ────────────────
-function renderQuestionText(text) {
-  if (!text) return null;
-  const parts = text.split(/(```[\s\S]*?```)/g);
-  return parts.map((part, idx) => {
-    if (part.startsWith("```")) {
-      const content = part.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "").trim();
-      return (
-        <pre key={idx} className="my-4 p-4 bg-slate-50 border border-slate-200 rounded-xl overflow-x-auto text-xs font-mono text-violet-800 leading-relaxed max-w-full text-left">
-          <code>{content}</code>
-        </pre>
-      );
-    }
-
-    const inlineParts = part.split(/(`[^`\n]+`)/g);
-    return (
-      <span key={idx} className="whitespace-pre-line">
-        {inlineParts.map((subPart, sIdx) => {
-          if (subPart.startsWith("`") && subPart.endsWith("`")) {
-            return (
-              <code key={sIdx} className="px-1.5 py-0.5 mx-0.5 bg-slate-100 border border-slate-200 text-violet-700 rounded font-mono text-xs">
-                {subPart.slice(1, -1)}
-              </code>
-            );
-          }
-          return subPart;
-        })}
-      </span>
-    );
-  });
-}
-
 export default function AssessmentResult({
   testTitle = "C Programming - Section A",
   studentName = "Akshay Sharma",
@@ -110,12 +88,12 @@ export default function AssessmentResult({
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ── Get state from location (from AptitudeTest submit flow) or localStorage ──────────
+  // ── Get state from location (from PracticalTest submit flow) or localStorage ──────────
   const state = useMemo(() => {
     if (location.state && Object.keys(location.state).length > 0) {
       return location.state;
     }
-    const saved = localStorage.getItem("aptitude_last_result");
+    const saved = localStorage.getItem("practical_test_last_result");
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -523,7 +501,7 @@ export default function AssessmentResult({
         <footer className="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
           <button
             onClick={() => {
-              const subId = state.subjectId || localStorage.getItem("aptitude_last_subject_id") || "";
+              const subId = state.subjectId || localStorage.getItem("practical_test_last_subject_id") || "";
               navigate(`/test-instructions/${subId}`);
             }}
             className="w-full md:w-64 py-3.5 rounded-xl bg-[#3525cd] text-white font-bold text-sm shadow-md shadow-[#3525cd]/20 hover:bg-[#3525cd]/90 active:scale-95 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer"

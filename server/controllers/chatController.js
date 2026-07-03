@@ -1,28 +1,79 @@
 const { getOpenAiClient } = require("../config/openrouter");
-const {
-  EXPLAIN_CODE_SYSTEM_PROMPT,
-} = require("../prompts/explainCodeSystemPrompt");
+const { EXPLAIN_CODE_SYSTEM_PROMPT } = require("../prompts/explainCodeSystemPrompt");
+const { getChatAssistantSystemPrompt } = require("../prompts/chatAssistantSystemPrompt");
 
-// POST /api/explain (streams code explanation)
+/**
+ * simulateStream
+ * Utility that simulates a Server-Sent Events (SSE) stream by splitting a
+ * static text string into small word-chunks and sending them at ~100 ms
+ * intervals. Used as a fallback when no OpenRouter API key is configured.
+ *
+ * @param {import("express").Response} res  - Express response object.
+ * @param {string}                    text  - The complete text to stream word-by-word.
+ * @returns {void}
+ */
+const simulateStream = (res, text) => {
+  const words = text.split(" ");
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < words.length) {
+      const chunk = words.slice(i, i + 3).join(" ") + " ";
+      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: chunk } }] })}\n\n`);
+      i += 3;
+    } else {
+      res.write("data: [DONE]\n\n");
+      clearInterval(interval);
+      res.end();
+    }
+  }, 100);
+};
+
+/**
+ * setSseHeaders
+ * Sets the standard HTTP headers required for a Server-Sent Events (SSE)
+ * streaming response. Must be called before any data is written.
+ *
+ * @param {import("express").Response} res - Express response object.
+ * @returns {void}
+ */
+const setSseHeaders = (res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+};
+
+// ── Controller: POST /api/explain ────────────────────────────────────────────
+
+/**
+ * explainCode
+ * Streams a step-by-step code explanation to the client using Server-Sent
+ * Events. When the OpenRouter API key is present, calls the live LLM;
+ * otherwise falls back to a static simulation message.
+ *
+ * Expected request body:
+ *   - code           {string}  Required. The code snippet to explain.
+ *   - language       {string}  Programming language (e.g. "c", "python").
+ *   - experimentTitle   {string}  Optional context for the explanation.
+ *   - problemStatement  {string}  Optional context for the explanation.
+ *   - algorithm         {string}  Optional context for the explanation.
+ *
+ * @param {import("express").Request}  req
+ * @param {import("express").Response} res
+ */
 const explainCode = async (req, res) => {
   try {
     const { experimentTitle, problemStatement, algorithm, code, language } = req.body;
-    const SYSTEM_PROMPT = EXPLAIN_CODE_SYSTEM_PROMPT;
-    if (!code) {
-      console.log("code is required");
 
+    if (!code) {
       return res.status(400).json({ error: "code is required" });
     }
 
-    // Set streaming headers
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
+    setSseHeaders(res);
 
     const openai = getOpenAiClient();
 
     if (!openai) {
-      // Mock stream simulation when key is missing
+      // Simulation mode — no API key configured
       const mockExplanation =
         `[BH.AI Assistant - Simulation Mode]\n\n` +
         `To enable live AI explanations, please add your OPENROUTER_API_KEY in the server/.env file.\n\n` +
@@ -31,21 +82,7 @@ const explainCode = async (req, res) => {
         `2. **Main Structure**: It defines an entrypoint function which acts as the main runner of the task.\n` +
         `3. **Core Logic**: It implements variables and control flows to execute operations.`;
 
-      const words = mockExplanation.split(" ");
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i < words.length) {
-          const chunk = words.slice(i, i + 3).join(" ") + " ";
-          res.write(
-            `data: ${JSON.stringify({ choices: [{ delta: { content: chunk } }] })}\n\n`,
-          );
-          i += 3;
-        } else {
-          res.write("data: [DONE]\n\n");
-          clearInterval(interval);
-          res.end();
-        }
-      }, 100);
+      simulateStream(res, mockExplanation);
       return;
     }
 
@@ -54,7 +91,7 @@ const explainCode = async (req, res) => {
       messages: [
         {
           role: "system",
-          content: SYSTEM_PROMPT,
+          content: EXPLAIN_CODE_SYSTEM_PROMPT,
         },
         {
           role: "user",
@@ -96,55 +133,45 @@ const explainCode = async (req, res) => {
   }
 };
 
-// POST /api/chat (streams chat assistant responses)
+// ── Controller: POST /api/chat ────────────────────────────────────────────────
+
+/**
+ * chatWithAssistant
+ * Streams a tutoring chat reply to the client using Server-Sent Events.
+ * Maintains conversation history so the model has prior context. Falls back to
+ * a simulation message when no API key is configured.
+ *
+ * Expected request body:
+ *   - message  {string}   Required. The student's latest message.
+ *   - language {string}   Programming language currently active in the editor.
+ *   - code     {string}   Current code content in the editor (may be empty).
+ *   - history  {Array}    Prior chat messages in {sender, text} format.
+ *
+ * @param {import("express").Request}  req
+ * @param {import("express").Response} res
+ */
 const chatWithAssistant = async (req, res) => {
   try {
     const { message, code, language, history } = req.body;
+
     if (!message) {
       return res.status(400).json({ error: "message is required" });
     }
 
-    // Set streaming headers
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
+    setSseHeaders(res);
 
     const openai = getOpenAiClient();
 
     if (!openai) {
-      // Mock stream simulation when key is missing
+      // Simulation mode — no API key configured
       const mockReply = `[Simulation Mode] I received your question: "${message}". Please configure OPENROUTER_API_KEY in the server/.env file to chat with the live model.`;
-      const words = mockReply.split(" ");
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i < words.length) {
-          const chunk = words.slice(i, i + 3).join(" ") + " ";
-          res.write(
-            `data: ${JSON.stringify({ choices: [{ delta: { content: chunk } }] })}\n\n`,
-          );
-          i += 3;
-        } else {
-          res.write("data: [DONE]\n\n");
-          clearInterval(interval);
-          res.end();
-        }
-      }, 100);
+      simulateStream(res, mockReply);
       return;
     }
 
-    const systemPrompt = `You are Bh.AI, a friendly programming tutor assisting a student in a lab workspace.
-The student is coding in the ${language} language.
-The current code in their editor is:
-\`\`\`${language}
-${code || "(empty)"}
-\`\`\`
-
-Answer their questions in an encouraging, simple, and tutoring style. Guide them towards the answer rather than just giving the solution code outright. Always explain concepts simply.
-DO NOT use any icons, emojis, or pictorial characters (such as 1️⃣, ✔️, 💡, etc.) under any circumstances. Use plain text list format (e.g. '1.', '-').
-CRITICAL: When providing code blocks, keep comments to an absolute minimum (write no comments, or at most 1-2 brief single-line comments like '// comment' on critical logic only). DO NOT include any decorative header blocks, author/date headers, or separator comments (such as '/*----*/' or '/*****...****/') in the code blocks under any circumstances.`;
-
+    // Build message array: system prompt → conversation history → latest user message
     const messages = [
-      { role: "system", content: systemPrompt },
+      { role: "system", content: getChatAssistantSystemPrompt(language, code) },
       ...(history || []).map((h) => ({
         role: h.sender === "ai" ? "assistant" : "user",
         content: h.text,

@@ -1,17 +1,109 @@
+/**
+ * practicalTestService.js
+ *
+ * Business logic for generating and persisting practical test questions.
+ * Separated from the controller so that the HTTP layer stays thin and
+ * this logic can be tested or reused independently.
+ *
+ * Flow:
+ *  1. getQuestions (controller) receives the HTTP request.
+ *  2. generateQuestionsForSubject (this service) does all the heavy lifting:
+ *     a. Loads the subject and its experiments from the DB.
+ *     b. Decides whether to generate a full fresh batch (bank not yet full)
+ *        or sample from the bank plus one fresh question.
+ *     c. Calls the OpenRouter LLM (or falls back to mock data).
+ *     d. Persists new questions via persistQuestions.
+ *     e. Returns the final shuffled array of 10 questions.
+ */
+
 const mongoose = require("mongoose");
 const Subject = require("../models/Subject");
 const Experiment = require("../models/Experiment");
 const TestQuestion = require("../models/TestQuestion");
 const { jsonrepair } = require("jsonrepair");
-const { APTITUDE_SYSTEM_PROMPT } = require("../prompts/aptitudeSystemPrompt");
+const { PRACTICAL_TEST_SYSTEM_PROMPT } = require("../prompts/practicalTestSystemPrompt");
 const { getOpenAiClient } = require("../config/openrouter");
 
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+/** Maximum number of questions stored per subject in the question bank. */
 const QUESTION_BANK_LIMIT = 50;
+
+/** Total number of questions served per test attempt. */
 const TEST_SIZE = 10;
+
+/** Number of questions reused from the existing bank once it is full. */
 const REUSE_FROM_BANK = 9;
+
+/** Number of freshly generated questions added per test once the bank is full. */
 const FRESH_PER_TEST = 1;
 
-// ---------- Mock fallback generator (used when no AI key, or AI call fails) ----------
+// ── Private helpers ───────────────────────────────────────────────────────────
+
+/**
+ * sanitizeJsonString
+ * Escapes backslashes that are not part of a recognised JSON escape sequence
+ * (e.g. LaTeX \%, stray Windows paths, regex snippets). This prevents
+ * JSON.parse from throwing on otherwise valid content.
+ *
+ * @param {string} str - Raw JSON string from the AI response.
+ * @returns {string}   Sanitized string safe to pass to JSON.parse.
+ */
+const sanitizeJsonString = (str) =>
+  str.replace(/\\(?!["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\");
+
+/**
+ * extractQuestionsRegex
+ * Fallback parser that extracts question objects directly from free-form text
+ * using a regex when full JSON parsing has already failed. Returns only
+ * questions that have exactly 4 options and a valid correctIndex.
+ *
+ * @param {string} text - Raw text from the AI response.
+ * @returns {Array<{text: string, options: string[], correctIndex: number}>}
+ */
+const extractQuestionsRegex = (text) => {
+  const matches = [];
+  const objRegex =
+    /\{\s*"id"\s*:\s*\d+\s*,\s*(?:"subexperiment"\s*:\s*"([\s\S]*?)"\s*,\s*)?"text"\s*:\s*"([\s\S]*?)"\s*,\s*"options"\s*:\s*\[([\s\S]*?)\]\s*,\s*"correctIndex"\s*:\s*(\d)\s*\}/gi;
+  let match;
+  while ((match = objRegex.exec(text)) !== null) {
+    try {
+      const qText = match[2];
+      const optionsRaw = match[3];
+      const correctIdx = parseInt(match[4], 10);
+
+      const options = [];
+      const optRegex = /"([\s\S]*?)"/g;
+      let optMatch;
+      while ((optMatch = optRegex.exec(optionsRaw)) !== null) {
+        options.push(optMatch[1].replace(/\\"/g, '"'));
+      }
+
+      if (options.length === 4) {
+        matches.push({
+          text: qText.replace(/\\"/g, '"'),
+          options,
+          correctIndex: correctIdx,
+        });
+      }
+    } catch (e) {
+      // Ignore malformed individual matches and continue
+    }
+  }
+  return matches;
+};
+
+/**
+ * generateMockQuestions
+ * Produces a deterministic set of placeholder MCQs based on the subject's
+ * sub-experiment titles. Used when no AI key is configured or when the AI
+ * call fails, so the application stays functional in degraded environments.
+ *
+ * @param {string} subjectName       - Human-readable subject name for question text.
+ * @param {Array}  subExperiments    - Array of sub-experiment objects with title/problemStatement.
+ * @param {number} [count=TEST_SIZE] - Number of questions to generate.
+ * @returns {Array<{text: string, options: string[], correctIndex: number}>}
+ */
 const generateMockQuestions = (subjectName, subExperiments, count = TEST_SIZE) => {
   const questions = [];
 
@@ -56,46 +148,22 @@ const generateMockQuestions = (subjectName, subExperiments, count = TEST_SIZE) =
   return questions;
 };
 
-// ---------- Helpers for parsing the AI response ----------
-const sanitizeJsonString = (str) =>
-  str.replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\");
-
-const extractQuestionsRegex = (text) => {
-  const matches = [];
-  const objRegex =
-    /\{\s*"id"\s*:\s*\d+\s*,\s*(?:"subexperiment"\s*:\s*"([\s\S]*?)"\s*,\s*)?"text"\s*:\s*"([\s\S]*?)"\s*,\s*"options"\s*:\s*\[([\s\S]*?)\]\s*,\s*"correctIndex"\s*:\s*(\d)\s*\}/gi;
-  let match;
-  while ((match = objRegex.exec(text)) !== null) {
-    try {
-      const qText = match[2];
-      const optionsRaw = match[3];
-      const correctIdx = parseInt(match[4], 10);
-
-      const options = [];
-      const optRegex = /"([\s\S]*?)"/g;
-      let optMatch;
-      while ((optMatch = optRegex.exec(optionsRaw)) !== null) {
-        options.push(optMatch[1].replace(/\\"/g, '"'));
-      }
-
-      if (options.length === 4) {
-        matches.push({
-          text: qText.replace(/\\"/g, '"'),
-          options,
-          correctIndex: correctIdx,
-        });
-      }
-    } catch (e) {
-      // Ignore malformed matches
-    }
-  }
-  return matches;
-};
-
-// Calls the AI to generate `count` question(s). `avoidTexts` (previously used
-// question text, from the DB bank) is passed so the model steers away from
-// duplicates. Only question text is shared with the AI - never answers tied
-// to any other subject or user data.
+/**
+ * generateAIQuestions
+ * Calls the OpenRouter LLM to produce `count` unique MCQ(s) for the given
+ * subject. Passes previously used question texts (`avoidTexts`) so the model
+ * avoids generating near-duplicates. Parses the response with a two-stage
+ * strategy: strict JSON first, regex extraction as fallback.
+ *
+ * @param {object}   params
+ * @param {OpenAI}   params.openai         - Pre-configured OpenAI/OpenRouter client.
+ * @param {object}   params.subject        - Mongoose Subject document.
+ * @param {string}   params.subExpsContext - Formatted string of sub-experiment details.
+ * @param {number}   params.count          - Exact number of questions to generate.
+ * @param {string[]} [params.avoidTexts=[]] - Previously used question texts to avoid.
+ * @returns {Promise<Array<{text: string, options: string[], correctIndex: number}>>}
+ * @throws {Error} When the AI returns unusable output despite both parse strategies.
+ */
 const generateAIQuestions = async ({ openai, subject, subExpsContext, count, avoidTexts = [] }) => {
   const avoidContext =
     avoidTexts.length > 0
@@ -105,26 +173,26 @@ const generateAIQuestions = async ({ openai, subject, subExpsContext, count, avo
       : "";
 
   const userPrompt = `
-                      Subject:
-                      ${subject.name}
+Subject:
+${subject.name}
 
-                      The following are the experiment details from which the aptitude test must be generated.
-                      Generate exactly ${count} unique MCQ(s) based ONLY on this information.
+The following are the experiment details from which the practical test must be generated.
+Generate exactly ${count} unique MCQ(s) based ONLY on this information.
 
-                      Experiment Details
-                      ------------------
-                      ${subExpsContext}
-                      ${avoidContext}
+Experiment Details
+------------------
+${subExpsContext}
+${avoidContext}
 
-                      Randomization Seed:
-                      Timestamp: ${Date.now()}
-                      Seed: ${Math.random()}
-                    `;
+Randomization Seed:
+Timestamp: ${Date.now()}
+Seed: ${Math.random()}
+`;
 
   const response = await openai.chat.completions.create({
     model: "openai/gpt-oss-20b",
     messages: [
-      { role: "system", content: APTITUDE_SYSTEM_PROMPT },
+      { role: "system", content: PRACTICAL_TEST_SYSTEM_PROMPT },
       { role: "user", content: userPrompt },
     ],
     temperature: 1.0,
@@ -136,6 +204,7 @@ const generateAIQuestions = async ({ openai, subject, subExpsContext, count, avo
     .replace(/```$/, "")
     .trim();
 
+  // Stage 1: strict JSON parse (with sanitization + jsonrepair)
   try {
     const sanitizedText = sanitizeJsonString(cleanedText);
     const repairedText = jsonrepair(sanitizedText);
@@ -157,6 +226,7 @@ const generateAIQuestions = async ({ openai, subject, subExpsContext, count, avo
     if (clean.length > 0) return clean;
     throw new Error("No valid questions parsed from AI response");
   } catch (parseErr) {
+    // Stage 2: regex extraction fallback
     console.warn(
       "JSON parsing error for generated questions, attempting regex fallback extraction...",
       parseErr,
@@ -167,8 +237,16 @@ const generateAIQuestions = async ({ openai, subject, subExpsContext, count, avo
   }
 };
 
-// Appends questions to the subject's bank. Never throws - a storage hiccup
-// should not stop questions from reaching the client.
+/**
+ * persistQuestions
+ * Writes a batch of validated question objects to the TestQuestion collection.
+ * Silently swallows storage errors so that a DB hiccup never prevents the
+ * questions from reaching the client in the same request.
+ *
+ * @param {mongoose.Types.ObjectId|string} subjectId - The subject the questions belong to.
+ * @param {Array<{text: string, options: string[], correctIndex: number}>} questions
+ * @returns {Promise<void>}
+ */
 const persistQuestions = async (subjectId, questions) => {
   try {
     const docs = questions
@@ -194,48 +272,22 @@ const persistQuestions = async (subjectId, questions) => {
   }
 };
 
-// GET /api/aptitude/questions/:subjectId
+// ── Exported service function ─────────────────────────────────────────────────
 
-// Prevents two near-simultaneous requests for the same subject from both
-// reading a stale bank count and both inserting a full batch (e.g. double
-// click, React StrictMode double-invoking an effect, a network retry).
-// Any request that arrives while one is already running for that subject
-// just awaits and reuses the same in-flight result instead of starting a
-// second generation.
-const inFlightGenerations = new Map();
-
-const getQuestions = async (req, res) => {
-  const { subjectId } = req.params;
-
-  if (inFlightGenerations.has(subjectId)) {
-    try {
-      const responseQs = await inFlightGenerations.get(subjectId);
-      return res.json(responseQs);
-    } catch (err) {
-      console.error("Get questions error (in-flight reuse):", err);
-      return res.status(500).json({ error: "Failed to generate aptitude questions" });
-    }
-  }
-
-  const generationPromise = generateQuestionsForSubject(subjectId);
-  inFlightGenerations.set(subjectId, generationPromise);
-
-  try {
-    const responseQs = await generationPromise;
-    return res.json(responseQs);
-  } catch (err) {
-    console.error("Get questions error:", err);
-    if (err.statusCode === 404) {
-      return res.status(404).json({ error: "Subject not found" });
-    }
-    return res.status(500).json({ error: "Failed to generate aptitude questions" });
-  } finally {
-    inFlightGenerations.delete(subjectId);
-  }
-};
-
-// Does the actual work: figures out how many questions exist for the subject,
-// generates/reuses accordingly, persists new ones, and returns the response shape.
+/**
+ * generateQuestionsForSubject
+ * Core service function that assembles a 10-question test for a given subject.
+ *
+ * Strategy:
+ *  - If the question bank has fewer than QUESTION_BANK_LIMIT entries, generate
+ *    a full fresh batch of TEST_SIZE questions and add them all to the bank.
+ *  - Once the bank is full, sample REUSE_FROM_BANK random questions from the DB
+ *    and generate FRESH_PER_TEST new question(s), then shuffle.
+ *
+ * @param {string} subjectId - MongoDB ObjectId string for the subject.
+ * @returns {Promise<Array<{id: number, text: string, options: string[], correctIndex: number}>>}
+ * @throws {Error} With `.statusCode = 404` if the subject is not found.
+ */
 const generateQuestionsForSubject = async (subjectId) => {
   const subject = await Subject.findById(subjectId);
   if (!subject) {
@@ -244,8 +296,8 @@ const generateQuestionsForSubject = async (subjectId) => {
     throw notFoundErr;
   }
 
+  // Collect all sub-experiments across the subject's experiments
   const experiments = await Experiment.find({ subjectId });
-
   const subExperiments = [];
   experiments.forEach((exp) => {
     if (exp.subExperiments && Array.isArray(exp.subExperiments)) {
@@ -260,6 +312,7 @@ const generateQuestionsForSubject = async (subjectId) => {
     }
   });
 
+  // Ensure there is always at least one context entry for question generation
   if (subExperiments.length === 0) {
     subExperiments.push({
       title: `${subject.name} Basic Execution`,
@@ -269,30 +322,29 @@ const generateQuestionsForSubject = async (subjectId) => {
     });
   }
 
+  // Shuffle sub-experiments so the AI sees varied context across requests
   const shuffledSubExps = [...subExperiments].sort(() => Math.random() - 0.5);
   const subExpsContext = shuffledSubExps
-    .map((sub, index) => {
-      return `[Subexperiment ${index + 1}]
-              Title: ${sub.title}
-              Problem: ${sub.problemStatement}
-              Theory: ${sub.theory}
-              Algorithm: ${sub.algorithm}`;
-    })
+    .map(
+      (sub, index) =>
+        `[Subexperiment ${index + 1}]
+        Title: ${sub.title}
+        Problem: ${sub.problemStatement}
+        Theory: ${sub.theory}
+        Algorithm: ${sub.algorithm}`,
+    )
     .join("\n\n");
 
   const openai = getOpenAiClient();
   const existingCount = await TestQuestion.countDocuments({ subjectId });
-
   let finalQuestions = [];
 
   if (existingCount < QUESTION_BANK_LIMIT) {
-    // Bank still filling up - generate a fresh batch of 10 and add them all to the bank
+    // Bank still filling up: generate a fresh batch and add it all to the bank
     let freshQs;
 
     if (!openai) {
-      console.log(
-        `[Aptitude] OpenAI key missing. Generating mock questions for ${subject.name}`,
-      );
+      console.log(`[Practical Test] OpenAI key missing. Generating mock questions for ${subject.name}`);
       freshQs = generateMockQuestions(subject.name, subExperiments, TEST_SIZE);
     } else {
       const existingDocs = await TestQuestion.find({ subjectId }).select("text").lean();
@@ -312,15 +364,13 @@ const generateQuestionsForSubject = async (subjectId) => {
       }
     }
 
-    // Re-check the count right before writing, and hard-cap what gets stored
-    // so the bank can never be pushed past QUESTION_BANK_LIMIT in one batch -
-    // this is a second line of defense on top of the in-flight request lock.
+    // Hard-cap the insertion to avoid exceeding QUESTION_BANK_LIMIT due to race conditions
     const preInsertCount = await TestQuestion.countDocuments({ subjectId });
     const remainingSlots = Math.max(0, QUESTION_BANK_LIMIT - preInsertCount);
     await persistQuestions(subjectId, freshQs.slice(0, remainingSlots));
     finalQuestions = freshQs;
   } else {
-    // Bank is big enough - reuse 9 random questions from DB + 1 freshly generated one
+    // Bank is full: reuse random archived questions + generate 1 fresh question
     const sampled = await TestQuestion.aggregate([
       { $match: { subjectId: new mongoose.Types.ObjectId(subjectId) } },
       { $sample: { size: REUSE_FROM_BANK } },
@@ -355,6 +405,7 @@ const generateQuestionsForSubject = async (subjectId) => {
     ].sort(() => Math.random() - 0.5);
   }
 
+  // Add sequential IDs for the client
   return finalQuestions.map((q, idx) => ({
     id: idx + 1,
     text: q.text,
@@ -363,6 +414,4 @@ const generateQuestionsForSubject = async (subjectId) => {
   }));
 };
 
-module.exports = {
-  getQuestions,
-};
+module.exports = { generateQuestionsForSubject };

@@ -80,8 +80,7 @@ export default function TestInstruction({
     setLoading(true);
 
     try {
-      // optional: show loader state
-      const res = await fetch(`/api/aptitude/questions/${subjectId}`);
+      const res = await fetch(`/api/practical-test/questions/${subjectId}`);
 
       if (!res.ok) {
         throw new Error("Failed to generate test questions");
@@ -89,7 +88,7 @@ export default function TestInstruction({
 
       const questions = await res.json();
 
-      navigate(`/aptitude-test/${subjectId}`, {
+      navigate(`/practical-test/${subjectId}`, {
         state: {
           questions,
           testTitle,

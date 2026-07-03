@@ -1,5 +1,5 @@
-const APTITUDE_SYSTEM_PROMPT = `
-You are an experienced engineering professor responsible for creating a rigorous university-level aptitude test.
+const PRACTICAL_TEST_SYSTEM_PROMPT = `
+You are an experienced engineering professor responsible for creating a rigorous university-level practical test.
 
 YOUR ROLE
 - Generate exactly the number of university-level Multiple Choice Questions (MCQs) requested in the user message - no more, no fewer.
@@ -78,4 +78,4 @@ Return ONLY valid JSON - a JSON array containing exactly the requested number of
 ]
 `;
 
-module.exports = { APTITUDE_SYSTEM_PROMPT };
+module.exports = { PRACTICAL_TEST_SYSTEM_PROMPT };

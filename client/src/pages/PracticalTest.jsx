@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import {
-  ArrowRight,
-  Clock,
-  AlertTriangle,
-  X,
-  HelpCircle,
-} from "lucide-react";
-// ── Helper: format elapsed seconds as HH:MM:SS ────────────────────────
+import { ArrowRight, Clock, AlertTriangle, X, HelpCircle } from "lucide-react";
+import { renderQuestionText } from "../utils/renderQuestionText";
+/**
+ * formatTime
+ * Converts a total seconds value into a zero-padded HH:MM:SS string
+ * suitable for display in the test timer UI.
+ *
+ * @param {number} totalSeconds - Elapsed or remaining seconds.
+ * @returns {string} Formatted time string, e.g. "00:09:45".
+ */
 function formatTime(totalSeconds) {
   const h = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
   const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
@@ -15,51 +17,10 @@ function formatTime(totalSeconds) {
   return `${h}:${m}:${s}`;
 }
 
-// ── Helper: parse and render code snippets dynamically ────────────────
-function renderQuestionText(text) {
-  if (!text) return null;
-  const parts = text.split(/(```[\s\S]*?```)/g);
-  return parts.map((part, idx) => {
-    if (part.startsWith("```")) {
-      const content = part
-        .replace(/^```[a-zA-Z]*\n?/, "")
-        .replace(/```$/, "")
-        .trim();
-      return (
-        <pre
-          key={idx}
-          className="my-4 p-4 bg-slate-50 border border-slate-200 rounded-xl overflow-x-auto text-xs font-mono text-violet-800 leading-relaxed max-w-full text-left"
-        >
-          <code>{content}</code>
-        </pre>
-      );
-    }
-
-    const inlineParts = part.split(/(`[^`\n]+`)/g);
-    return (
-      <span key={idx} className="whitespace-pre-line">
-        {inlineParts.map((subPart, sIdx) => {
-          if (subPart.startsWith("`") && subPart.endsWith("`")) {
-            return (
-              <code
-                key={sIdx}
-                className="px-1.5 py-0.5 mx-0.5 bg-slate-100 border border-slate-200 text-violet-700 rounded font-mono text-xs"
-              >
-                {subPart.slice(1, -1)}
-              </code>
-            );
-          }
-          return subPart;
-        })}
-      </span>
-    );
-  });
-}
-
 // =====================================================================
-// AptitudeTest  –  main page component
+// PracticalTest  –  main page component
 // =====================================================================
-export default function AptitudeTest({
+export default function PracticalTest({
   testTitle = "C Programming",
   studentName = "Akshay Manjrekar",
   onNavigate,
@@ -68,7 +29,7 @@ export default function AptitudeTest({
   const navigate = useNavigate();
   const location = useLocation();
   const { subjectId } = useParams();
-  const storageKey = `aptitude_test_${subjectId}`;
+  const storageKey = `practical_test_${subjectId}`;
 
   // Helper to load initial state from localStorage
   const getInitialState = () => {
@@ -158,7 +119,17 @@ export default function AptitudeTest({
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     }
-  }, [questionsList, currentIndex, answers, tempAnswers, markedForReview, visited, remaining, submitted, storageKey]);
+  }, [
+    questionsList,
+    currentIndex,
+    answers,
+    tempAnswers,
+    markedForReview,
+    visited,
+    remaining,
+    submitted,
+    storageKey,
+  ]);
 
   // ── Countdown Timer ─────────────────────────────────────────────────
   useEffect(() => {
@@ -284,7 +255,7 @@ export default function AptitudeTest({
     // Clear localStorage for this subject
     localStorage.removeItem(storageKey);
     // Store subjectId for retake navigation
-    localStorage.setItem("aptitude_last_subject_id", subjectId);
+    localStorage.setItem("practical_test_last_subject_id", subjectId);
 
     if (onSubmit)
       onSubmit({
@@ -471,11 +442,14 @@ export default function AptitudeTest({
                 <div className="grid grid-cols-4 gap-3 mb-8">
                   {questionsList.map((_, idx) => {
                     const isMarked = markedForReview[idx];
-                    const isAnswered = answers[idx] !== undefined || tempAnswers[idx] !== undefined;
+                    const isAnswered =
+                      answers[idx] !== undefined ||
+                      tempAnswers[idx] !== undefined;
                     const isVisited = visited[idx];
                     const isAllowed = isVisited || idx === currentIndex;
 
-                    let bgClass = "bg-slate-100 text-slate-500 border border-slate-200";
+                    let bgClass =
+                      "bg-slate-100 text-slate-500 border border-slate-200";
 
                     if (isMarked) {
                       bgClass = "bg-purple-800 text-white";

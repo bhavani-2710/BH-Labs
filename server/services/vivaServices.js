@@ -1,21 +1,42 @@
 const { jsonrepair } = require("jsonrepair");
-const {
-  EXPERIMENT_VIVA_SYSTEM_PROMPT,
-} = require("../prompts/experimentVivaSystemPrompt");
+const { EXPERIMENT_VIVA_SYSTEM_PROMPT } = require("../prompts/experimentVivaSystemPrompt");
 const { getOpenAiClient } = require("../config/openrouter");
 
-// Escape backslashes that aren't part of a valid JSON escape sequence
-// (e.g. LaTeX-style \%, \_, \d from regex snippets, stray Windows paths, etc.)
+/**
+ * sanitizeJsonString
+ * Escapes backslashes that are not part of a recognised JSON escape sequence
+ * (e.g. LaTeX \%, \_, \d from regex snippets, stray Windows paths, etc.).
+ * Applied as a pre-processing step before JSON.parse or jsonrepair.
+ *
+ * @param {string} str - Raw string from the AI response.
+ * @returns {string}   Sanitized string with stray backslashes doubled.
+ */
 const sanitizeJsonString = (str) => {
-  return str.replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\");
+  return str.replace(/\\(?!["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\");
 };
 
 /**
  * generateVivaQA
- * Calls google/gemini-2.5-flash-lite to produce 7–9 short Q&A pairs for a sub-experiment.
- * @param {Object} subExp  - a subExperiment document (title, problemStatement, theory, concepts)
- * @returns {Array}        - [{ question, answer }, ...]
- **/
+ * Calls the LLM via OpenRouter to produce 7-10 short viva Q&A pairs for a
+ * given sub-experiment. The AI is instructed to return strict JSON; if the
+ * response contains markdown fences or minor structural errors, a two-stage
+ * repair strategy is applied before raising an error.
+ *
+ * Repair strategy:
+ *  1. Strip markdown fences from the raw response.
+ *  2. Try strict JSON.parse.
+ *  3. On failure: sanitize bad escapes, then apply jsonrepair for structural fixes.
+ *
+ * @param {object} subExp                  - A sub-experiment document.
+ * @param {string} subExp.title            - Title of the sub-experiment.
+ * @param {string} [subExp.problemStatement] - Problem description.
+ * @param {string} [subExp.theory]          - Background theory text.
+ * @param {string[]} [subExp.concepts]      - Array of concept keywords.
+ * @returns {Promise<Array<{ question: string, answer: string }>>}
+ *   Array of Q&A pair objects.
+ * @throws {Error} If the API key is missing or the AI returns malformed JSON
+ *   that cannot be repaired.
+ */
 const generateVivaQA = async (subExp) => {
   const openai = getOpenAiClient();
   if (!openai) {
@@ -36,25 +57,25 @@ const generateVivaQA = async (subExp) => {
     temperature: 0.7,
   });
 
+  // Strip any accidental markdown fences from the response
   let raw = response.choices[0].message.content || "";
-  // Strip any accidental markdown fences
-  raw = raw
-    .replace(/```json/gi, "")
-    .replace(/```/g, "")
-    .trim();
+  raw = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
 
+  // Stage 1: strict JSON.parse
   let parsed;
   try {
     parsed = JSON.parse(raw);
   } catch (parseErr) {
-    // Fall back: fix bad escapes, then let jsonrepair patch any remaining
-    // structural issues (trailing commas, unbalanced brackets, etc.)
+    // Stage 2: sanitize bad escapes, then let jsonrepair patch structural issues
     try {
       const sanitized = sanitizeJsonString(raw);
       const repaired = jsonrepair(sanitized);
       parsed = JSON.parse(repaired);
     } catch (repairErr) {
-      console.error("generateVivaQA: failed to parse AI response even after repair", repairErr);
+      console.error(
+        "generateVivaQA: failed to parse AI response even after repair",
+        repairErr,
+      );
       throw new Error("AI returned malformed JSON that could not be repaired.");
     }
   }
@@ -62,6 +83,7 @@ const generateVivaQA = async (subExp) => {
   if (!parsed || !Array.isArray(parsed.qaPairs)) {
     throw new Error("AI did not return a valid qaPairs array.");
   }
+
   return parsed.qaPairs;
 };
 

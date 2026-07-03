@@ -2,18 +2,36 @@ const Experiment = require("../models/Experiment");
 const VivaQA = require("../models/VivaQA");
 const { generateVivaQA } = require("../services/vivaServices");
 
-
 /**
- * GET /api/vivas/qa
- * Body: { experimentId, part }
+ * pendingGenerations
+ * In-process Map that prevents duplicate simultaneous AI generation requests
+ * for the same (experimentId, part) pair. If a second request arrives while
+ * one is already generating, it awaits the same Promise and then reads the
+ * newly-inserted document from the DB rather than triggering a second API call.
  *
- * If a VivaQA document already exists for (experimentId, part), return it.
- * Otherwise fetch the sub-experiment from the Experiment document, call OpenAI
- * to generate 7-9 Q&A pairs, persist them, and return.
+ * @type {Map<string, Promise>}
  */
-// At the top of vivaController.js (outside the controller)
 const pendingGenerations = new Map();
 
+/**
+ * getVivaQA
+ * HTTP handler for POST /api/vivas/qa
+ *
+ * Returns viva Q&A pairs for a specific sub-experiment (identified by
+ * experimentId + part). Uses a three-tier strategy:
+ *  1. Fast path   – return cached Q&A from the DB if it already exists.
+ *  2. Wait path   – if another request is already generating, await it and
+ *                   then return the document that was saved.
+ *  3. Generate    – call the AI service, persist the result, then return it.
+ *
+ * @route  POST /api/vivas/qa
+ * @param  {import("express").Request}  req
+ *   Body: { experimentId: string, part: string }
+ *   - experimentId: MongoDB _id of the parent experiment.
+ *   - part:         Sub-experiment part identifier (e.g. "a", "b"). Case-insensitive.
+ * @param  {import("express").Response} res
+ *   Returns { source: "db"|"ai", qaPairs: Array<{ question, answer }> }
+ */
 const getVivaQA = async (req, res) => {
   try {
     const { experimentId, part } = req.body;
@@ -27,39 +45,27 @@ const getVivaQA = async (req, res) => {
     const normalizedPart = part.toLowerCase();
 
     // 1. Fast path: return cached Q&A if it already exists
-    const existing = await VivaQA.findOne({
-      experimentId,
-      part: normalizedPart,
-    });
+    const existing = await VivaQA.findOne({ experimentId, part: normalizedPart });
 
     if (existing) {
-      return res.json({
-        source: "db",
-        qaPairs: existing.qaPairs,
-      });
+      return res.json({ source: "db", qaPairs: existing.qaPairs });
     }
 
-    // Unique key for this experiment + part
+    // Unique key for deduplication: experimentId + part
     const key = `${experimentId}:${normalizedPart}`;
 
-    // 2. If another request is already generating, wait for it
+    // 2. Wait path: another request is already generating for this key
     if (pendingGenerations.has(key)) {
       await pendingGenerations.get(key);
 
-      const generated = await VivaQA.findOne({
-        experimentId,
-        part: normalizedPart,
-      });
+      const generated = await VivaQA.findOne({ experimentId, part: normalizedPart });
 
       if (generated) {
-        return res.json({
-          source: "db",
-          qaPairs: generated.qaPairs,
-        });
+        return res.json({ source: "db", qaPairs: generated.qaPairs });
       }
     }
 
-    // 3. Start generation
+    // 3. Generate: start a new AI generation, store the promise, persist the result
     const generationPromise = (async () => {
       const experiment = await Experiment.findById(experimentId);
 
@@ -67,35 +73,25 @@ const getVivaQA = async (req, res) => {
         throw new Error("Experiment not found");
       }
 
+      // Locate the matching sub-experiment within the parent experiment
       const subExp = experiment.subExperiments.find(
         (s) => s.part?.toLowerCase() === normalizedPart,
       );
 
       if (!subExp) {
-        throw new Error(
-          `Sub-experiment with part "${normalizedPart}" not found`,
-        );
+        throw new Error(`Sub-experiment with part "${normalizedPart}" not found`);
       }
 
       const qaPairs = await generateVivaQA(subExp);
 
       try {
-        const doc = await VivaQA.create({
-          experimentId,
-          part: normalizedPart,
-          qaPairs,
-        });
-
+        const doc = await VivaQA.create({ experimentId, part: normalizedPart, qaPairs });
         return doc;
       } catch (err) {
-        // Another request inserted while we were generating
+        // Handle race condition where another request inserted while generating
         if (err.code === 11000) {
-          return await VivaQA.findOne({
-            experimentId,
-            part: normalizedPart,
-          });
+          return await VivaQA.findOne({ experimentId, part: normalizedPart });
         }
-
         throw err;
       }
     })();
@@ -104,11 +100,7 @@ const getVivaQA = async (req, res) => {
 
     try {
       const doc = await generationPromise;
-
-      return res.status(201).json({
-        source: "ai",
-        qaPairs: doc.qaPairs,
-      });
+      return res.status(201).json({ source: "ai", qaPairs: doc.qaPairs });
     } finally {
       pendingGenerations.delete(key);
     }
@@ -123,9 +115,7 @@ const getVivaQA = async (req, res) => {
       return res.status(404).json({ error: err.message });
     }
 
-    return res.status(500).json({
-      error: err.message || "Internal Server Error",
-    });
+    return res.status(500).json({ error: err.message || "Internal Server Error" });
   }
 };
 

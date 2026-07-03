@@ -1,10 +1,6 @@
 const express = require("express");
-const multer = require("multer");
-const path = require("path");
-const router = express.Router();          // <-- this line was missing
-const {
-  getVivaQA,
-} = require("../controllers/vivaController");
+const router = express.Router();
+const { getVivaQA } = require("../controllers/vivaController");
 
 // POST /api/vivas/qa
 // Body: { experimentId, part }
