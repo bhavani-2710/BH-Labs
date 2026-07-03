@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useMemo } from "react";
 import Editor from "@monaco-editor/react";
 import FlowchartRenderer from "../components/FlowchartRenderer";
 import MarkdownRenderer from "../components/MarkdownRenderer";
@@ -25,6 +25,8 @@ const COMPILER_MAP = {
   python: "cpython-3.12.7",
   java: "openjdk-jdk-22+36",
   javascript: "nodejs-20.17.0",
+  sql: "sqlite-3.46.1",
+  sqlite: "sqlite-3.46.1",
 };
 
 const EXTENSION_MAP = {
@@ -33,6 +35,8 @@ const EXTENSION_MAP = {
   python: "py",
   java: "java",
   javascript: "js",
+  sql: "sql",
+  sqlite: "sql",
 };
 
 const MONACO_LANG_MAP = {
@@ -41,11 +45,14 @@ const MONACO_LANG_MAP = {
   python: "python",
   java: "java",
   javascript: "javascript",
+  sql: "sql",
+  sqlite: "sql",
 };
 
 export default function LabWorkspace({
   onBack,
   experiment,
+  subject,
   subPart = "a",
   onNavigate,
   onSaveCode,
@@ -58,18 +65,91 @@ export default function LabWorkspace({
   const [activeLeftTab, setActiveLeftTab] = useState("theory");
   const [activeRightTab, setActiveRightTab] = useState("assistant");
 
-  // Derive supported languages from: explicit field → starterCode → referenceSolution keys → fallback
-  // NOTE: use .length checks because [] is truthy in JS — `[] || ["c"]` returns [] not ["c"]
-  const refSolKeys = subExp?.referenceSolution
-    ? Object.keys(subExp.referenceSolution)
-    : [];
-  const supportedLanguages = (subExp?.supportedLanguages?.length
-    ? subExp.supportedLanguages
-    : null) ||
-    (subExp?.starterCode?.supportedLanguages?.length
-      ? subExp.starterCode.supportedLanguages
-      : null) ||
-    (refSolKeys.length ? refSolKeys : null) || ["c"];
+  const getTemplate = (lang) => {
+    // 1. Try to read starter code from DB
+    if (subExp?.starterCode?.templates) {
+      const templates = subExp.starterCode.templates;
+      let val = "";
+      if (typeof templates.get === "function") {
+        val = templates.get(lang);
+      } else {
+        val = templates[lang];
+      }
+      if (val) {
+        return val.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+      }
+    }
+
+    // 2. Dynamic boilerplate fallback templates
+    switch (lang) {
+      case "c":
+        return `#include <stdio.h>\n\nint main() {\n    // Write your code here\n    \n    return 0;\n}\n`;
+      case "cpp":
+        return `#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your code here\n    \n    return 0;\n}\n`;
+      case "python":
+        return `def main():\n    # Write your code here\n    pass\n\nif __name__ == "__main__":\n    main()\n`;
+      case "java":
+        return `public class Main {\n    public static void main(String[] args) {\n        // Write your code here\n        \n    }\n}\n`;
+      case "javascript":
+        return `function main() {\n    // Write your code here\n    \n}\n\nmain();\n`;
+      case "sql":
+        return `-- Write your SQL queries here\n\n`;
+      default:
+        return `// Write your code here\n`;
+    }
+  };
+
+  const getReferenceSolution = (lang) => {
+    if (!subExp?.referenceSolution) return "";
+    const solutions = subExp.referenceSolution;
+    let val = "";
+    if (typeof solutions.get === "function") {
+      val = solutions.get(lang) || "";
+    } else {
+      val = solutions[lang] || "";
+    }
+    return val.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+  };
+
+  // Derive supported languages from: subject details → explicit field → starterCode → referenceSolution keys → fallback
+  const refSolKeys = useMemo(() => {
+    if (!subExp?.referenceSolution) return [];
+    const solutions = subExp.referenceSolution;
+    if (typeof solutions.keys === "function") {
+      return Array.from(solutions.keys());
+    }
+    return Object.keys(solutions);
+  }, [subExp]);
+
+  const supportedLanguages = useMemo(() => {
+    if (!subject) {
+      return (subExp?.supportedLanguages?.length ? subExp.supportedLanguages : null) ||
+             (subExp?.starterCode?.supportedLanguages?.length ? subExp.starterCode.supportedLanguages : null) ||
+             (refSolKeys.length ? refSolKeys : null) || ["c"];
+    }
+
+    const name = subject.name.toLowerCase();
+
+    // 1. Standalone language subjects
+    if (name.includes("c programming") || name.includes("programming in c")) {
+      return ["c"];
+    }
+    if (name.includes("c++") || name.includes("cpp")) {
+      return ["cpp"];
+    }
+    if (name.includes("python")) {
+      return ["python"];
+    }
+    if (name.includes("java full stack") || name.includes("java programming") || name.includes("core java")) {
+      return ["java"];
+    }
+    if (name.includes("javascript")) {
+      return ["javascript"];
+    }
+
+    // 2. Multi-language/flexible subjects (DBMS, AOA, OS, etc.)
+    return ["c", "cpp", "python", "java", "javascript", "sql"];
+  }, [subject, subExp, refSolKeys]);
 
   const [editorLanguage, setEditorLanguage] = useState(
     supportedLanguages[0] || "c",
@@ -150,12 +230,26 @@ export default function LabWorkspace({
   useEffect(() => {
     const initial = {};
     supportedLanguages.forEach((lang) => {
-      initial[lang] = "";
+      initial[lang] = getTemplate(lang);
     });
+
+    const expLangs = subExp?.starterCode?.supportedLanguages || 
+                     (subExp?.starterCode?.templates ? (typeof subExp.starterCode.templates.keys === "function" ? Array.from(subExp.starterCode.templates.keys()) : Object.keys(subExp.starterCode.templates)) : null) ||
+                     refSolKeys;
+    const defaultLang = (expLangs && expLangs.length > 0 && supportedLanguages.includes(expLangs[0]))
+      ? expLangs[0]
+      : (supportedLanguages[0] || "c");
+
+    if (savedCode) {
+      initial[defaultLang] = savedCode;
+    }
+
     setCodeByLang(initial);
     setConsoleOutput("");
     setConsoleErrors("");
-    setEditorLanguage(supportedLanguages[0] || "c");
+    setEditorLanguage(defaultLang);
+    setCode(savedCode || initial[defaultLang] || "");
+
     setChatMessages([
       {
         sender: "ai",
@@ -229,11 +323,21 @@ export default function LabWorkspace({
     };
   }, [experiment?._id, subPart]);
 
-  // Runs when language changes — loads reference solution, then starter code, then saved code
+  // Runs when language changes — load from codeByLang or starter template
   useEffect(() => {
-    // Keep it blank by default unless we have savedCode
-    setCode(savedCode || "");
-  }, [editorLanguage, subPart, experiment]);
+    if (codeByLang[editorLanguage] !== undefined && codeByLang[editorLanguage] !== "") {
+      setCode(codeByLang[editorLanguage]);
+    } else {
+      setCode(getTemplate(editorLanguage));
+    }
+  }, [editorLanguage]);
+
+  // Keep editorLanguage in sync if supportedLanguages list shifts
+  useEffect(() => {
+    if (supportedLanguages.length > 0 && !supportedLanguages.includes(editorLanguage)) {
+      setEditorLanguage(supportedLanguages[0]);
+    }
+  }, [supportedLanguages, editorLanguage]);
 
   const handleLanguageChange = (e) => {
     setEditorLanguage(e.target.value);
@@ -274,7 +378,7 @@ export default function LabWorkspace({
   };
 
   const handleSolveQuestion = async () => {
-    const refSol = subExp?.referenceSolution?.[editorLanguage] || "";
+    const refSol = getReferenceSolution(editorLanguage);
     if (!refSol) {
       alert("No solution available for this language.");
       return;

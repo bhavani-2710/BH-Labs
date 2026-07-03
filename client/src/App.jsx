@@ -95,14 +95,16 @@ function SubjectDetailWrapper({
  * from the global list, and provides the lab workspace with its code state
  * and save handler.
  */
-function WorkspaceWrapper({ experiments, codeStore, onSaveCode }) {
+function WorkspaceWrapper({ experiments, subjects, codeStore, onSaveCode }) {
   const { experimentId, part } = useParams();
   const navigate = useNavigate();
   const experiment = experiments.find((e) => e._id === experimentId);
+  const subject = subjects.find((s) => s._id === experiment?.subjectId);
 
   return (
     <LabWorkspace
       experiment={experiment}
+      subject={subject}
       subPart={part || "a"}
       savedCode={codeStore[`${experimentId}_${part || "a"}`] || ""}
       onSaveCode={onSaveCode}
@@ -305,6 +307,7 @@ export default function App() {
         element={
           <WorkspaceWrapper
             experiments={experiments}
+            subjects={subjects}
             codeStore={codeStore}
             onSaveCode={handleSaveCode}
           />
