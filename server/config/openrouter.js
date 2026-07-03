@@ -8,7 +8,7 @@ const getOpenAiClient = () => {
     apiKey: apiKey,
     defaultHeaders: {
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": "http://localhost:5050",
+      "HTTP-Referer": "http://github.com/bh-labs",
       "X-Title": "BH Labs",
     },
   });

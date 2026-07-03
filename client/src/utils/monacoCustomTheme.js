@@ -6,8 +6,8 @@ export default function defineThemes(monaco) {
     rules: [],
 
     colors: {
-      "editor.background": "#FCFCFD",
-      "editorGutter.background": "#FCFCFD",
+      "editor.background": "#fefefe",
+      "editorGutter.background": "#fefefe",
 
       "editor.lineHighlightBackground": "#F7F5FF",
 
