@@ -80,7 +80,8 @@ export default function TestInstruction({
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/practical-test/questions/${subjectId}`);
+      // optional: show loader state
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/aptitude/questions/${subjectId}`);
 
       if (!res.ok) {
         throw new Error("Failed to generate test questions");
