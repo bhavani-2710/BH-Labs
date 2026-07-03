@@ -11,7 +11,8 @@ const codeRoutes = require("./routes/codeRoutes");
 const compilerRoutes = require("./routes/compilerRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const aptitudeRoutes = require("./routes/aptitudeRoutes");
-const vivaRoutes = require("./routes/vivaRoutes");   // <-- add this
+const vivaRoutes = require("./routes/vivaRoutes");   
+const testRoutes = require("./routes/testRoutes");   
 
 connectDB();
 
@@ -30,6 +31,7 @@ app.use("/api/run", compilerRoutes);
 app.use("/api", chatRoutes);
 app.use("/api/aptitude", aptitudeRoutes);
 app.use("/api/vivas", vivaRoutes);   // <-- add this
+app.use("/api/questions", testRoutes);  
 
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/experiments", experimentRoutes);
