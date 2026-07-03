@@ -74,8 +74,8 @@ const WorkspaceRightSidebar = ({
                   key={i}
                   className={
                     msg.sender === "ai"
-                      ? "bg-[#F0ECFF] border border-[#5521FF]/10 rounded-[10px] rounded-tl-[2px] p-2 px-2.5 text-[11px] leading-relaxed text-[#3730A3] self-start max-w-[92%] text-wrap"
-                      : "bg-[#5521FF] text-white rounded-[10px] rounded-tr-[2px] p-2 px-2.5 text-[11px] leading-relaxed self-end max-w-[85%] shadow-[0_2px_6px_rgba(85,33,255,0.2)] text-wrap"
+                      ? "bg-[#f5f5f5] border border-[#5521FF]/10 rounded-xl rounded-tl-[2px] p-2 px-2.5 text-[12px] leading-relaxed text-[#3730A3] self-start max-w-[92%] text-wrap"
+                      : "bg-[#5521FF] text-white rounded-xl rounded-tr-[2px] p-2 px-2.5 text-[12px] leading-relaxed self-end max-w-[85%] shadow-[0_2px_6px_rgba(85,33,255,0.2)] text-wrap"
                   }
                 >
                   {msg.sender === "ai" ? (

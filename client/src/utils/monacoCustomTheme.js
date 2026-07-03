@@ -9,7 +9,7 @@ export default function defineThemes(monaco) {
       "editor.background": "#fefefe",
       "editorGutter.background": "#fefefe",
 
-      "editor.lineHighlightBackground": "#F7F5FF",
+      "editor.lineHighlightBackground": "#f2f2f2",
 
       "editor.selectionBackground": "#5521FF20",
       "editor.inactiveSelectionBackground": "#5521FF12",
