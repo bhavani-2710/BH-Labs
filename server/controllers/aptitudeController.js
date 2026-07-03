@@ -122,7 +122,7 @@ const generateAIQuestions = async ({ openai, subject, subExpsContext, count, avo
                     `;
 
   const response = await openai.chat.completions.create({
-    model: "openai/gpt-oss-120b",
+    model: "openai/gpt-oss-20b",
     messages: [
       { role: "system", content: APTITUDE_SYSTEM_PROMPT },
       { role: "user", content: userPrompt },
