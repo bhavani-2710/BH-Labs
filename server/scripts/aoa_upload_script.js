@@ -646,13 +646,78 @@ const experiments = [
     ],
   },
 
-  // ── Exp 6: N-Queens & Graph Coloring (Backtracking) ──────────────────────────
+  // ── Exp 6: Graph Algorithms - BFS/DFS ──────────────────────────
   {
-    _id: new ObjectId("685b2a1f3c4e8d0012a7b506"),
+    _id: new ObjectId("685b2a1f3c4e8d0012a7b507"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b002"),
     experimentNumber: 6,
     problemStatement:
-      "Experiment based on backtracking approach. (N-Queens problem, Graph Coloring problem)",
+      "Implementation of fundamental graph algorithms including Breadth-First Search (BFS) and Depth-First Search (DFS).",
+    subExperiments: [
+      {
+        part: "a",
+        title: "Graph Algorithms - BFS/DFS",
+        concepts: ["Graph Traversal", "Breadth-First Search", "Depth-First Search"],
+        hints: [
+          "DFS goes as deep as possible along one path before backtracking — a natural fit for recursion.",
+          "BFS explores neighbor-by-neighbor using a queue, guaranteeing the shortest path in an unweighted graph.",
+          "Always mark a vertex as visited the moment it's discovered (enqueued), not when it's processed, to avoid adding it to the queue multiple times in BFS.",
+        ],
+        difficulty: "Medium",
+        problemStatement:
+          "Implement and analyze fundamental graph algorithms including Breadth-First Search (BFS) and Depth-First Search (DFS).",
+        theory:
+          "BFS explores a graph level by level starting from a source vertex, visiting all neighbors before moving to the next level, using a queue to track vertices to visit. DFS explores as far as possible along each branch before backtracking, using recursion (or an explicit stack). Both traversals visit every reachable vertex exactly once and are foundational for solving connectivity, shortest-path (unweighted), and cycle-detection problems. Time complexity: O(V + E) for both, where V is vertices and E is edges.",
+        algorithm:
+          "1. Start\n2. Read V vertices, E edges, and the edge list\n3. Read starting vertex\n4. DFS(v):\n   a. Mark v as visited; print v\n   b. For each unvisited neighbor i of v: DFS(i)\n5. BFS(start):\n   a. Mark start as visited; enqueue start\n   b. While queue is not empty:\n      Dequeue vertex v; print v\n      For each unvisited neighbor i of v: mark visited, enqueue i\n6. Stop",
+        flowchart: {
+          nodes: [
+            { id: "1", type: "start",    label: "Start" },
+            { id: "2", type: "input",    label: "Read graph (V, E, edges) and start vertex" },
+            { id: "3", type: "process",  label: "DFS: visit vertex, mark visited" },
+            { id: "4", type: "decision", label: "Unvisited neighbor exists?" },
+            { id: "5", type: "process",  label: "Recurse DFS on neighbor" },
+            { id: "6", type: "process",  label: "BFS: enqueue start, mark visited" },
+            { id: "7", type: "decision", label: "Queue empty?" },
+            { id: "8", type: "process",  label: "Dequeue vertex, visit, enqueue unvisited neighbors" },
+            { id: "9", type: "output",   label: "Print DFS and BFS traversal orders" },
+            { id: "10", type: "end",     label: "Stop" },
+          ],
+          edges: [
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4" },
+            { source: "4", target: "5", label: "Yes" },
+            { source: "5", target: "4" },
+            { source: "4", target: "6", label: "No" },
+            { source: "6", target: "7" },
+            { source: "7", target: "8", label: "No" },
+            { source: "8", target: "7" },
+            { source: "7", target: "9", label: "Yes" },
+            { source: "9", target: "10" },
+          ],
+        },
+        referenceSolution: {
+          c: '#include <stdio.h>\n\n#define MAX 20\n\nint graph[MAX][MAX];\nint visited[MAX];\nint V;\n\nvoid dfs(int v) {\n    visited[v] = 1;\n    printf("%d ", v);\n    for (int i = 0; i < V; i++) {\n        if (graph[v][i] && !visited[i]) {\n            dfs(i);\n        }\n    }\n}\n\nvoid bfs(int start) {\n    int queue[MAX], front = 0, rear = 0;\n    int visitedBFS[MAX] = {0};\n\n    visitedBFS[start] = 1;\n    queue[rear++] = start;\n\n    while (front < rear) {\n        int v = queue[front++];\n        printf("%d ", v);\n        for (int i = 0; i < V; i++) {\n            if (graph[v][i] && !visitedBFS[i]) {\n                visitedBFS[i] = 1;\n                queue[rear++] = i;\n            }\n        }\n    }\n}\n\nint main() {\n    int E, u, v, start;\n\n    printf("Enter number of vertices: ");\n    scanf("%d", &V);\n    printf("Enter number of edges: ");\n    scanf("%d", &E);\n\n    for (int i = 0; i < V; i++)\n        for (int j = 0; j < V; j++)\n            graph[i][j] = 0;\n\n    printf("Enter edges (u v):\\n");\n    for (int i = 0; i < E; i++) {\n        scanf("%d %d", &u, &v);\n        graph[u][v] = 1;\n        graph[v][u] = 1;\n    }\n\n    printf("Enter starting vertex: ");\n    scanf("%d", &start);\n\n    for (int i = 0; i < V; i++) visited[i] = 0;\n    printf("DFS traversal: ");\n    dfs(start);\n    printf("\\n");\n\n    printf("BFS traversal: ");\n    bfs(start);\n    printf("\\n");\n\n    return 0;\n}',
+          python: 'from collections import deque\n\ndef dfs(graph, v, visited, order):\n    visited[v] = True\n    order.append(v)\n    for i in range(len(graph)):\n        if graph[v][i] and not visited[i]:\n            dfs(graph, i, visited, order)\n\ndef bfs(graph, start):\n    V = len(graph)\n    visited = [False] * V\n    order = []\n    q = deque([start])\n    visited[start] = True\n    while q:\n        v = q.popleft()\n        order.append(v)\n        for i in range(V):\n            if graph[v][i] and not visited[i]:\n                visited[i] = True\n                q.append(i)\n    return order\n\nV = int(input("Enter number of vertices: "))\nE = int(input("Enter number of edges: "))\ngraph = [[0] * V for _ in range(V)]\n\nprint("Enter edges (u v):")\nfor _ in range(E):\n    u, v = map(int, input().split())\n    graph[u][v] = 1\n    graph[v][u] = 1\n\nstart = int(input("Enter starting vertex: "))\n\nvisited = [False] * V\ndfs_order = []\ndfs(graph, start, visited, dfs_order)\nprint("DFS traversal:", *dfs_order)\n\nbfs_order = bfs(graph, start)\nprint("BFS traversal:", *bfs_order)',
+        },
+        samples: [
+          {
+            input: "6\n7\n0 1\n0 2\n1 3\n1 4\n2 5\n3 5\n4 5\n0",
+            output: "DFS traversal: 0 1 3 5 2 4 \nBFS traversal: 0 1 2 3 4 5 \n",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Exp 7: N-Queens & Graph Coloring & sum of subsets (Backtracking) ──────────────────────────
+  {
+    _id: new ObjectId("685b2a1f3c4e8d0012a7b506"),
+    subjectId: new ObjectId("685b2a1f3c4e8d0012a7b002"),
+    experimentNumber: 7,
+    problemStatement:
+      "Experiment based on backtracking approach. (N-Queens problem, Graph Coloring problem, sum of subsets)",
     subExperiments: [
       {
         part: "a",
@@ -759,14 +824,134 @@ const experiments = [
           },
         ],
       },
+      {
+        part: "c",
+        title: "Sum of Subsets Problem",
+        concepts: ["Backtracking", "Combinatorics", "Constraint Satisfaction"],
+        hints: [
+          "At each element, branch into two choices: include it in the current subset, or exclude it.",
+          "Prune a branch early if the running sum already exceeds the target — no need to keep including more elements.",
+          "A subset can be printed as soon as its sum equals the target; recursion can still continue to find other subsets.",
+        ],
+        difficulty: "Hard",
+        problemStatement:
+          "Implement and analyze the Sum of Subsets problem using backtracking.",
+        theory:
+          "Sum of Subsets finds all subsets of a given set of positive integers whose elements add up to a given target sum. Backtracking explores each element by first including it in the current subset and recursing, then excluding it and recursing, pruning any branch whose partial sum already exceeds the target. Time: O(2^n) worst case.",
+        algorithm:
+          "1. Start\n2. Read n elements and target sum\n3. sumOfSubsets(idx, currentSubset, sum):\n   a. If sum == target: print currentSubset, return\n   b. If sum > target or idx == n: return\n   c. Include set[idx]: sumOfSubsets(idx+1, currentSubset + set[idx], sum + set[idx])\n   d. Exclude set[idx]: sumOfSubsets(idx+1, currentSubset, sum)\n4. Stop",
+        flowchart: {
+          nodes: [
+            { id: "1", type: "start",    label: "Start" },
+            { id: "2", type: "input",    label: "Read elements, target sum" },
+            { id: "3", type: "decision", label: "sum == target?" },
+            { id: "4", type: "output",   label: "Print subset" },
+            { id: "5", type: "decision", label: "sum > target or idx == n?" },
+            { id: "6", type: "process",  label: "Include set[idx]; recurse idx+1" },
+            { id: "7", type: "process",  label: "Exclude set[idx]; recurse idx+1" },
+            { id: "8", type: "end",      label: "Stop" },
+          ],
+          edges: [
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4", label: "Yes" },
+            { source: "3", target: "5", label: "No" },
+            { source: "4", target: "8" },
+            { source: "5", target: "8", label: "Yes" },
+            { source: "5", target: "6", label: "No" },
+            { source: "6", target: "3" },
+            { source: "6", target: "7" },
+            { source: "7", target: "3" },
+          ],
+        },
+        referenceSolution: {
+          c: '#include <stdio.h>\n\n#define MAX 20\n\nint set[MAX];\nint subset[MAX];\nint n, target;\n\nvoid printSubset(int k) {\n    printf("{ ");\n    for (int i = 0; i < k; i++) printf("%d ", subset[i]);\n    printf("}\\n");\n}\n\nvoid sumOfSubsets(int idx, int k, int sum) {\n    if (sum == target) {\n        printSubset(k);\n        return;\n    }\n    if (sum > target || idx == n) return;\n\n    // Include set[idx]\n    subset[k] = set[idx];\n    sumOfSubsets(idx + 1, k + 1, sum + set[idx]);\n\n    // Exclude set[idx]\n    sumOfSubsets(idx + 1, k, sum);\n}\n\nint main() {\n    printf("Enter number of elements: ");\n    scanf("%d", &n);\n    printf("Enter %d elements:\\n", n);\n    for (int i = 0; i < n; i++) scanf("%d", &set[i]);\n    printf("Enter target sum: ");\n    scanf("%d", &target);\n\n    printf("Subsets with sum %d:\\n", target);\n    sumOfSubsets(0, 0, 0);\n    return 0;\n}',
+          python: 'def sum_of_subsets(nums, idx, target, current, results):\n    total = sum(current)\n    if total == target:\n        results.append(list(current))\n        return\n    if total > target or idx == len(nums):\n        return\n    # include\n    current.append(nums[idx])\n    sum_of_subsets(nums, idx + 1, target, current, results)\n    current.pop()\n    # exclude\n    sum_of_subsets(nums, idx + 1, target, current, results)\n\nn = int(input("Enter number of elements: "))\nnums = list(map(int, input(f"Enter {n} elements:\\n").split()))\ntarget = int(input("Enter target sum: "))\n\nresults = []\nsum_of_subsets(nums, 0, target, [], results)\n\nprint(f"Subsets with sum {target}:")\nfor r in results:\n    print("{", *r, "}")',
+        },
+        samples: [
+          {
+            input: "5\n10 7 5 18 12\n15",
+            output: "Subsets with sum 15:\n{ 10 5 }\n",
+          },
+        ],
+      },
     ],
   },
 
-  // ── Exp 7: String Matching ────────────────────────────────────────────────────
+  // ── Exp 8: 0/1 Knapsack using Branch and Bound ──────────────────────────
+  {
+    _id: new ObjectId("685b2a1f3c4e8d0012a7b508"),
+    subjectId: new ObjectId("685b2a1f3c4e8d0012a7b002"),
+    experimentNumber: 8,
+    problemStatement:
+      "Implement and analyze optimization problems using the branch and bound strategy.",
+    subExperiments: [
+      {
+        part: "a",
+        title: "Branch and Bound Strategy",
+        concepts: ["Branch and Bound", "Optimization", "0/1 Knapsack", "Pruning"],
+        hints: [
+          "At each item, branch into two choices: include it, or exclude it.",
+          "Compute an optimistic upper bound (via fractional knapsack) for each branch — if it can't beat the best value found so far, prune that branch entirely.",
+          "Unlike plain backtracking, Branch and Bound prunes based on a computed bound, not just constraint violations, making it far more efficient for optimization problems.",
+        ],
+        difficulty: "Hard",
+        problemStatement:
+          "Implement and analyze optimization problems using the branch and bound strategy.",
+        theory:
+          "Branch and Bound solves optimization problems by systematically exploring the solution space (branching) while using a bound function to eliminate (prune) branches that cannot produce a better solution than the best one found so far. For the 0/1 Knapsack problem, an upper bound is estimated at each node using the fractional knapsack relaxation (allowing fractional items), which gives an optimistic value. If this bound is not better than the current best solution, the branch is discarded without exploring it further, saving significant computation compared to plain backtracking. Time: O(2^n) worst case, but with substantial pruning in practice.",
+        algorithm:
+          "1. Start\n2. Read n items (weight, value) and knapsack capacity\n3. branchAndBound(idx, currentWeight, currentValue):\n   a. If currentWeight > capacity: return\n   b. Update bestValue if currentValue is better\n   c. If idx == n: return\n   d. Compute bound(idx, currentWeight, currentValue) using fractional relaxation\n   e. If bound <= bestValue: prune, return\n   f. Include item idx: recurse with updated weight/value\n   g. Exclude item idx: recurse without updating weight/value\n4. Print selected items and maximum value\n5. Stop",
+        flowchart: {
+          nodes: [
+            { id: "1", type: "start",    label: "Start" },
+            { id: "2", type: "input",    label: "Read items (weight, value), capacity" },
+            { id: "3", type: "decision", label: "currentWeight > capacity?" },
+            { id: "4", type: "process",  label: "Update bestValue if improved" },
+            { id: "5", type: "decision", label: "idx == n?" },
+            { id: "6", type: "process",  label: "Compute bound via fractional relaxation" },
+            { id: "7", type: "decision", label: "bound <= bestValue?" },
+            { id: "8", type: "process",  label: "Include item; recurse idx+1" },
+            { id: "9", type: "process",  label: "Exclude item; recurse idx+1" },
+            { id: "10", type: "output",  label: "Print selected items and max value" },
+            { id: "11", type: "end",     label: "Stop" },
+          ],
+          edges: [
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "11", label: "Yes" },
+            { source: "3", target: "4",  label: "No" },
+            { source: "4", target: "5" },
+            { source: "5", target: "11", label: "Yes" },
+            { source: "5", target: "6",  label: "No" },
+            { source: "6", target: "7" },
+            { source: "7", target: "11", label: "Yes (prune)" },
+            { source: "7", target: "8",  label: "No" },
+            { source: "8", target: "3" },
+            { source: "8", target: "9" },
+            { source: "9", target: "3" },
+            { source: "10", target: "11" },
+          ],
+        },
+        referenceSolution: {
+          c: '#include <stdio.h>\n\n#define MAX 20\n\nint n, capacity;\nint weight[MAX], value[MAX];\nint bestValue = 0;\nint bestSelected[MAX], selected[MAX];\n\ndouble bound(int idx, int currentWeight, int currentValue) {\n    if (currentWeight >= capacity) return 0;\n    double result = currentValue;\n    int totalWeight = currentWeight;\n    int i = idx;\n    while (i < n && totalWeight + weight[i] <= capacity) {\n        totalWeight += weight[i];\n        result += value[i];\n        i++;\n    }\n    if (i < n)\n        result += (capacity - totalWeight) * ((double)value[i] / weight[i]);\n    return result;\n}\n\nvoid branchAndBound(int idx, int currentWeight, int currentValue) {\n    if (currentWeight > capacity) return;\n\n    if (currentValue > bestValue) {\n        bestValue = currentValue;\n        for (int i = 0; i < n; i++) bestSelected[i] = selected[i];\n    }\n\n    if (idx == n) return;\n\n    if (bound(idx, currentWeight, currentValue) <= bestValue) return;\n\n    selected[idx] = 1;\n    branchAndBound(idx + 1, currentWeight + weight[idx], currentValue + value[idx]);\n    selected[idx] = 0;\n\n    branchAndBound(idx + 1, currentWeight, currentValue);\n}\n\nint main() {\n    printf("Enter number of items: ");\n    scanf("%d", &n);\n    printf("Enter weight and value of each item:\\n");\n    for (int i = 0; i < n; i++)\n        scanf("%d %d", &weight[i], &value[i]);\n    printf("Enter knapsack capacity: ");\n    scanf("%d", &capacity);\n\n    for (int i = 0; i < n; i++) selected[i] = 0;\n\n    branchAndBound(0, 0, 0);\n\n    printf("\\nSelected items: ");\n    for (int i = 0; i < n; i++)\n        if (bestSelected[i]) printf("%d ", i + 1);\n    printf("\\nMaximum value = %d\\n", bestValue);\n\n    return 0;\n}',
+          python: 'def bound(idx, current_weight, current_value, n, capacity, weight, value):\n    if current_weight >= capacity:\n        return 0\n    result = current_value\n    total_weight = current_weight\n    i = idx\n    while i < n and total_weight + weight[i] <= capacity:\n        total_weight += weight[i]\n        result += value[i]\n        i += 1\n    if i < n:\n        result += (capacity - total_weight) * (value[i] / weight[i])\n    return result\n\ndef branch_and_bound(idx, current_weight, current_value, n, capacity, weight, value, selected, best):\n    if current_weight > capacity:\n        return\n    if current_value > best["value"]:\n        best["value"] = current_value\n        best["selected"] = selected.copy()\n    if idx == n:\n        return\n    if bound(idx, current_weight, current_value, n, capacity, weight, value) <= best["value"]:\n        return\n\n    selected[idx] = 1\n    branch_and_bound(idx + 1, current_weight + weight[idx], current_value + value[idx],\n                      n, capacity, weight, value, selected, best)\n    selected[idx] = 0\n\n    branch_and_bound(idx + 1, current_weight, current_value,\n                      n, capacity, weight, value, selected, best)\n\nn = int(input("Enter number of items: "))\nweight = [0] * n\nvalue = [0] * n\nprint("Enter weight and value of each item:")\nfor i in range(n):\n    w, v = map(int, input().split())\n    weight[i] = w\n    value[i] = v\ncapacity = int(input("Enter knapsack capacity: "))\n\nselected = [0] * n\nbest = {"value": 0, "selected": [0] * n}\nbranch_and_bound(0, 0, 0, n, capacity, weight, value, selected, best)\n\nprint("\\nSelected items:", *[i + 1 for i in range(n) if best["selected"][i]])\nprint("Maximum value =", best["value"])',
+        },
+        samples: [
+          {
+            input: "4\n2 40\n3 50\n4 60\n5 70\n5",
+            output: "\nSelected items: 1 2 \nMaximum value = 90\n",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Exp 9: String Matching ────────────────────────────────────────────────────
   {
     _id: new ObjectId("685b2a1f3c4e8d0012a7b507"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b002"),
-    experimentNumber: 7,
+    experimentNumber: 9,
     problemStatement:
       "Experiment based on string matching algorithms. (Naive, KMP, Rabin-Karp)",
     subExperiments: [
