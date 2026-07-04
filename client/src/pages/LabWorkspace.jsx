@@ -18,6 +18,7 @@ import CollapsedLeftSidebar from "../components/CollapsedLeftSidebar";
 import WorkspaceLeftSidebar from "../components/WorkspaceLeftSidebar";
 import WorkspaceRightSidebar from "../components/WorkspaceRightSidebar";
 import CollapsedRightSidebar from "../components/CollapsedRightSidebar";
+import { generateJournalPdf } from "../utils/journalPdfGenerator";
 
 const COMPILER_MAP = {
   c: "gcc-head-c",
@@ -25,6 +26,7 @@ const COMPILER_MAP = {
   python: "cpython-3.12.7",
   java: "openjdk-jdk-22+36",
   javascript: "nodejs-20.17.0",
+  sql: "sqlite-3.46.1",
 };
 
 const EXTENSION_MAP = {
@@ -33,6 +35,7 @@ const EXTENSION_MAP = {
   python: "py",
   java: "java",
   javascript: "js",
+  sql: "sql",
 };
 
 const MONACO_LANG_MAP = {
@@ -41,6 +44,7 @@ const MONACO_LANG_MAP = {
   python: "python",
   java: "java",
   javascript: "javascript",
+  sql: "sql",
 };
 
 export default function LabWorkspace({
@@ -136,6 +140,23 @@ function main() {
 main();
 `;
 
+      case "sql":
+        return `-- SQL Workspace
+-- Write your SQL queries below.
+-- Create tables, insert data, and run SELECT queries.
+
+-- Example:
+CREATE TABLE student (
+    id   INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+INSERT INTO student VALUES (1, 'Alice');
+INSERT INTO student VALUES (2, 'Bob');
+
+SELECT * FROM student;
+`;
+
       default:
         return `/**
  * Write your code here
@@ -169,12 +190,18 @@ main();
   // Derive supported languages purely from referenceSolution keys.
   // Falls back to an explicit subExp.supportedLanguages field only if no
   // reference solution languages are defined at all.
-  // SQL/SQLite is never offered in the code editor.
+  // Derive supported languages purely from referenceSolution keys.
+  // If referenceSolution contains only SQL keys (DBMS experiments), keep sql.
+  // Otherwise filter out SQL and fall back to ["c"] if nothing else remains.
   const supportedLanguages = useMemo(() => {
+    const sqlKeys = new Set(["sql", "sqlite"]);
     const excludeSql = (langs) =>
-      langs.filter((lang) => lang !== "sql" && lang !== "sqlite");
+      langs.filter((lang) => !sqlKeys.has(lang));
 
     if (refSolKeys.length > 0) {
+      // If every key is SQL-based, expose exactly ["sql"]
+      const allSql = refSolKeys.every((k) => sqlKeys.has(k));
+      if (allSql) return ["sql"];
       const filtered = excludeSql(refSolKeys);
       return filtered.length > 0 ? filtered : ["c"];
     }
@@ -183,6 +210,8 @@ main();
       ? subExp.supportedLanguages
       : ["c"];
 
+    const allSql = fallback.every((k) => sqlKeys.has(k));
+    if (allSql) return ["sql"];
     const filtered = excludeSql(fallback);
     return filtered.length > 0 ? filtered : ["c"];
   }, [subExp, refSolKeys]);
@@ -212,6 +241,64 @@ main();
   const [inputValue, setInputValue] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [saveStatus, setSaveStatus] = useState("Saved");
+
+  const [showJournalModal, setShowJournalModal] = useState(false);
+  const [journalPdfUrl, setJournalPdfUrl] = useState("");
+  const [journalPdfBlob, setJournalPdfBlob] = useState(null);
+  const [isGeneratingJournal, setIsGeneratingJournal] = useState(false);
+
+  useEffect(() => {
+    if (!showJournalModal) {
+      if (journalPdfUrl) {
+        URL.revokeObjectURL(journalPdfUrl);
+        setJournalPdfUrl("");
+      }
+      setJournalPdfBlob(null);
+      return;
+    }
+
+    let active = true;
+    setIsGeneratingJournal(true);
+
+    async function loadPdf() {
+      try {
+        const bytes = await generateJournalPdf({
+          experiment,
+          subPart,
+          codeText: code,
+          outputText: consoleOutput
+        });
+        if (!active) return;
+        const blob = new Blob([bytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        setJournalPdfBlob(blob);
+        setJournalPdfUrl(url);
+      } catch (err) {
+        console.error("Failed to generate journal PDF:", err);
+      } finally {
+        if (active) {
+          setIsGeneratingJournal(false);
+        }
+      }
+    }
+
+    loadPdf();
+
+    return () => {
+      active = false;
+    };
+  }, [showJournalModal, experiment, subPart, code, consoleOutput]);
+
+  const handleDownloadJournalPdf = () => {
+    if (!journalPdfBlob) return;
+    const url = URL.createObjectURL(journalPdfBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    const filename = `${(subExp?.title || "Journal").replace(/\s+/g, "_")}_Record.pdf`;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   // Viva Q&A
   const [vivaQAPairs, setVivaQAPairs] = useState([]);
@@ -884,12 +971,7 @@ main();
           )}
           <button
             className="bg-[#5521FF] text-white border-none px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-all duration-150 shadow-[0_2px_6px_rgba(85,33,255,0.2)] font-sans hover:brightness-110"
-            onClick={() =>
-              onNavigate?.("journal-view", {
-                experimentId: experiment?._id,
-                subPart,
-              })
-            }
+            onClick={() => setShowJournalModal(true)}
           >
             Generate Journal
           </button>
@@ -1149,6 +1231,64 @@ main();
           </Panel>
         )}
       </Group>
+
+      {/* Journal Preview Modal */}
+      {showJournalModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-[#FAFAFA] w-full max-w-[900px] h-[90vh] rounded-[24px] shadow-2xl flex flex-col overflow-hidden border border-slate-200/50">
+            {/* Header */}
+            <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
+              <div className="flex items-center space-x-3.5">
+                <button 
+                  onClick={() => setShowJournalModal(false)}
+                  className="text-slate-500 hover:text-slate-800 border border-slate-200 p-2 bg-white hover:bg-slate-50 rounded-full transition-all flex items-center justify-center cursor-pointer active:scale-95"
+                  title="Close Preview"
+                >
+                  <ArrowLeft className="w-4 h-4 text-slate-600" />
+                </button>
+                <div>
+                  <h1 className="font-bold text-slate-800 text-sm leading-tight">Practical Journal Preview</h1>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Engineering Portal V4.2</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <button 
+                  onClick={handleDownloadJournalPdf}
+                  disabled={isGeneratingJournal || !journalPdfBlob}
+                  className="bg-[#630ed4] hover:bg-[#520cb2] disabled:opacity-50 text-white text-xs font-bold px-6 py-2.5 rounded-full shadow-md cursor-pointer transition-all active:scale-95"
+                >
+                  Download PDF
+                </button>
+                <button 
+                  onClick={() => setShowJournalModal(false)}
+                  className="text-slate-400 hover:text-slate-600 p-2 rounded-full cursor-pointer transition-all hover:bg-slate-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Preview Frame */}
+            <div className="flex-1 p-6 flex items-center justify-center bg-slate-100/50">
+              {isGeneratingJournal ? (
+                <div className="flex flex-col items-center space-y-3">
+                  <Loader2 className="w-8 h-8 text-[#630ed4] animate-spin" />
+                  <span className="text-slate-500 font-semibold text-xs">Generating Journal PDF...</span>
+                </div>
+              ) : journalPdfUrl ? (
+                <iframe 
+                  src={`${journalPdfUrl}#navpanes=0&toolbar=1`}
+                  title="Practical Journal PDF Preview"
+                  className="w-full h-full border border-slate-200 rounded-[20px] shadow-lg bg-white"
+                />
+              ) : (
+                <span className="text-slate-400 text-xs font-semibold">Failed to load preview</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

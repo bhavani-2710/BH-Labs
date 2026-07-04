@@ -21,7 +21,15 @@ const runCode = async (req, res) => {
       return res.status(400).json({ error: "compiler and code are required" });
     }
 
-    const wandboxBody = { compiler, code };
+    let finalCode = code;
+    // For Java compilations, strip the "public" keyword from class definitions
+    // because Wandbox saves the primary code file as prog.java, which triggers
+    // a compilation error if any public class is not named "prog".
+    if (compiler.includes("openjdk") || req.body.language === "java") {
+      finalCode = code.replace(/\bpublic\s+class\s+(\w+)/g, "class $1");
+    }
+
+    const wandboxBody = { compiler, code: finalCode };
     if (stdin) wandboxBody.stdin = stdin;
 
     const response = await fetch("https://wandbox.org/api/compile.json", {

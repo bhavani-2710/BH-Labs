@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate, useParams } from "react-router-dom";
+import { Routes, Route, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import LandingPage from "./pages/LandingPage";
@@ -110,8 +110,14 @@ function WorkspaceWrapper({ experiments, subjects, codeStore, onSaveCode }) {
       onSaveCode={onSaveCode}
       onBack={() => navigate(-1)}
       onNavigate={(page, params) => {
-        if (page === "journal")
-          navigate(`/journal/${params.experimentId}/${params.part || "a"}`);
+        if (page === "journal" || page === "journal-view") {
+          navigate(`/journal/${params.experimentId}/${params.subPart || params.part || "a"}`, {
+            state: {
+              codeText: params.codeText,
+              outputText: params.outputText
+            }
+          });
+        }
       }}
     />
   );
@@ -190,14 +196,19 @@ function TestInstructionWrapper({ subjects }) {
 function JournalWrapper({ experiments, codeStore }) {
   const { experimentId, part } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const experiment = experiments.find((e) => e._id === experimentId);
   const key = `${experimentId}_${part || "a"}`;
+
+  const codeText = location.state?.codeText || codeStore[key] || "";
+  const outputText = location.state?.outputText || "";
 
   return (
     <PracticalJournal
       experiment={experiment}
       subPart={part || "a"}
-      codeText={codeStore[key] || ""}
+      codeText={codeText}
+      outputText={outputText}
       onBack={() => navigate(-1)}
     />
   );
