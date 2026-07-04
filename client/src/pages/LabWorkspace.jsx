@@ -1,16 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import Editor from "@monaco-editor/react";
-import FlowchartRenderer from "../components/FlowchartRenderer";
-import MarkdownRenderer from "../components/MarkdownRenderer";
-import { Panel, Group, Separator, usePanelRef } from "react-resizable-panels";
+import { Panel, Group, Separator } from "react-resizable-panels";
 import {
   ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
   Loader2,
-  PanelLeftClose,
-  PanelLeftOpen,
-  SendHorizontal,
   X,
 } from "lucide-react";
 import monacoCustomTheme from "../utils/monacoCustomTheme";
@@ -63,8 +56,7 @@ export default function LabWorkspace({
   const [activeLeftTab, setActiveLeftTab] = useState("theory");
   const [activeRightTab, setActiveRightTab] = useState("assistant");
 
-  // Boilerplate fallback templates (starterCode field no longer exists in DB,
-  // so this switch is now the sole source of starter templates).
+  // Boilerplate templates 
   const getTemplate = (lang) => {
     switch (lang) {
       case "c":
@@ -74,7 +66,7 @@ export default function LabWorkspace({
  */
 #include <stdio.h>
 
-int main(void) {
+int main() {
     // Write your code here
 
     return 0;
@@ -92,24 +84,22 @@ int main() {
     // Write your code here
 
     return 0;
-}
-`;
-
+}`;
       case "python":
         return `"""
+main.py
 Module entry point.
 """
 
 
-def main() -> None:
+def main():
     """Program entry point."""
     # Write your code here
     pass
 
 
 if __name__ == "__main__":
-    main()
-`;
+    main()`;
 
       case "java":
         return `/**
@@ -119,7 +109,6 @@ class Main {
 
     /**
      * Program entry point.
-     *
      * @param args command-line arguments
      */
     public static void main(String[] args) {
@@ -141,8 +130,7 @@ main();
 `;
 
       case "sql":
-        return `-- SQL Workspace
--- Write your SQL queries below.
+        return `-- Write your SQL queries below.
 -- Create tables, insert data, and run SELECT queries.
 
 -- Example:
@@ -158,10 +146,7 @@ SELECT * FROM student;
 `;
 
       default:
-        return `/**
- * Write your code here
- */
-`;
+        return `// Write your code here\n`;
     }
   };
 
@@ -174,6 +159,7 @@ SELECT * FROM student;
     } else {
       val = solutions[lang] || "";
     }
+    return val;
     return val;
   };
 
@@ -195,8 +181,7 @@ SELECT * FROM student;
   // Otherwise filter out SQL and fall back to ["c"] if nothing else remains.
   const supportedLanguages = useMemo(() => {
     const sqlKeys = new Set(["sql", "sqlite"]);
-    const excludeSql = (langs) =>
-      langs.filter((lang) => !sqlKeys.has(lang));
+    const excludeSql = (langs) => langs.filter((lang) => !sqlKeys.has(lang));
 
     if (refSolKeys.length > 0) {
       // If every key is SQL-based, expose exactly ["sql"]
@@ -266,7 +251,7 @@ SELECT * FROM student;
           experiment,
           subPart,
           codeText: code,
-          outputText: consoleOutput
+          outputText: consoleOutput,
         });
         if (!active) return;
         const blob = new Blob([bytes], { type: "application/pdf" });
@@ -448,7 +433,10 @@ SELECT * FROM student;
 
   // Runs when language changes — load from codeByLang or starter template
   useEffect(() => {
-    if (codeByLang[editorLanguage] !== undefined && codeByLang[editorLanguage] !== "") {
+    if (
+      codeByLang[editorLanguage] !== undefined &&
+      codeByLang[editorLanguage] !== ""
+    ) {
       setCode(codeByLang[editorLanguage]);
     } else {
       setCode(getTemplate(editorLanguage));
@@ -457,7 +445,10 @@ SELECT * FROM student;
 
   // Keep editorLanguage in sync if supportedLanguages list shifts
   useEffect(() => {
-    if (supportedLanguages.length > 0 && !supportedLanguages.includes(editorLanguage)) {
+    if (
+      supportedLanguages.length > 0 &&
+      !supportedLanguages.includes(editorLanguage)
+    ) {
       setEditorLanguage(supportedLanguages[0]);
     }
   }, [supportedLanguages, editorLanguage]);
@@ -1023,7 +1014,7 @@ SELECT * FROM student;
           <Group orientation="vertical">
             <Panel
               defaultSize={"72%"}
-              minSize={"50%"}
+              minSize={"20%"}
               className="flex flex-col min-h-0"
             >
               <div className="flex items-center bg-[#F4F4F5] border-b border-[#E4E4E7] h-[34px] shrink-0">
@@ -1077,7 +1068,7 @@ SELECT * FROM student;
             <Panel
               defaultSize={"28%"}
               minSize={"5%"}
-              maxSize={"50%"}
+              maxSize={"80%"}
               className="flex flex-col min-h-0 border-t border-[#E4E4E7] bg-[#F4F4F5]"
             >
               <div className="flex items-center gap-3 px-3 border-b border-[#E4E4E7] bg-[#F9F9FB] shrink-0">
@@ -1239,7 +1230,7 @@ SELECT * FROM student;
             {/* Header */}
             <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
               <div className="flex items-center space-x-3.5">
-                <button 
+                <button
                   onClick={() => setShowJournalModal(false)}
                   className="text-slate-500 hover:text-slate-800 border border-slate-200 p-2 bg-white hover:bg-slate-50 rounded-full transition-all flex items-center justify-center cursor-pointer active:scale-95"
                   title="Close Preview"
@@ -1247,20 +1238,24 @@ SELECT * FROM student;
                   <ArrowLeft className="w-4 h-4 text-slate-600" />
                 </button>
                 <div>
-                  <h1 className="font-bold text-slate-800 text-sm leading-tight">Practical Journal Preview</h1>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Engineering Portal V4.2</p>
+                  <h1 className="font-bold text-slate-800 text-sm leading-tight">
+                    Practical Journal Preview
+                  </h1>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                    Engineering Portal V4.2
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3">
-                <button 
+                <button
                   onClick={handleDownloadJournalPdf}
                   disabled={isGeneratingJournal || !journalPdfBlob}
                   className="bg-[#630ed4] hover:bg-[#520cb2] disabled:opacity-50 text-white text-xs font-bold px-6 py-2.5 rounded-full shadow-md cursor-pointer transition-all active:scale-95"
                 >
                   Download PDF
                 </button>
-                <button 
+                <button
                   onClick={() => setShowJournalModal(false)}
                   className="text-slate-400 hover:text-slate-600 p-2 rounded-full cursor-pointer transition-all hover:bg-slate-100"
                 >
@@ -1274,16 +1269,20 @@ SELECT * FROM student;
               {isGeneratingJournal ? (
                 <div className="flex flex-col items-center space-y-3">
                   <Loader2 className="w-8 h-8 text-[#630ed4] animate-spin" />
-                  <span className="text-slate-500 font-semibold text-xs">Generating Journal PDF...</span>
+                  <span className="text-slate-500 font-semibold text-xs">
+                    Generating Journal PDF...
+                  </span>
                 </div>
               ) : journalPdfUrl ? (
-                <iframe 
+                <iframe
                   src={`${journalPdfUrl}#navpanes=0&toolbar=1`}
                   title="Practical Journal PDF Preview"
                   className="w-full h-full border border-slate-200 rounded-[20px] shadow-lg bg-white"
                 />
               ) : (
-                <span className="text-slate-400 text-xs font-semibold">Failed to load preview</span>
+                <span className="text-slate-400 text-xs font-semibold">
+                  Failed to load preview
+                </span>
               )}
             </div>
           </div>

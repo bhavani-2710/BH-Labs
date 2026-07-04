@@ -983,17 +983,18 @@ const experiments = [
           "Memory Segments",
         ],
         hints: [
-          "Static variables retain their values across multiple function calls and are initialized only once.",
-          "Use the 'extern' keyword to share a variable definition across multiple translation units.",
-          "The 'register' keyword is a hint to the compiler to store the variable in a CPU register for faster access.",
+          "Local variables are 'auto' by default and exist only while the function executes.",
+          "A static variable retains its value between successive function calls because it is initialized only once.",
+          "Use the 'extern' keyword to access a global variable declared outside the current function.",
+          "The 'register' keyword suggests that the compiler store the variable in a CPU register for faster access, although the compiler may ignore this request.",
         ],
         difficulty: "Medium",
         problemStatement:
           "Write a program to demonstrate Auto, Extern, Static, and Register storage classes.",
         theory:
-          "Storage classes define the scope, lifetime, and visibility of variables. Auto is the default for local variables, created and destroyed with the function. Extern declares a variable defined in another file or globally. Static preserves the variable's value between function calls and limits scope to the file. Register suggests storing the variable in a CPU register for faster access.",
+          "Storage classes determine the scope, lifetime and storage location of variables in C. The auto storage class is the default for local variables and they exist only during function execution. A static variable retains its value between function calls and is initialized only once. The extern keyword allows a function to access a global variable declared outside its scope. The register storage class suggests that the compiler store frequently used variables in CPU registers for faster access, although the compiler may choose a different storage location.",
         algorithm:
-          "1. Start\n2. Demonstrate auto variable inside a function\n3. Demonstrate static variable that retains its value across calls\n4. Demonstrate extern variable shared across files\n5. Demonstrate register variable for fast access\n6. Display results\n7. Stop",
+          "1. Start\n 2. Declare auto variables inside main() and display them\n 3. Access a global variable using the extern keyword\n 4. Call a function multiple times to demonstrate that a static variable retains its value\n 5. Demonstrate a register variable inside a loop\n 6. Display the results\n 7. Stop",
         flowchart: {
           nodes: [
             {
@@ -1004,25 +1005,30 @@ const experiments = [
             {
               id: "2",
               type: "process",
-              label: "auto int x = 10",
+              label: "Declare auto variables",
             },
             {
               id: "3",
               type: "process",
-              label: "static int count = 0; count++",
+              label: "Access global variable using extern",
             },
             {
               id: "4",
               type: "process",
-              label: "register int r = 5",
+              label: "Call staticDemo() repeatedly",
             },
             {
               id: "5",
-              type: "output",
-              label: "Display all variables",
+              type: "process",
+              label: "Demonstrate register variable",
             },
             {
               id: "6",
+              type: "output",
+              label: "Display results",
+            },
+            {
+              id: "7",
               type: "end",
               label: "Stop",
             },
@@ -1047,6 +1053,10 @@ const experiments = [
             {
               source: "5",
               target: "6",
+            },
+            {
+              source: "6",
+              target: "7",
             },
           ],
         },
@@ -1073,84 +1083,41 @@ const experiments = [
         part: "a",
         title: "1D Array",
         concepts: [
-          "Contiguous Memory",
-          "Array Indexing",
-          "Traversal Operations",
+          "One-Dimensional Arrays",
+          "Array Traversal",
+          "Insertion, Deletion & Update",
+          "Linear Search",
         ],
         hints: [
-          "Remember that arrays are zero-indexed, meaning elements range from index 0 to size - 1.",
-          "Use a loop to iterate through the indices of the array to read or print elements.",
+          "Remember that array indices range from 0 to n - 1.",
+          "Use loops to traverse, insert, delete, search and update array elements.",
+          "Insertion and deletion require shifting elements to maintain the array structure.",
         ],
         difficulty: "Medium",
         problemStatement:
           "Write a program to demonstrate 1D Array operations in C.",
         theory:
-          "A 1D array is a collection of elements of the same data type stored in contiguous memory locations. Elements are accessed using an index starting from 0. Common operations include traversal, insertion, deletion, searching, and sorting.",
+          "A one-dimensional array is a collection of elements of the same data type stored in contiguous memory locations. Elements are accessed using zero-based indexing. Common operations include traversal, insertion, deletion, searching, and updating elements. Since arrays have fixed size, insertion and deletion involve shifting elements to maintain continuity.",
         algorithm:
-          "1. Start\n2. Declare array of size n\n3. Read n elements into the array\n4. Traverse and display all elements\n5. Search for an element using linear search\n6. Sort the array using bubble sort\n7. Display sorted array\n8. Stop",
+          "1. Start\n 2. Read the number of elements n\n 3. Read the array elements\n 4. Display a menu of operations\n 5. Based on the user's choice:\n       a. Display the array\n       b. Insert an element at a specified position\n       c. Delete an element from a specified position\n       d. Search for an element using linear search\n       e. Update an existing element\n 6. Repeat until Exit is selected\n 7. Stop",
         flowchart: {
           nodes: [
-            {
-              id: "1",
-              type: "start",
-              label: "Start",
-            },
-            {
-              id: "2",
-              type: "input",
-              label: "Read n",
-            },
-            {
-              id: "3",
-              type: "input",
-              label: "Read n elements",
-            },
-            {
-              id: "4",
-              type: "output",
-              label: "Display elements",
-            },
-            {
-              id: "5",
-              type: "process",
-              label: "Sort array",
-            },
-            {
-              id: "6",
-              type: "output",
-              label: "Display sorted array",
-            },
-            {
-              id: "7",
-              type: "end",
-              label: "Stop",
-            },
+            { id: "1", type: "start", label: "Start" },
+            { id: "2", type: "input", label: "Read array" },
+            { id: "3", type: "process", label: "Display menu" },
+            { id: "4", type: "decision", label: "Select operation" },
+            { id: "5", type: "process", label: "Perform selected operation" },
+            { id: "6", type: "decision", label: "Exit?" },
+            { id: "7", type: "end", label: "Stop" },
           ],
           edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-            },
-            {
-              source: "4",
-              target: "5",
-            },
-            {
-              source: "5",
-              target: "6",
-            },
-            {
-              source: "6",
-              target: "7",
-            },
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4" },
+            { source: "4", target: "5" },
+            { source: "5", target: "6" },
+            { source: "6", target: "3", label: "No" },
+            { source: "6", target: "7", label: "Yes" },
           ],
         },
         referenceSolution: {
@@ -1160,88 +1127,50 @@ const experiments = [
           {
             input: "5\n4 1 3 5 2\n1\n6",
             output:
-              "Enter number of elements: Enter array elements:\n\n--- 1D Array Operations ---\n1. Display\n2. Insert\n3. Delete\n4. Search\n5. Update\n6. Exit\nEnter choice: Array elements: 4 1 3 5 2 \n\n--- 1D Array Operations ---\n1. Display\n2. Insert\n3. Delete\n4. Search\n5. Update\n6. Exit\nEnter choice: ",
+              "Enter number of elements: 5\nEnter array elements: 4 1 3 5 2\n\n--- 1D Array Operations ---\n1. Display\n2. Insert\n3. Delete\n4. Search\n5. Update\n6. Exit\nEnter choice: 1\nArray elements: 4 1 3 5 2 \n\n--- 1D Array Operations ---\n1. Display\n2. Insert\n3. Delete\n4. Search\n5. Update\n6. Exit\nEnter choice: 6",
           },
         ],
       },
       {
         part: "b",
         title: "2D Array",
-        concepts: ["Matrices", "Nested Loops", "Row-Major Order"],
+        concepts: [
+          "Two-Dimensional Arrays",
+          "Matrix Operations",
+          "Nested Loops",
+          "Matrix Traversal",
+        ],
         hints: [
-          "Access elements in a 2D array using double indexing, e.g., matrix[row][col].",
-          "Use nested loops to traverse rows and columns for input, output, or calculation.",
+          "Use nested loops to read and display matrix elements.",
+          "Matrix addition requires both matrices to have identical dimensions.",
+          "Matrix multiplication is possible only when the number of columns of the first matrix equals the number of rows of the second matrix.",
+          "The transpose of a matrix is obtained by interchanging rows and columns.",
         ],
         difficulty: "Medium",
         problemStatement:
           "Write a program to demonstrate 2D Array (Matrix) operations in C.",
         theory:
-          "A 2D array is an array of arrays, representing a matrix with rows and columns. Elements are accessed using two indices arr[row][col]. Common operations include matrix addition, subtraction, multiplication, and transpose.",
+          "A two-dimensional array represents data in rows and columns and is commonly used to store matrices. Matrix elements are accessed using two indices. Common operations include displaying matrices, matrix addition, matrix multiplication, and transpose. Matrix addition requires identical dimensions, while multiplication requires the number of columns of the first matrix to equal the number of rows of the second matrix.",
         algorithm:
-          "1. Start\n2. Read dimensions m x n for two matrices A and B\n3. Read elements of matrix A\n4. Read elements of matrix B\n5. Add matrices A and B to get C\n6. Display matrix C\n7. Multiply matrices if dimensions allow\n8. Stop",
+          "1. Start\n 2. Read the dimensions and elements of matrix A\n 3. Read the dimensions and elements of matrix B\n 4. Display a menu of matrix operations\n 5. Based on the user's choice:\n       a. Display both matrices\n       b. Add matrices if dimensions match\n       c. Multiply matrices if dimensions permit\n       d. Display transpose of matrix A\n 6. Repeat until Exit is selected\n 7. Stop",
         flowchart: {
           nodes: [
-            {
-              id: "1",
-              type: "start",
-              label: "Start",
-            },
-            {
-              id: "2",
-              type: "input",
-              label: "Read m, n",
-            },
-            {
-              id: "3",
-              type: "input",
-              label: "Read matrix A",
-            },
-            {
-              id: "4",
-              type: "input",
-              label: "Read matrix B",
-            },
-            {
-              id: "5",
-              type: "process",
-              label: "C[i][j] = A[i][j] + B[i][j]",
-            },
-            {
-              id: "6",
-              type: "output",
-              label: "Display matrix C",
-            },
-            {
-              id: "7",
-              type: "end",
-              label: "Stop",
-            },
+            { id: "1", type: "start", label: "Start" },
+            { id: "2", type: "input", label: "Read matrices" },
+            { id: "3", type: "process", label: "Display menu" },
+            { id: "4", type: "decision", label: "Select operation" },
+            { id: "5", type: "process", label: "Perform selected operation" },
+            { id: "6", type: "decision", label: "Exit?" },
+            { id: "7", type: "end", label: "Stop" },
           ],
           edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-            },
-            {
-              source: "4",
-              target: "5",
-            },
-            {
-              source: "5",
-              target: "6",
-            },
-            {
-              source: "6",
-              target: "7",
-            },
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4" },
+            { source: "4", target: "5" },
+            { source: "5", target: "6" },
+            { source: "6", target: "3", label: "No" },
+            { source: "6", target: "7", label: "Yes" },
           ],
         },
         referenceSolution: {
@@ -1251,7 +1180,7 @@ const experiments = [
           {
             input: "2 2\n1 2\n3 4\n2 2\n5 6\n7 8\n1\n5",
             output:
-              "Enter rows and columns of matrix A: Enter elements of matrix A:\nEnter rows and columns of matrix B: Enter elements of matrix B:\n\n--- Matrix Operations ---\n1. Display Matrices\n2. Addition\n3. Multiplication\n4. Transpose of A\n5. Exit\nEnter choice: \nMatrix A:\n1 2 \n3 4 \n\nMatrix B:\n5 6 \n7 8 \n\n--- Matrix Operations ---\n1. Display Matrices\n2. Addition\n3. Multiplication\n4. Transpose of A\n5. Exit\nEnter choice: ",
+              "Enter rows and columns of matrix A: 2 2\nEnter elements of matrix A: 1 2\n                            3 4\nEnter rows and columns of matrix B: 2 2\nEnter elements of matrix B: 5 6\n                            7 8\n\n--- Matrix Operations ---\n1. Display Matrices\n2. Addition\n3. Multiplication\n4. Transpose of A\n5. Exit\nEnter choice: \nMatrix A:\n1 2 \n3 4 \n\nMatrix B:\n5 6 \n7 8 \n\n--- Matrix Operations ---\n1. Display Matrices\n2. Addition\n3. Multiplication\n4. Transpose of A\n5. Exit\nEnter choice: 5",
           },
         ],
       },
@@ -1364,7 +1293,7 @@ const experiments = [
           {
             input: "Hello\nWorld\n1\n6",
             output:
-              "Enter first string: Enter second string: \n--- STRING OPERATIONS ---\n1. Length\n2. Copy\n3. Concatenate\n4. Compare\n5. Display Strings\n6. Exit\nEnter choice: Length of str1 = 5\nLength of str2 = 5\n\n--- STRING OPERATIONS ---\n1. Length\n2. Copy\n3. Concatenate\n4. Compare\n5. Display Strings\n6. Exit\nEnter choice: ",
+              "Enter first string: Hello\nEnter second string: World\n--- STRING OPERATIONS ---\n1. Length\n2. Copy\n3. Concatenate\n4. Compare\n5. Display Strings\n6. Exit\nEnter choice: 1\nLength of str1 = 5\nLength of str2 = 5\n\n--- STRING OPERATIONS ---\n1. Length\n2. Copy\n3. Concatenate\n4. Compare\n5. Display Strings\n6. Exit\nEnter choice: 6",
           },
         ],
       },
@@ -1459,7 +1388,7 @@ const experiments = [
           {
             input: "3\nZebra\nApple\nMango\n1\n5",
             output:
-              "Enter number of strings: Enter 3 strings:\n\n--- ARRAY OF STRINGS OPERATIONS ---\n1. Display Strings\n2. Sort Strings (Alphabetical)\n3. Search String\n4. Reverse Each String\n5. Exit\nEnter choice: \nStrings:\nZebra\nApple\nMango\n\n--- ARRAY OF STRINGS OPERATIONS ---\n1. Display Strings\n2. Sort Strings (Alphabetical)\n3. Search String\n4. Reverse Each String\n5. Exit\nEnter choice: ",
+              "Enter number of strings: 3\nEnter 3 strings: Zebra\n                 Apple\n                 Mango\n\n--- ARRAY OF STRINGS OPERATIONS ---\n1. Display Strings\n2. Sort Strings (Alphabetical)\n3. Search String\n4. Reverse Each String\n5. Exit\nEnter choice: 1\nStrings:\nZebra\nApple\nMango\n\n--- ARRAY OF STRINGS OPERATIONS ---\n1. Display Strings\n2. Sort Strings (Alphabetical)\n3. Search String\n4. Reverse Each String\n5. Exit\nEnter choice: 5",
           },
         ],
       },
@@ -1533,11 +1462,26 @@ const experiments = [
             },
             {
               id: "8",
-              type: "output",
-              label: "Display student[i] details",
+              type: "process",
+              label: "j = 0",
             },
             {
               id: "9",
+              type: "decision",
+              label: "j < n?",
+            },
+            {
+              id: "10",
+              type: "output",
+              label: "Display student[j] details",
+            },
+            {
+              id: "11",
+              type: "process",
+              label: "j++",
+            },
+            {
+              id: "12",
               type: "end",
               label: "Stop",
             },
@@ -1562,7 +1506,7 @@ const experiments = [
             {
               source: "5",
               target: "6",
-              label: "Yes (Input Phase)",
+              label: "Yes",
             },
             {
               source: "6",
@@ -1575,22 +1519,40 @@ const experiments = [
             {
               source: "5",
               target: "8",
-              label: "No (Start Display)",
+              label: "No",
             },
             {
               source: "8",
               target: "9",
             },
+            {
+              source: "9",
+              target: "10",
+              label: "Yes",
+            },
+            {
+              source: "10",
+              target: "11",
+            },
+            {
+              source: "11",
+              target: "9",
+            },
+            {
+              source: "9",
+              target: "12",
+              label: "No",
+            },
           ],
         },
         referenceSolution: {
-          c: '#include <stdio.h>\n\n#define MAX 100\n\n// Structure definition\nstruct Student {\n    int rollNo;\n    char name[50];\n    char branch[50];\n    float marks;\n};\n\nint main() {\n    struct Student s[MAX];\n    int n;\n\n    // Input number of students\n    printf("Enter number of students: ");\n    scanf("%d", &n);\n\n    // Input student details\n    for (int i = 0; i < n; i++) {\n        printf("\\n--- Enter details of student %d ---\\n", i + 1);\n\n        printf("Roll No: ");\n        scanf("%d", &s[i].rollNo);\n\n        printf("Name: ");\n        scanf(" %[^\\n]", s[i].name);\n\n        printf("Branch: ");\n        scanf(" %[^\\n]", s[i].branch);\n\n        printf("Marks: ");\n        scanf("%f", &s[i].marks);\n    }\n\n    // Display student details\n    printf("\\n===== STUDENT DETAILS =====\\n");\n    for (int i = 0; i < n; i++) {\n        printf("\\nStudent %d\\n", i + 1);\n        printf("Roll No : %d\\n", s[i].rollNo);\n        printf("Name    : %s\\n", s[i].name);\n        printf("Branch  : %s\\n", s[i].branch);\n        printf("Marks   : %.2f\\n", s[i].marks);\n    }\n\n    return 0;\n}\n\n/*\nTIME COMPLEXITY: O(n)\nSPACE COMPLEXITY: O(n)\n\nCONCEPTS:\n- Structures in C\n- Array of structures\n- Input/output using scanf/printf\n- Loop traversal of records\n*/',
+          c: '#include <stdio.h>\n\n#define MAX 100\n\n// Structure definition\nstruct Student {\n    int rollNo;\n    char name[50];\n    char branch[50];\n    float marks;\n};\n\nint main() {\n    struct Student s[MAX];\n    int n;\n\n    // Input number of students\n    printf("Enter number of students: ");\n    scanf("%d", &n);\n\n    // Input student details\n    for (int i = 0; i < n; i++) {\n        printf("\\n--- Enter details of student %d ---\\n", i + 1);\n\n        printf("Roll No: ");\n        scanf("%d", &s[i].rollNo);\n\n        printf("Name: ");\n        scanf(" %[^\\n]", s[i].name);\n\n        printf("Branch: ");\n        scanf(" %[^\\n]", s[i].branch);\n\n        printf("Marks: ");\n        scanf("%f", &s[i].marks);\n    }\n\n    // Display student details\n    printf("\\n\\n===== STUDENT DETAILS =====\\n");\n    for (int i = 0; i < n; i++) {\n        printf("\\nStudent %d\\n", i + 1);\n        printf("Roll No : %d\\n", s[i].rollNo);\n        printf("Name    : %s\\n", s[i].name);\n        printf("Branch  : %s\\n", s[i].branch);\n        printf("Marks   : %.2f\\n", s[i].marks);\n    }\n\n    return 0;\n}\n\n/*\nTIME COMPLEXITY: O(n)\nSPACE COMPLEXITY: O(n)\n\nCONCEPTS:\n- Structures in C\n- Array of structures\n- Input/output using scanf/printf\n- Loop traversal of records\n*/',
         },
         samples: [
           {
             input: "2\n1\nAlice\nCS\n95.5\n2\nBob\nIT\n88.0",
             output:
-              "Enter number of students: \n--- Enter details of student 1 ---\nRoll No: Name: Branch: Marks: \n--- Enter details of student 2 ---\nRoll No: Name: Branch: Marks: \n===== STUDENT DETAILS =====\n\nStudent 1\nRoll No : 1\nName    : Alice\nBranch  : CS\nMarks   : 95.50\n\nStudent 2\nRoll No : 2\nName    : Bob\nBranch  : IT\nMarks   : 88.00\n",
+              "Enter number of students: 2\n--- Enter details of student 1 ---\nRoll No: 1\nName: Alice\nBranch: CS\nMarks: 95.5\n--- Enter details of student 2 ---\nRoll No: 2\nName: Bob\nBranch: IT\nMarks: 88.0\n\n===== STUDENT DETAILS =====\n\nStudent 1\nRoll No : 1\nName    : Alice\nBranch  : CS\nMarks   : 95.50\n\nStudent 2\nRoll No : 2\nName    : Bob\nBranch  : IT\nMarks   : 88.00\n",
           },
         ],
       },
@@ -1626,7 +1588,7 @@ const experiments = [
         theory:
           "A linked list is a dynamic linear data structure where each node contains data and a pointer to the next node. Unlike arrays, linked lists use non-contiguous memory and grow dynamically using malloc(). Each node is a self-referential structure containing a data field and a pointer to another node of the same type. Basic operations include insertion, deletion, and traversal.",
         algorithm:
-          "1. Start\n2. Define struct Node with data and next pointer\n3. Initialize head = NULL\n4. To insert: create node using malloc, attach at end or beginning\n5. To delete: search node, update links, free memory\n6. To display: traverse from head to NULL and print data\n7. Stop",
+          "1. Start\n2. Define struct Node with data and next pointer\n3. Initialize head = NULL\n4. Create a new node using malloc() and insert it at the end of the linked list\n5. Search for the node containing the given value, update the links, and free the deleted node\n6. To display: traverse from head to NULL and print data\n7. Stop",
         flowchart: {
           nodes: [
             {
@@ -1637,119 +1599,277 @@ const experiments = [
             {
               id: "2",
               type: "process",
-              label: "Define struct Node { data, *next }",
+              label: "Define struct Node & head = NULL",
             },
             {
               id: "3",
-              type: "process",
-              label: "head = NULL",
+              type: "output",
+              label: "Display Menu",
             },
             {
               id: "4",
-              type: "process",
-              label: "Insert node using malloc()",
+              type: "input",
+              label: "Read Choice",
             },
             {
               id: "5",
               type: "decision",
-              label: "Delete node?",
+              label: "Choice == Insert?",
             },
             {
               id: "6",
               type: "process",
-              label: "Update pointers & free node",
+              label: "Create node & Insert at end",
             },
             {
               id: "7",
-              type: "output",
-              label: "Traverse & display list",
+              type: "decision",
+              label: "Choice == Delete?",
             },
             {
               id: "8",
+              type: "process",
+              label: "Delete node by value",
+            },
+            {
+              id: "9",
+              type: "decision",
+              label: "Choice == Display?",
+            },
+            {
+              id: "10",
+              type: "output",
+              label: "Traverse & Display List",
+            },
+            {
+              id: "11",
+              type: "decision",
+              label: "Choice == Exit?",
+            },
+            {
+              id: "12",
               type: "end",
               label: "Stop",
             },
           ],
           edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-            },
-            {
-              source: "4",
-              target: "5",
-            },
-            {
-              source: "5",
-              target: "6",
-              label: "Yes",
-            },
-            {
-              source: "5",
-              target: "7",
-              label: "No",
-            },
-            {
-              source: "6",
-              target: "7",
-            },
-            {
-              source: "7",
-              target: "8",
-            },
+            { source: "1", target: "2" },
+            { source: "2", target: "3" },
+            { source: "3", target: "4" },
+            { source: "4", target: "5" },
+            { source: "5", target: "6", label: "Yes" },
+            { source: "6", target: "3" },
+            { source: "5", target: "7", label: "No" },
+            { source: "7", target: "8", label: "Yes" },
+            { source: "8", target: "3" },
+            { source: "7", target: "9", label: "No" },
+            { source: "9", target: "10", label: "Yes" },
+            { source: "10", target: "3" },
+            { source: "9", target: "11", label: "No" },
+            { source: "11", target: "12", label: "Yes" },
+            { source: "11", target: "3", label: "No" },
           ],
         },
         referenceSolution: {
-          c: '#include <stdio.h>\n#include <stdlib.h>\n\n// Node structure\nstruct Node {\n    int data;\n    struct Node *next;\n};\n\nstruct Node *head = NULL;\n\n// Create new node\nstruct Node* createNode(int value) {\n    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));\n    newNode->data = value;\n    newNode->next = NULL;\n    return newNode;\n}\n\n// Insert at end\nvoid insertEnd(int value) {\n    struct Node *newNode = createNode(value);\n\n    if (head == NULL) {\n        head = newNode;\n        return;\n    }\n\n    struct Node *temp = head;\n    while (temp->next != NULL) {\n        temp = temp->next;\n    }\n\n    temp->next = newNode;\n}\n\n// Delete node by value\nvoid deleteNode(int value) {\n    struct Node *temp = head, *prev = NULL;\n\n    if (temp != NULL && temp->data == value) {\n        head = temp->next;\n        free(temp);\n        return;\n    }\n\n    while (temp != NULL && temp->data != value) {\n        prev = temp;\n        temp = temp->next;\n    }\n\n    if (temp == NULL) {\n        printf("Value not found\\n");\n        return;\n    }\n\n    prev->next = temp->next;\n    free(temp);\n}\n\n// Display list\nvoid display() {\n    struct Node *temp = head;\n\n    if (temp == NULL) {\n        printf("List is empty\\n");\n        return;\n    }\n\n    while (temp != NULL) {\n        printf("%d -> ", temp->data);\n        temp = temp->next;\n    }\n    printf("NULL\\n");\n}\n\nint main() {\n    int choice, value;\n\n    while (1) {\n        printf("\\n--- Linked List Menu ---\\n");\n        printf("1. Insert\\n2. Delete\\n3. Display\\n4. Exit\\n");\n        printf("Enter choice: ");\n        scanf("%d", &choice);\n\n        switch (choice) {\n            case 1:\n                printf("Enter value: ");\n                scanf("%d", &value);\n                insertEnd(value);\n                break;\n\n            case 2:\n                printf("Enter value to delete: ");\n                scanf("%d", &value);\n                deleteNode(value);\n                break;\n\n            case 3:\n                display();\n                break;\n\n            case 4:\n                exit(0);\n\n            default:\n                printf("Invalid choice\\n");\n        }\n    }\n\n    return 0;\n}\n\n/*\nTIME COMPLEXITY:\n- Insert: O(n)\n- Delete: O(n)\n- Display: O(n)\n\nSPACE COMPLEXITY: O(n)\n\nCONCEPTS:\n- Linked list implementation\n- Dynamic memory allocation\n- Pointer manipulation\n- Traversal operations\n*/',
+          c: '#include <stdio.h>\n#include <stdlib.h>\n\n// Node structure\nstruct Node {\n    int data;\n    struct Node *next;\n};\n\nstruct Node *head = NULL;\n\n// Create new node\nstruct Node* createNode(int value) {\n    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));\n    newNode->data = value;\n    newNode->next = NULL;\n    return newNode;\n}\n\n// Insert at end\nvoid insertEnd(int value) {\n    struct Node *newNode = createNode(value);\n\n    if (head == NULL) {\n        head = newNode;\n        return;\n    }\n\n    struct Node *temp = head;\n    while (temp->next != NULL) {\n        temp = temp->next;\n    }\n\n    temp->next = newNode;\n}\n\n// Delete node by value\nvoid deleteNode(int value) {\n    struct Node *temp = head, *prev = NULL;\n\n    if (temp != NULL && temp->data == value) {\n        head = temp->next;\n        free(temp);\n        return;\n    }\n\n    while (temp != NULL && temp->data != value) {\n        prev = temp;\n        temp = temp->next;\n    }\n\n    if (temp == NULL) {\n        printf("Value not found\\n");\n        return;\n    }\n\n    prev->next = temp->next;\n    free(temp);\n}\n\n// Display list\nvoid display() {\n    struct Node *temp = head;\n\n    if (temp == NULL) {\n        printf("List is empty\\n");\n        return;\n    }\n\n    while (temp != NULL) {\n        printf("%d -> ", temp->data);\n        temp = temp->next;\n    }\n    printf("NULL\\n");\n}\n\nint main() {\n    int choice, value;\n\n    while (1) {\n        printf("\\n\\n--- Linked List Menu ---\\n");\n        printf("1. Insert\\n2. Delete\\n3. Display\\n4. Exit\\n");\n        printf("Enter choice: ");\n        scanf("%d", &choice);\n\n        switch (choice) {\n            case 1:\n                printf("Enter value: ");\n                scanf("%d", &value);\n                insertEnd(value);\n                break;\n\n            case 2:\n                printf("Enter value to delete: ");\n                scanf("%d", &value);\n                deleteNode(value);\n                break;\n\n            case 3:\n                display();\n                break;\n\n            case 4:\n                exit(0);\n\n            default:\n                printf("Invalid choice\\n");\n        }\n    }\n\n    return 0;\n}\n\n/*\nTIME COMPLEXITY:\n- Insert: O(n)\n- Delete: O(n)\n- Display: O(n)\n\nSPACE COMPLEXITY: O(n)\n\nCONCEPTS:\n- Linked list implementation\n- Dynamic memory allocation\n- Pointer manipulation\n- Traversal operations\n*/',
         },
         samples: [
           {
             input: "1\n10\n1\n20\n3\n2\n20\n3\n4",
             output:
-              "\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: Enter value: \n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: Enter value: \n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: 10 -> 20 -> NULL\n\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: Enter value to delete: \n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: 10 -> NULL\n\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: ",
+              "\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: 1\nEnter value: 10\n\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: 1\nEnter value: 20\n\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: 3\n10 -> 20 -> NULL\n\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: 2\nEnter value to delete: 20\n\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: 3\n10 -> NULL\n\n--- Linked List Menu ---\n1. Insert\n2. Delete\n3. Display\n4. Exit\nEnter choice: 4",
           },
         ],
       },
     ],
   },
+  // {
+  //   _id: new ObjectId("685b2a1f3c4e8d0012a7b311"),
+  //   subjectId: new ObjectId("685b2a1f3c4e8d0012a7b000"),
+  //   experimentNumber: 11,
+  //   problemStatement: "Program to demonstrate files and file handling",
+  //   subExperiments: [
+  //     {
+  //       part: "a",
+  //       title:
+  //         "Open a File to Store Student Records, Add, Update, and Display Records and Ensure Data Persistence",
+  //       problemStatement:
+  //         "Implement file handling in C to store student records, perform add/update/display operations, and ensure data persistence.",
+  //       concepts: [
+  //         "File Handling in C",
+  //         "File Modes (r, w, a)",
+  //         "File I/O Functions (fopen, fprintf, fscanf, fclose, fflush)",
+  //       ],
+  //       hints: [
+  //         "Open the file in write mode ('w') or append mode ('a') using fopen().",
+  //         "Check if the file pointer is NULL to ensure the file was opened successfully.",
+  //         "Use fprintf() / fscanf() for text files, or fwrite() / fread() to write and read structures directly in binary mode.",
+  //         "When updating records, you can read all records into memory, modify the target record, and write them back.",
+  //         "Close the file stream using fclose() after every operation to ensure all buffers are flushed to disk.",
+  //         "Avoid keeping the file open indefinitely to protect against data corruption during unexpected program termination.",
+  //       ],
+  //       difficulty: "Hard",
+  //       theory:
+  //         "File handling in C allows permanent storage of data using files. Structures can be written to files using fprintf() or fread(). Files are opened using modes like 'r' (read), 'w' (write), and 'a' (append). Data persistence is ensured by immediately writing updates to the file and properly closing it using fclose(). fflush() forces buffer data to be written to disk, ensuring integrity.",
+  //       algorithm:
+  //         "1. Start\n2. Define structure Student\n3. Implement file operations (open, read, write, append)\n4. Add student: open file in append mode and write record\n5. Display students: open file in read mode and read all records\n6. Update student: read all records, modify, and rewrite file\n7. Close all opened files using fclose() to save changes\n8. Stop",
+  //       flowchart: {
+  //         nodes: [
+  //           {
+  //             id: "1",
+  //             type: "start",
+  //             label: "Start",
+  //           },
+  //           {
+  //             id: "2",
+  //             type: "process",
+  //             label: "Define Student Structure",
+  //           },
+  //           {
+  //             id: "3",
+  //             type: "input",
+  //             label: "Display Menu & Read Choice",
+  //           },
+  //           {
+  //             id: "4",
+  //             type: "decision",
+  //             label: "Choice?",
+  //           },
+  //           {
+  //             id: "5",
+  //             type: "process",
+  //             label: "Open File (Append) & Add Record",
+  //           },
+  //           {
+  //             id: "6",
+  //             type: "process",
+  //             label: "Open File (Read) & Display Records",
+  //           },
+  //           {
+  //             id: "7",
+  //             type: "process",
+  //             label: "Open Files & Update Record",
+  //           },
+  //           {
+  //             id: "8",
+  //             type: "process",
+  //             label: "Close File(s)",
+  //           },
+  //           {
+  //             id: "9",
+  //             type: "decision",
+  //             label: "Exit?",
+  //           },
+  //           {
+  //             id: "10",
+  //             type: "end",
+  //             label: "Stop",
+  //           },
+  //         ],
+
+  //         edges: [
+  //           {
+  //             source: "1",
+  //             target: "2",
+  //           },
+  //           {
+  //             source: "2",
+  //             target: "3",
+  //           },
+  //           {
+  //             source: "3",
+  //             target: "4",
+  //           },
+
+  //           {
+  //             source: "4",
+  //             target: "5",
+  //             label: "Add",
+  //           },
+  //           {
+  //             source: "4",
+  //             target: "6",
+  //             label: "Display",
+  //           },
+  //           {
+  //             source: "4",
+  //             target: "7",
+  //             label: "Update",
+  //           },
+  //           {
+  //             source: "5",
+  //             target: "8",
+  //           },
+  //           {
+  //             source: "6",
+  //             target: "8",
+  //           },
+  //           {
+  //             source: "7",
+  //             target: "8",
+  //           },
+  //           {
+  //             source: "8",
+  //             target: "9",
+  //           },
+  //           {
+  //             source: "9",
+  //             target: "3",
+  //             label: "No",
+  //           },
+  //           {
+  //             source: "9",
+  //             target: "10",
+  //             label: "Yes",
+  //           },
+  //         ],
+  //       },
+  //       referenceSolution: {
+  //         c: '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nstruct Student {\n    int rollNo;\n    char name[50];\n    char branch[50];\n    float marks;\n};\n\nvoid addStudent() {\n    FILE *fp = fopen("students.txt", "a");\n    struct Student s;\n\n    if (fp == NULL) {\n        printf("Error opening file!\\n");\n        return;\n    }\n\n    printf("Enter Roll No: ");\n    scanf("%d", &s.rollNo);\n\n    printf("Enter Name: ");\n    scanf(" %[^\\n]", s.name);\n\n    printf("Enter Branch: ");\n    scanf(" %[^\\n]", s.branch);\n\n    printf("Enter Marks: ");\n    scanf("%f", &s.marks);\n\n    fprintf(fp, "%d %s %s %.2f\\n", s.rollNo, s.name, s.branch, s.marks);\n\n    fclose(fp);\n    printf("Student added successfully.\\n");\n}\n\nvoid displayStudents() {\n    FILE *fp = fopen("students.txt", "r");\n    struct Student s;\n\n    if (fp == NULL) {\n        printf("No records found!\\n");\n        return;\n    }\n\n    while (fscanf(fp, "%d %s %s %f", &s.rollNo, s.name, s.branch, &s.marks) != EOF) {\n        printf("%d %s %s %.2f\\n", s.rollNo, s.name, s.branch, s.marks);\n    }\n\n    fclose(fp);\n}\n\nvoid updateStudent() {\n    FILE *fp = fopen("students.txt", "r");\n    FILE *temp = fopen("temp.txt", "w");\n\n    struct Student s;\n    int roll, found = 0;\n\n    printf("Enter Roll No to update: ");\n    scanf("%d", &roll);\n\n    while (fscanf(fp, "%d %s %s %f", &s.rollNo, s.name, s.branch, &s.marks) != EOF) {\n        if (s.rollNo == roll) {\n            printf("Enter new name: ");\n            scanf(" %[^\\n]", s.name);\n\n            printf("Enter new branch: ");\n            scanf(" %[^\\n]", s.branch);\n\n            printf("Enter new marks: ");\n            scanf("%f", &s.marks);\n\n            found = 1;\n        }\n        fprintf(temp, "%d %s %s %.2f\\n", s.rollNo, s.name, s.branch, s.marks);\n    }\n\n    fclose(fp);\n    fclose(temp);\n\n    remove("students.txt");\n    rename("temp.txt", "students.txt");\n\n    if (found)\n        printf("Record updated successfully.\\n");\n    else\n        printf("Record not found.\\n");\n}\n\nint main() {\n    int choice;\n\n    while (1) {\n        printf("\\n1. Add\\n2. Display\\n3. Update\\n4. Exit\\n");\n        scanf("%d", &choice);\n\n        switch (choice) {\n            case 1: addStudent(); break;\n            case 2: displayStudents(); break;\n            case 3: updateStudent(); break;\n            case 4: exit(0);\n        }\n    }\n\n    return 0;\n}\n\n/*\nTIME COMPLEXITY:\n- Add: O(1)\n- Display: O(n)\n- Update: O(n)\n\nSPACE COMPLEXITY: O(1)\n\nCONCEPTS:\n- File handling\n- Structure serialization\n- Persistent storage\n- Menu-driven program\n*/',
+  //       },
+  //       samples: [
+  //         {
+  //           input: "1\n1\nAlice\nCS\n95.5\n2\n4",
+  //           output:
+  //             "\n1. Add\n2. Display\n3. Update\n4. Exit\nEnter Roll No: Enter Name: Enter Branch: Enter Marks: Student added successfully.\n\n1. Add\n2. Display\n3. Update\n4. Exit\n1 Alice CS 95.50\n\n1. Add\n2. Display\n3. Update\n4. Exit\n",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
   {
-    _id: new ObjectId("685b2a1f3c4e8d0012a7b311"),
+    _id: new ObjectId("685b2a1f3c4e8d0012a7b312"),
     subjectId: new ObjectId("685b2a1f3c4e8d0012a7b000"),
-    experimentNumber: 11,
-    problemStatement: "Program to demonstrate files and file handling",
+    experimentNumber: 12,
+    problemStatement:
+      "Implement one small application using Function, Structure and Pointers",
     subExperiments: [
       {
         part: "a",
         title:
-          "Open a File to Store Student Records, Add, Update, and Display Records and Ensure Data Persistence",
+          "Functions – Add, Display, Search Books, Structures – Represent a Book, Pointers – Manage Book List Dynamically",
         problemStatement:
-          "Implement file handling in C to store student records, perform add/update/display operations, and ensure data persistence.",
+          "Implement a library management system using C that demonstrates structures, functions, pointers, and file handling for managing book records.",
         concepts: [
-          "File Handling in C",
-          "File Modes (r, w, a)",
-          "File I/O Functions (fopen, fprintf, fscanf, fclose, fflush)",
+          "Structures in C",
+          "Modular Programming using Functions",
+          "Dynamic Memory Allocation",
+          "Pointers and Pointer Arithmetic",
+          "Array of Structures",
         ],
         hints: [
-          "Open the file in write mode ('w') or append mode ('a') using fopen().",
-          "Check if the file pointer is NULL to ensure the file was opened successfully.",
-          "Use fprintf() / fscanf() for text files, or fwrite() / fread() to write and read structures directly in binary mode.",
-          "When updating records, you can read all records into memory, modify the target record, and write them back.",
-          "Close the file stream using fclose() after every operation to ensure all buffers are flushed to disk.",
-          "Avoid keeping the file open indefinitely to protect against data corruption during unexpected program termination.",
+          "Design separate functions such as addBook(), displayBooks(), and searchBook() to keep the program modular.",
+          "Use a pointer to manage a dynamically allocated array of books.",
+          "Use realloc() whenever a new book is added to increase the storage size.",
+          "Pass the book array and current count to functions whenever appropriate.",
+          "Use strcmp() to search for a book by its title.",
+          "Call free() before the program exits to release dynamically allocated memory.",
         ],
         difficulty: "Hard",
         theory:
-          "File handling in C allows permanent storage of data using files. Structures can be written to files using fprintf() or fread(). Files are opened using modes like 'r' (read), 'w' (write), and 'a' (append). Data persistence is ensured by immediately writing updates to the file and properly closing it using fclose(). fflush() forces buffer data to be written to disk, ensuring integrity.",
+          "A library management system demonstrates several important C programming concepts. Structures are used to represent books with different attributes such as ID, title, author, and price. Functions provide modular operations such as adding, displaying, and searching for books. Dynamic memory allocation using malloc() and realloc() allows the book collection to grow during program execution. Pointers are used to manage the dynamically allocated memory efficiently. This application demonstrates how multiple C concepts can be combined to build a practical menu-driven program.",
         algorithm:
-          "1. Start\n2. Define structure Student\n3. Implement file operations (open, read, write, append)\n4. Add student: open file in append mode and write record\n5. Display students: open file in read mode and read all records\n6. Update student: read all records, modify, and rewrite file\n7. Ensure persistence using fclose() and fflush()\n8. Stop",
+          "1. Start\n 2. Define Book structure with id, title, author, and price\n 3. Initialize a dynamic book list using a pointer\n 4. Display menu\n 5. Read user choice\n 6. Add, Display, or Search books using functions\n 7. Resize memory using realloc() whenever a new book is added\n 8. Repeat until Exit is selected\n 9. Free allocated memory\n 10. Stop",
         flowchart: {
           nodes: [
             {
@@ -1760,42 +1880,42 @@ const experiments = [
             {
               id: "2",
               type: "process",
-              label: "Define Student Structure",
+              label: "Define Book Structure",
             },
             {
               id: "3",
               type: "process",
-              label: "Open file (r/w/a mode)",
+              label: "Initialize Dynamic Book List",
             },
             {
               id: "4",
-              type: "process",
-              label: "Add / Update / Display Records",
+              type: "input",
+              label: "Display Menu & Read Choice",
             },
             {
               id: "5",
               type: "decision",
-              label: "Operation Type?",
+              label: "Choice?",
             },
             {
               id: "6",
               type: "process",
-              label: "Write new record (append mode)",
+              label: "Add Book (realloc)",
             },
             {
               id: "7",
               type: "process",
-              label: "Read & display records",
+              label: "Display Books",
             },
             {
               id: "8",
               type: "process",
-              label: "Modify record & rewrite file",
+              label: "Search Book",
             },
             {
               id: "9",
               type: "process",
-              label: "fflush() + fclose()",
+              label: "Free Memory",
             },
             {
               id: "10",
@@ -1833,19 +1953,24 @@ const experiments = [
             {
               source: "5",
               target: "8",
-              label: "Update",
+              label: "Search",
             },
             {
               source: "6",
-              target: "9",
+              target: "4",
             },
             {
               source: "7",
-              target: "9",
+              target: "4",
             },
             {
               source: "8",
+              target: "4",
+            },
+            {
+              source: "5",
               target: "9",
+              label: "Exit",
             },
             {
               source: "9",
@@ -1854,145 +1979,14 @@ const experiments = [
           ],
         },
         referenceSolution: {
-          c: '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nstruct Student {\n    int rollNo;\n    char name[50];\n    char branch[50];\n    float marks;\n};\n\nvoid addStudent() {\n    FILE *fp = fopen("students.txt", "a");\n    struct Student s;\n\n    if (fp == NULL) {\n        printf("Error opening file!\\n");\n        return;\n    }\n\n    printf("Enter Roll No: ");\n    scanf("%d", &s.rollNo);\n\n    printf("Enter Name: ");\n    scanf(" %[^\\n]", s.name);\n\n    printf("Enter Branch: ");\n    scanf(" %[^\\n]", s.branch);\n\n    printf("Enter Marks: ");\n    scanf("%f", &s.marks);\n\n    fprintf(fp, "%d %s %s %.2f\\n", s.rollNo, s.name, s.branch, s.marks);\n\n    fclose(fp);\n    printf("Student added successfully.\\n");\n}\n\nvoid displayStudents() {\n    FILE *fp = fopen("students.txt", "r");\n    struct Student s;\n\n    if (fp == NULL) {\n        printf("No records found!\\n");\n        return;\n    }\n\n    while (fscanf(fp, "%d %s %s %f", &s.rollNo, s.name, s.branch, &s.marks) != EOF) {\n        printf("%d %s %s %.2f\\n", s.rollNo, s.name, s.branch, s.marks);\n    }\n\n    fclose(fp);\n}\n\nvoid updateStudent() {\n    FILE *fp = fopen("students.txt", "r");\n    FILE *temp = fopen("temp.txt", "w");\n\n    struct Student s;\n    int roll, found = 0;\n\n    printf("Enter Roll No to update: ");\n    scanf("%d", &roll);\n\n    while (fscanf(fp, "%d %s %s %f", &s.rollNo, s.name, s.branch, &s.marks) != EOF) {\n        if (s.rollNo == roll) {\n            printf("Enter new name: ");\n            scanf(" %[^\\n]", s.name);\n\n            printf("Enter new branch: ");\n            scanf(" %[^\\n]", s.branch);\n\n            printf("Enter new marks: ");\n            scanf("%f", &s.marks);\n\n            found = 1;\n        }\n        fprintf(temp, "%d %s %s %.2f\\n", s.rollNo, s.name, s.branch, s.marks);\n    }\n\n    fclose(fp);\n    fclose(temp);\n\n    remove("students.txt");\n    rename("temp.txt", "students.txt");\n\n    if (found)\n        printf("Record updated successfully.\\n");\n    else\n        printf("Record not found.\\n");\n}\n\nint main() {\n    int choice;\n\n    while (1) {\n        printf("\\n1. Add\\n2. Display\\n3. Update\\n4. Exit\\n");\n        scanf("%d", &choice);\n\n        switch (choice) {\n            case 1: addStudent(); break;\n            case 2: displayStudents(); break;\n            case 3: updateStudent(); break;\n            case 4: exit(0);\n        }\n    }\n\n    return 0;\n}\n\n/*\nTIME COMPLEXITY:\n- Add: O(1)\n- Display: O(n)\n- Update: O(n)\n\nSPACE COMPLEXITY: O(1)\n\nCONCEPTS:\n- File handling\n- Structure serialization\n- Persistent storage\n- Menu-driven program\n*/',
+          c: '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[100];\n    char author[50];\n    float price;\n} Book;\n\nBook *books = NULL;\nint count = 0;\n\n// Add a new book\nvoid addBook() {\n    books = (Book *)realloc(books, (count + 1) * sizeof(Book));\n\n    if (books == NULL) {\n        printf("Memory allocation failed!\\n");\n        exit(1);\n    }\n\n    printf("Enter ID: ");\n    scanf("%d", &books[count].id);\n\n    printf("Enter Title: ");\n    scanf(" %[^\\n]", books[count].title);\n\n    printf("Enter Author: ");\n    scanf(" %[^\\n]", books[count].author);\n\n    printf("Enter Price: ");\n    scanf("%f", &books[count].price);\n\n    count++;\n    printf("Book added successfully.\\n");\n}\n\n// Display all books\nvoid displayBooks() {\n    if (count == 0) {\n        printf("No books available.\\n");\n        return;\n    }\n\n    printf("\\n===== BOOK LIST =====\\n");\n\n    for (int i = 0; i < count; i++) {\n        printf("%d | %s | %s | %.2f\\n",\n               books[i].id,\n               books[i].title,\n               books[i].author,\n               books[i].price);\n    }\n}\n\n// Search book by title\nvoid searchBook(char title[]) {\n    int found = 0;\n\n    for (int i = 0; i < count; i++) {\n        if (strcmp(books[i].title, title) == 0) {\n            printf("\\nBook Found:\\n");\n            printf("%d | %s | %s | %.2f\\n",\n                   books[i].id,\n                   books[i].title,\n                   books[i].author,\n                   books[i].price);\n            found = 1;\n            break;\n        }\n    }\n\n    if (!found)\n        printf("Book not found.\\n");\n}\n\nint main() {\n    int choice;\n    char title[100];\n\n    while (1) {\n        printf("\\n===== LIBRARY MANAGEMENT SYSTEM =====\\n");\n        printf("1. Add Book\\n");\n        printf("2. Display Books\\n");\n        printf("3. Search Book\\n");\n        printf("4. Exit\\n");\n        printf("Enter your choice: ");\n        scanf("%d", &choice);\n\n        switch (choice) {\n            case 1:\n                addBook();\n                break;\n\n            case 2:\n                displayBooks();\n                break;\n\n            case 3:\n                printf("Enter Title: ");\n                scanf(" %[^\\n]", title);\n                searchBook(title);\n                break;\n\n            case 4:\n                free(books);\n                printf("Exiting program...\\n");\n                return 0;\n\n            default:\n                printf("Invalid choice!\\n");\n        }\n    }\n\n    return 0;\n}\n\n/*\nTIME COMPLEXITY:\n- Add Book: O(n) (realloc may copy existing elements)\n- Display Books: O(n)\n- Search Book: O(n)\n\nSPACE COMPLEXITY: O(n)\n\nCONCEPTS DEMONSTRATED:\n- Structures\n- Functions\n- Pointers\n- Dynamic Memory Allocation (realloc, free)\n- Menu-driven Programming\n*/',
         },
         samples: [
           {
-            input: "1\n1\nAlice\nCS\n95.5\n2\n4",
+            input:
+              "1\n101\nC_Programming\nKernighan\n299\n2\n3\nC_Programming\n4",
             output:
-              "\n1. Add\n2. Display\n3. Update\n4. Exit\nEnter Roll No: Enter Name: Enter Branch: Enter Marks: Student added successfully.\n\n1. Add\n2. Display\n3. Update\n4. Exit\n1 Alice CS 95.50\n\n1. Add\n2. Display\n3. Update\n4. Exit\n",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    _id: new ObjectId("685b2a1f3c4e8d0012a7b312"),
-    subjectId: new ObjectId("685b2a1f3c4e8d0012a7b000"),
-    experimentNumber: 12,
-    problemStatement:
-      "Implement one small application using Function, Files, Structure and Pointers",
-    subExperiments: [
-      {
-        part: "a",
-        title:
-          "Functions – Add, Display, Search Books, Files – Store and Retrieve Book Data, Structures – Represent a Book, Pointers – Manage Book List Dynamically",
-        problemStatement:
-          "Implement a library management system using C that demonstrates structures, functions, pointers, and file handling for managing book records.",
-        concepts: [
-          "Structures in C",
-          "Modular Programming using Functions",
-          "File Handling (fopen, fread, fwrite, fprintf, fscanf)",
-          "Dynamic Memory Allocation",
-          "Pointers and Pointer Arithmetic",
-          "Array of Structures",
-        ],
-        hints: [
-          "Design distinct functions for each operation: addBook(), displayBooks(), and searchBook().",
-          "Pass the books array and its current count as arguments to these functions.",
-          "Save the book records to a text or binary file during program termination.",
-          "Load the book records back into memory when the program starts up.",
-          "Define a structure 'struct Book' with fields like title, author, and price.",
-          "Choose appropriate data types for each field (e.g., character arrays for text and float for price).",
-          "Use a pointer to point to the dynamically allocated book array in the heap.",
-          "Use realloc() to resize the book list dynamically as the number of books grows.",
-        ],
-        difficulty: "Hard",
-        theory:
-          "A library management system demonstrates multiple core C programming concepts. Structures are used to represent books. Functions provide modular operations like add, display, and search. Pointers and dynamic memory allocation allow flexible storage of book records. File handling ensures persistent storage so that data is not lost after program termination. Together, these concepts form a complete system for managing book records efficiently.",
-        algorithm:
-          "1. Start\n2. Define Book structure with id, title, author, price\n3. Initialize book storage (array or dynamic pointer)\n4. Implement functions: addBook(), displayBooks(), searchBook()\n5. Use pointers and realloc() for dynamic memory management\n6. Save and load books using file handling\n7. Perform operations based on user input\n8. Stop",
-        flowchart: {
-          nodes: [
-            {
-              id: "1",
-              type: "start",
-              label: "Start",
-            },
-            {
-              id: "2",
-              type: "process",
-              label: "Define Book structure",
-            },
-            {
-              id: "3",
-              type: "process",
-              label: "Initialize storage (array/pointer)",
-            },
-            {
-              id: "4",
-              type: "process",
-              label: "Add Book (function)",
-            },
-            {
-              id: "5",
-              type: "process",
-              label: "Display Books (function)",
-            },
-            {
-              id: "6",
-              type: "process",
-              label: "Search Book (function)",
-            },
-            {
-              id: "7",
-              type: "process",
-              label: "File Operations (save/load)",
-            },
-            {
-              id: "8",
-              type: "process",
-              label: "Dynamic memory (realloc/free)",
-            },
-            {
-              id: "9",
-              type: "end",
-              label: "Stop",
-            },
-          ],
-          edges: [
-            {
-              source: "1",
-              target: "2",
-            },
-            {
-              source: "2",
-              target: "3",
-            },
-            {
-              source: "3",
-              target: "4",
-            },
-            {
-              source: "4",
-              target: "5",
-            },
-            {
-              source: "5",
-              target: "6",
-            },
-            {
-              source: "6",
-              target: "7",
-            },
-            {
-              source: "7",
-              target: "8",
-            },
-            {
-              source: "8",
-              target: "9",
-            },
-          ],
-        },
-        referenceSolution: {
-          c: '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[100];\n    char author[50];\n    float price;\n} Book;\n\nBook *books = NULL;\nint count = 0;\n\nvoid addBook() {\n    books = realloc(books, (count + 1) * sizeof(Book));\n\n    printf("Enter ID: ");\n    scanf("%d", &books[count].id);\n\n    printf("Enter Title: ");\n    scanf(" %[^\\n]", books[count].title);\n\n    printf("Enter Author: ");\n    scanf(" %[^\\n]", books[count].author);\n\n    printf("Enter Price: ");\n    scanf("%f", &books[count].price);\n\n    count++;\n}\n\nvoid displayBooks() {\n    for (int i = 0; i < count; i++) {\n        printf("%d | %s | %s | %.2f\\n",\n               books[i].id,\n               books[i].title,\n               books[i].author,\n               books[i].price);\n    }\n}\n\nvoid searchBook(char title[]) {\n    int found = 0;\n\n    for (int i = 0; i < count; i++) {\n        if (strcmp(books[i].title, title) == 0) {\n            printf("Found: %d | %s | %s | %.2f\\n",\n                   books[i].id,\n                   books[i].title,\n                   books[i].author,\n                   books[i].price);\n            found = 1;\n        }\n    }\n\n    if (!found)\n        printf("Book not found\\n");\n}\n\nvoid saveToFile() {\n    FILE *fp = fopen("books.txt", "w");\n\n    for (int i = 0; i < count; i++) {\n        fprintf(fp, "%d %s %s %.2f\\n",\n                books[i].id,\n                books[i].title,\n                books[i].author,\n                books[i].price);\n    }\n\n    fclose(fp);\n}\n\nvoid loadFromFile() {\n    FILE *fp = fopen("books.txt", "r");\n    if (!fp) return;\n\n    Book temp;\n\n    while (fscanf(fp, "%d %s %s %f",\n                  &temp.id,\n                  temp.title,\n                  temp.author,\n                  &temp.price) != EOF) {\n\n        books = realloc(books, (count + 1) * sizeof(Book));\n        books[count++] = temp;\n    }\n\n    fclose(fp);\n}\n\nint main() {\n    loadFromFile();\n\n    int choice;\n    char title[100];\n\n    while (1) {\n        printf("\\n1. Add\\n2. Display\\n3. Search\\n4. Exit\\n");\n        scanf("%d", &choice);\n\n        switch (choice) {\n            case 1: addBook(); saveToFile(); break;\n            case 2: displayBooks(); break;\n            case 3:\n                printf("Enter title: ");\n                scanf(" %[^\\n]", title);\n                searchBook(title);\n                break;\n            case 4:\n                saveToFile();\n                free(books);\n                exit(0);\n        }\n    }\n\n    return 0;\n}\n\n/*\nTIME COMPLEXITY:\n- Add: O(n) (realloc)\n- Display: O(n)\n- Search: O(n)\n- File operations: O(n)\n\nSPACE COMPLEXITY: O(n)\n\nCONCEPTS:\n- Structures\n- Functions\n- Pointers\n- Dynamic memory allocation\n- File handling\n- Persistent storage system\n*/',
-        },
-        samples: [
-          {
-            input: "1\n1\nC_Programming\nKernighan\n299\n2\n4",
-            output:
-              "\n1. Add\n2. Display\n3. Search\n4. Exit\nEnter ID: Enter Title: Enter Author: Enter Price: \n1. Add\n2. Display\n3. Search\n4. Exit\n1 | C_Programming | Kernighan | 299.00\n\n1. Add\n2. Display\n3. Search\n4. Exit\n",
+              "\n===== LIBRARY MANAGEMENT SYSTEM =====\n1. Add Book\n2. Display Books\n3. Search Book\n4. Exit\nEnter your choice: 1\nEnter ID: 101\nEnter Title: C_Programming \nEnter Author: Kernighan\nEnter Price: 299\nBook added successfully.\n\n===== LIBRARY MANAGEMENT SYSTEM =====\n1. Add Book\n2. Display Books\n3. Search Book\n4. Exit\nEnter your choice: 2\n===== BOOK LIST =====\n101 | C_Programming | Kernighan | 299.00\n\n===== LIBRARY MANAGEMENT SYSTEM =====\n1. Add Book\n2. Display Books\n3. Search Book\n4. Exit\nEnter your choice: 3\nEnter Title: C_Programming\nBook Found:\n101 | C_Programming | Kernighan | 299.00\n\n===== LIBRARY MANAGEMENT SYSTEM =====\n1. Add Book\n2. Display Books\n3. Search Book\n4. Exit\nEnter your choice: 4\nExiting program...\n",
           },
         ],
       },

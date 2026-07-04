@@ -218,7 +218,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
 
   // SOURCE CODE Section
   drawHeading("Source Code");
-  const code = codeText || (subExp?.starterCode?.templates?.c || "// No source code available");
+  const code = codeText || (subExp?.referenceSolution?.c || "// No source code available");
   const codeLines = code.split("\n");
   ensureSpace(40);
   
