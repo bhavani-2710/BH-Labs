@@ -153,7 +153,7 @@ main();
     } else {
       val = solutions[lang] || "";
     }
-    return val.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+    return val;
   };
 
   // Keys present on the referenceSolution object (Map or plain object)
