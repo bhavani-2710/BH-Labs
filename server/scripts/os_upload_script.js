@@ -20,67 +20,7 @@ const subjects = [
 
 // ─── Experiments ──────────────────────────────────────────────────────────────
 const experiments = [
-  // ── Exp 3: Linux Commands ──────────────────────────────────────────────────
-  {
-    _id: new ObjectId("685b2a1f3c4e8d0012a7b401"),
-    subjectId: new ObjectId("685b2a1f3c4e8d0012a7b001"),
-    experimentNumber: 3,
-    problemStatement:
-      "Implement any one basic command of Linux like ls, cp, mv and others using kernel APIs.",
-    subExperiments: [
-      {
-        part: "a",
-        title: "Implement Basic Linux Commands",
-        concepts: ["System Calls", "Linux Commands", "File System"],
-        hints: [
-          "Use opendir() to open a directory.",
-          "Use readdir() to read directory entries.",
-          "Ensure to check for NULL pointers.",
-        ],
-        difficulty: "Easy",
-        problemStatement:
-          "Implement the basic Linux 'ls' command using kernel APIs.",
-        theory:
-          "Linux kernel APIs allow programs to interact directly with the OS. To implement ls, opendir() opens a directory and readdir() reads its entries. To implement cp, open() opens source and destination files, read() reads data, and write() writes it. To implement mv, rename() moves or renames a file.",
-        algorithm:
-          "1. Start\n2. Open directory using opendir()\n3. Read each entry using readdir()\n4. Print each entry name\n5. Close directory using closedir()\n6. Stop",
-        flowchart: {
-          nodes: [
-            { id: "1", type: "start", label: "Start" },
-            { id: "2", type: "process", label: "dir = opendir('.')" },
-            { id: "3", type: "decision", label: "dir == NULL?" },
-            { id: "4", type: "output", label: "Print error, exit" },
-            { id: "5", type: "process", label: "entry = readdir(dir)" },
-            { id: "6", type: "decision", label: "entry != NULL?" },
-            { id: "7", type: "output", label: "Print entry->d_name" },
-            { id: "8", type: "process", label: "closedir(dir)" },
-            { id: "9", type: "end", label: "Stop" },
-          ],
-          edges: [
-            { source: "1", target: "2" },
-            { source: "2", target: "3" },
-            { source: "3", target: "4", label: "Yes" },
-            { source: "3", target: "5", label: "No" },
-            { source: "5", target: "6" },
-            { source: "6", target: "7", label: "Yes" },
-            { source: "7", target: "5" },
-            { source: "6", target: "8", label: "No" },
-            { source: "8", target: "9" },
-          ],
-        },
-        referenceSolution: {
-          c: '#include <stdio.h>\n#include <dirent.h>\n\nint main() {\n    DIR *dir = opendir(".");\n    if (dir == NULL) {\n        printf("Error opening directory\\n");\n        return 1;\n    }\n    printf(".\\n..\\n");\n    closedir(dir);\n    return 0;\n}',
-        },
-        samples: [
-          {
-            input: "",
-            output: ".\n..\n",
-          },
-        ],
-      },
-    ],
-  },
-
+ 
   // ── Exp 4: Child Process ───────────────────────────────────────────────────
   {
     _id: new ObjectId("685b2a1f3c4e8d0012a7b402"),
@@ -689,61 +629,6 @@ const experiments = [
             input: "",
             output:
               "\nSequential Allocation:\nFile occupies blocks: 5 6 7 8 \n\nLinked Allocation:\nBlock 10 -> Block 15\nBlock 15 -> Block 22\nBlock 22 -> Block 30\nBlock 30 -> NULL\n\nIndexed Allocation:\nIndex Block: 3\nData Blocks: 10 15 22 30 \n",
-          },
-        ],
-      },
-    ],
-  },
-
-  // ── Exp 14: Multi-Level Directory Structure ────────────────────────────────
-  {
-    _id: new ObjectId("685b2a1f3c4e8d0012a7b412"),
-    subjectId: new ObjectId("685b2a1f3c4e8d0012a7b001"),
-    experimentNumber: 14,
-    problemStatement:
-      "Write a C program to simulate file organization of multi-level directory structure.",
-    subExperiments: [
-      {
-        part: "a",
-        title: "Multi-Level Directory Structure",
-        concepts: ["File Management", "Directories", "Hierarchical Organization"],
-        hints: [
-          "Design a directory node structure containing children directories and files.",
-          "Use recursion to traverse and display the tree structure.",
-          "Properly format levels with indentation to represent hierarchy.",
-        ],
-        difficulty: "Hard",
-        problemStatement:
-          "Write a C program to simulate file organization of multi-level directory structure.",
-        theory:
-          "A multi-level directory structure organizes files in a hierarchy of directories and subdirectories, like a tree. Each directory can contain files and other directories. This allows users to organize files logically and avoids name conflicts. In C, this can be simulated using structures with arrays of children and file names.",
-        algorithm:
-          "1. Start\n2. Define a Directory structure with name, list of files, list of subdirectories\n3. Create root directory\n4. Add subdirectories and files to directories\n5. Display the full directory tree using recursive traversal\n6. Stop",
-        flowchart: {
-          nodes: [
-            { id: "1", type: "start", label: "Start" },
-            { id: "2", type: "process", label: "Create root directory" },
-            { id: "3", type: "process", label: "Add subdirectories to root" },
-            { id: "4", type: "process", label: "Add files to directories" },
-            { id: "5", type: "output", label: "Display directory tree (recursive)" },
-            { id: "6", type: "end", label: "Stop" },
-          ],
-          edges: [
-            { source: "1", target: "2" },
-            { source: "2", target: "3" },
-            { source: "3", target: "4" },
-            { source: "4", target: "5" },
-            { source: "5", target: "6" },
-          ],
-        },
-        referenceSolution: {
-          c: '#include <stdio.h>\n\nint main() {\n    printf("|-- root/\\n  |-- config.sys\\n  |-- home/\\n    |-- user/\\n      |-- resume.pdf\\n      |-- notes.txt\\n");\n    return 0;\n}',
-        },
-        samples: [
-          {
-            input: "",
-            output:
-              "|-- root/\n  |-- config.sys\n  |-- home/\n    |-- user/\n      |-- resume.pdf\n      |-- notes.txt\n",
           },
         ],
       },

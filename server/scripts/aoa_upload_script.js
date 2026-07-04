@@ -528,7 +528,7 @@ const experiments = [
         samples: [
           {
             input: "4\n2 2 3 1\n6 10 12 5\n5",
-            output: "Maximum Profit = 21\n",
+            output: "Maximum Profit = 22\n",
           },
         ],
       },
@@ -635,7 +635,7 @@ const experiments = [
         samples: [
           {
             input: "ABCBDAB\nBDCABA",
-            output: "LCS Length = 4\nLCS String = BCBA\n",
+            output: "LCS Length = 4\nLCS String = BDAB\n",
           },
           {
             input: "AGGTAB\nGXTXAYB",
@@ -934,7 +934,7 @@ const experiments = [
           ],
         },
         referenceSolution: {
-          c: '#include <stdio.h>\n#include <string.h>\n\n#define D 256\n#define Q 101\n\nvoid rabinKarp(char T[], char P[]) {\n    int n = strlen(T), m = strlen(P);\n    int hP = 0, hT = 0, h = 1, found = 0;\n    for (int i = 0; i < m - 1; i++) h = (h * D) % Q;\n    for (int i = 0; i < m; i++) {\n        hP = (D * hP + P[i]) % Q;\n        hT = (D * hT + T[i]) % Q;\n    }\n    for (int i = 0; i <= n - m; i++) {\n        if (hP == hT) {\n            int j;\n            for (j = 0; j < m; j++)\n                if (T[i + j] != P[j]) break;\n            if (j == m) {\n                printf("Pattern found at index %d\\n", i);\n                found = 1;\n            }\n        }\n        if (i < n - m)\n            hT = (D * (hT - T[i] * h) + T[i + m]) % Q;\n        if (hT < 0) hT += Q;\n    }\n    if (!found) printf("Pattern not found\\n");\n}\n\nint main() {\n    char T[1000], P[100];\n    printf("Enter text:    "); scanf("%s", T);\n    printf("Enter pattern: "); scanf("%s", P);\n    rabinKarp(T, P);\n    return 0;\n}',
+          c: '#include <stdio.h>\n#include <string.h>\n\n#define D 256\n#define Q 101\n\nvoid rabinKarp(char T[], char P[]) {\n    int n = strlen(T), m = strlen(P);\n    int hP = 0, hT = 0, h = 1, found = 0;\n    for (int i = 0; i < m - 1; i++) h = (h * D) % Q;\n    for (int i = 0; i < m; i++) {\n        hP = (D * hP + P[i]) % Q;\n        hT = (D * hT + T[i]) % Q;\n    }\n    for (int i = 0; i <= n - m; i++) {\n        if (hP == hT) {\n            int j;\n            for (j = 0; j < m; j++)\n                if (T[i + j] != P[j]) break;\n            if (j == m) {\n                printf("Pattern found at index %d\\n", i);\n                found = 1;\n            }\n        }\n        if (i < n - m)\n            hT = (D * (hT - T[i] * h) + T[i + m]) % Q;\n        if (hT < 0) hT += Q;\n    }\n    if (!found) printf("Pattern not found\\n");\n}\n\nint main() {\n    char T[1000], P[100];\n    printf("Enter text:    ");\n    fgets(T, sizeof(T), stdin);\n    T[strcspn(T, "\\n")] = \'\\0\';\n\n    printf("Enter pattern: ");\n    fgets(P, sizeof(P), stdin);\n    P[strcspn(P, "\\n")] = \'\\0\';\n\n    rabinKarp(T, P);\n    return 0;\n}',
           python: 'D = 256\nQ = 101\n\ndef rabin_karp(text, pattern):\n    n, m = len(text), len(pattern)\n    h = pow(D, m - 1, Q)\n    hp = hT = 0\n    for i in range(m):\n        hp = (D * hp + ord(pattern[i])) % Q\n        hT = (D * hT + ord(text[i]))    % Q\n    found = False\n    for i in range(n - m + 1):\n        if hp == hT:\n            if text[i:i + m] == pattern:\n                print(f"Pattern found at index {i}")\n                found = True\n        if i < n - m:\n            hT = (D * (hT - ord(text[i]) * h) + ord(text[i + m])) % Q\n            if hT < 0:\n                hT += Q\n    if not found:\n        print("Pattern not found")\n\ntext    = input("Enter text:    ")\npattern = input("Enter pattern: ")\nrabin_karp(text, pattern)',
         },
         samples: [
