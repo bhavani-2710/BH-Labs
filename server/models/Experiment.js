@@ -49,19 +49,8 @@ const subExperimentSchema = new mongoose.Schema(
     },
     referenceSolution: {
       type: Map,
-      of: String, // Key: language (e.g., 'python'), Value: solution code
+      of: String, 
       default: {},
-    },
-    starterCode: {
-      supportedLanguages: {
-        type: [String],
-        default: [],
-      },
-      templates: {
-        type: Map,
-        of: String,
-        default: {},
-      },
     },
     samples: {
       type: [sampleSchema],
