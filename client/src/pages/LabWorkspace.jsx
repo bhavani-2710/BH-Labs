@@ -111,7 +111,7 @@ if __name__ == "__main__":
         return `/**
  * Main class - program entry point.
  */
-public class Main {
+class Main {
 
     /**
      * Program entry point.
