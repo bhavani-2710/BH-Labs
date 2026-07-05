@@ -12,6 +12,7 @@ import WorkspaceLeftSidebar from "../components/WorkspaceLeftSidebar";
 import WorkspaceRightSidebar from "../components/WorkspaceRightSidebar";
 import CollapsedRightSidebar from "../components/CollapsedRightSidebar";
 import { generateJournalPdf } from "../utils/journalPdfGenerator";
+import { runJsInWebWorker } from "../workers/jsWorkerHelper";
 
 const COMPILER_MAP = {
   c: "gcc-head-c",
@@ -739,19 +740,23 @@ SELECT * FROM student;
 
       let data;
 
-      // Use Wandbox for all languages via our server
-      const res = await fetch(`/api/run`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          compiler: COMPILER_MAP[editorLanguage] || "gcc-head-c",
-          code,
-          language: editorLanguage,
-          stdin: normalizedStdin,
-        }),
-      });
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      data = await res.json();
+      if (editorLanguage === "javascript") {
+        data = await runJsInWebWorker(code);
+      } else {
+        // Use Wandbox for all other languages via our server
+        const res = await fetch(`/api/run`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            compiler: COMPILER_MAP[editorLanguage] || "gcc-head-c",
+            code,
+            language: editorLanguage,
+            stdin: normalizedStdin,
+          }),
+        });
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        data = await res.json();
+      }
 
       let out = "";
       if (data.compiler_message)
