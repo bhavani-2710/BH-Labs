@@ -1,8 +1,41 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
+function sanitizeText(str) {
+  if (typeof str !== "string") return "";
+  return str
+    .replace(/\t/g, "    ")              // Replace tabs with 4 spaces
+    .replace(/\r/g, "")                  // Remove carriage returns
+    .replace(/[\u2018\u2019]/g, "'")     // Smart single quotes
+    .replace(/[\u201C\u201D]/g, '"')     // Smart double quotes
+    .replace(/[^\x00-\x7F]/g, "?");      // Replace non-ASCII characters with '?'
+}
+
 export async function generateJournalPdf({ experiment, subPart = "a", codeText, outputText }) {
   const subExp = experiment?.subExperiments?.find(s => s.part === subPart) || experiment?.subExperiments?.[0];
-  const conclusionText = `The ${subExp?.title || "experiment"} program was successfully implemented and compiled. Through this experiment, we observed how basic logic structures can manipulate data in memory. The program executed with zero errors and produced the expected output matching the unit validation cases.`;
+  
+  // Extract reference solution from DB
+  let referenceSolutionCode = "";
+  if (subExp?.referenceSolution) {
+    const solutions = subExp.referenceSolution;
+    let keys = [];
+    if (typeof solutions.keys === "function") {
+      keys = Array.from(solutions.keys());
+    } else if (solutions) {
+      keys = Object.keys(solutions);
+    }
+    if (keys.length > 0) {
+      const firstLang = keys[0];
+      if (typeof solutions.get === "function") {
+        referenceSolutionCode = solutions.get(firstLang) || "";
+      } else {
+        referenceSolutionCode = solutions[firstLang] || "";
+      }
+    }
+  }
+
+  const conclusionText = sanitizeText(
+    `The ${subExp?.title || "experiment"} program was successfully implemented and compiled. Through this experiment, we observed how basic logic structures can manipulate data in memory. The program executed with zero errors and produced the expected output matching the unit validation cases.`
+  );
 
   const pdfDoc = await PDFDocument.create();
   
@@ -64,7 +97,6 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   };
 
   // 1. HEADER (Title & Logo / Metadata)
-  // Draw Logo Text "BH.Lab"
   currentPage.drawText("BH.Lab", {
     x: MARGIN_LEFT,
     y: currentY - 5,
@@ -72,13 +104,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     font: helveticaBold,
     color: purpleColor
   });
-  currentPage.drawText("Student Record Portal", {
-    x: MARGIN_LEFT,
-    y: currentY - 18,
-    size: 8,
-    font: helveticaBold,
-    color: grayTextColor
-  });
+
 
   // Metadata block (Right side)
   const metaX = PAGE_WIDTH - MARGIN_RIGHT - 180;
@@ -128,7 +154,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   });
   currentY -= 18;
 
-  const titleText = `${subExp?.title || "Experiment"} Implementation`;
+  const titleText = `${sanitizeText(subExp?.title) || "Experiment"} Implementation`;
   currentPage.drawText(titleText, {
     x: MARGIN_LEFT,
     y: currentY,
@@ -139,40 +165,31 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   currentY -= 25;
 
 
-  // Function to wrap and draw block texts
+  // Function to wrap and draw block texts (No background, just colored text)
   const drawHeading = (text) => {
-    ensureSpace(30);
-    currentPage.drawRectangle({
-      x: MARGIN_LEFT,
-      y: currentY - 16,
-      width: 150,
-      height: 20,
-      color: lightGrayBg,
-      borderRadius: 10
-    });
+    ensureSpace(35);
     currentPage.drawText(text.toUpperCase(), {
-      x: MARGIN_LEFT + 10,
+      x: MARGIN_LEFT,
       y: currentY - 8,
-      size: 9,
+      size: 10,
       font: helveticaBold,
       color: purpleColor
     });
-    currentY -= 26;
+    currentY -= 18;
   };
 
   const drawParagraph = (text, isMonospace = false, customFontSize = 9, customLineHeight = 13) => {
     const font = isMonospace ? courierFont : helveticaFont;
     const lines = [];
+    const sanitized = sanitizeText(text);
     
-    // Split input by explicit newlines first
-    const paragraphs = text.split("\n");
+    const paragraphs = sanitized.split("\n");
     for (let p of paragraphs) {
       if (p.trim() === "" && isMonospace) {
         lines.push("");
         continue;
       }
       
-      // Simple word wrapping
       const words = p.split(" ");
       let currentLine = "";
       for (let word of words) {
@@ -201,7 +218,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
       });
       currentY -= customLineHeight;
     }
-    currentY -= 10; // spacing after paragraph
+    currentY -= 10;
   };
 
   // AIM Section
@@ -216,10 +233,148 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   drawHeading("Algorithm");
   drawParagraph(subExp?.algorithm || "No algorithm details provided.");
 
+  // FLOWCHART Section
+  if (subExp?.flowchart?.nodes && subExp.flowchart.nodes.length > 0) {
+    drawHeading("Flowchart");
+    
+    const nodes = subExp.flowchart.nodes;
+    const edges = subExp.flowchart.edges || [];
+    
+    // Position layout coordinates (vertical flow)
+    const nodeCoords = {};
+    const cx = MARGIN_LEFT + CONTENT_WIDTH / 2;
+    
+    // Ensure sufficient vertical space for the flowchart block
+    const flowchartHeight = nodes.length * 45 + 10;
+    ensureSpace(flowchartHeight + 10);
+    
+    let nodeY = currentY - 20;
+    
+    // Step 1: Assign positions and draw connection lines first (drawn behind shapes)
+    for (let i = 0; i < nodes.length; i++) {
+      nodeCoords[nodes[i].id] = { x: cx, y: nodeY };
+      nodeY -= 45;
+    }
+    
+    // Draw connecting edges
+    for (let edge of edges) {
+      const src = nodeCoords[edge.source];
+      const tgt = nodeCoords[edge.target];
+      if (src && tgt) {
+        // Line from bottom edge of source to top edge of target
+        currentPage.drawLine({
+          start: { x: src.x, y: src.y - 12 },
+          end: { x: tgt.x, y: tgt.y + 12 },
+          thickness: 1,
+          color: purpleColor
+        });
+        
+        // Draw arrowhead at target
+        currentPage.drawLine({ start: { x: tgt.x, y: tgt.y + 12 }, end: { x: tgt.x - 3, y: tgt.y + 17 }, thickness: 1, color: purpleColor });
+        currentPage.drawLine({ start: { x: tgt.x, y: tgt.y + 12 }, end: { x: tgt.x + 3, y: tgt.y + 17 }, thickness: 1, color: purpleColor });
+        
+        // Draw label if available
+        if (edge.label) {
+          const edgeLabel = sanitizeText(edge.label);
+          currentPage.drawText(edgeLabel, {
+            x: (src.x + tgt.x) / 2 + 5,
+            y: (src.y - 12 + tgt.y + 12) / 2,
+            size: 7,
+            font: helveticaBold,
+            color: purpleColor
+          });
+        }
+      }
+    }
+    
+    // Step 2: Draw node shapes and text labels
+    for (let node of nodes) {
+      const coords = nodeCoords[node.id];
+      if (!coords) continue;
+      
+      const { x, y } = coords;
+      const type = node.type?.toLowerCase();
+      
+      if (type === "start" || type === "end") {
+        // Capsule shape
+        currentPage.drawRectangle({
+          x: x - 65,
+          y: y - 12,
+          width: 130,
+          height: 24,
+          color: lightGrayBg,
+          borderColor: purpleColor,
+          borderWidth: 1,
+          borderRadius: 12
+        });
+      } else if (type === "decision") {
+        // Diamond shape
+        const halfW = 65;
+        const halfH = 12;
+        currentPage.drawRectangle({
+          x: x - halfW,
+          y: y - halfH,
+          width: 130,
+          height: 24,
+          color: rgb(1, 1, 1),
+        });
+        currentPage.drawLine({ start: { x: x - halfW, y: y }, end: { x: x, y: y + halfH }, thickness: 1.2, color: purpleColor });
+        currentPage.drawLine({ start: { x: x, y: y + halfH }, end: { x: x + halfW, y: y }, thickness: 1.2, color: purpleColor });
+        currentPage.drawLine({ start: { x: x + halfW, y: y }, end: { x: x, y: y - halfH }, thickness: 1.2, color: purpleColor });
+        currentPage.drawLine({ start: { x: x, y: y - halfH }, end: { x: x - halfW, y: y }, thickness: 1.2, color: purpleColor });
+      } else if (type === "output") {
+        // Parallelogram shape
+        const halfW = 65;
+        const halfH = 12;
+        const skew = 8;
+        currentPage.drawRectangle({
+          x: x - halfW,
+          y: y - halfH,
+          width: 130,
+          height: 24,
+          color: rgb(1, 1, 1),
+        });
+        currentPage.drawLine({ start: { x: x - halfW + skew, y: y + halfH }, end: { x: x + halfW + skew, y: y + halfH }, thickness: 1.2, color: purpleColor });
+        currentPage.drawLine({ start: { x: x + halfW + skew, y: y + halfH }, end: { x: x + halfW - skew, y: y - halfH }, thickness: 1.2, color: purpleColor });
+        currentPage.drawLine({ start: { x: x + halfW - skew, y: y - halfH }, end: { x: x - halfW - skew, y: y - halfH }, thickness: 1.2, color: purpleColor });
+        currentPage.drawLine({ start: { x: x - halfW - skew, y: y - halfH }, end: { x: x - halfW + skew, y: y + halfH }, thickness: 1.2, color: purpleColor });
+      } else {
+        // Standard process rectangle
+        currentPage.drawRectangle({
+          x: x - 65,
+          y: y - 12,
+          width: 130,
+          height: 24,
+          color: rgb(1, 1, 1),
+          borderColor: purpleColor,
+          borderWidth: 1
+        });
+      }
+      
+      // Node Text
+      const label = sanitizeText(node.label || "");
+      const fontSize = 7.5;
+      const textWidth = helveticaFont.widthOfTextAtSize(label, fontSize);
+      currentPage.drawText(label, {
+        x: x - textWidth / 2,
+        y: y - 2.5,
+        size: fontSize,
+        font: helveticaFont,
+        color: darkTextColor
+      });
+    }
+    
+    // Set currentY to the bottom of the flowchart section
+    currentY -= flowchartHeight;
+    currentY -= 15;
+  }
+
   // SOURCE CODE Section
   drawHeading("Source Code");
-  const code = codeText || (subExp?.referenceSolution?.c || "// No source code available");
-  const codeLines = code.split("\n");
+  
+  // Use the reference solution from DB for the source code printout in the PDF record sheet
+  const code = referenceSolutionCode || codeText || "// No source code available";
+  const codeLines = sanitizeText(code).split("\n");
   ensureSpace(40);
   
   // Draw header bar for source code
@@ -230,7 +385,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     height: 15,
     color: rgb(0.12, 0.12, 0.12)
   });
-  currentPage.drawText("main.c", {
+  currentPage.drawText("solution_source_code", {
     x: MARGIN_LEFT + 10,
     y: currentY - 11,
     size: 7,
@@ -273,7 +428,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   // EXECUTION OUTPUT Section
   drawHeading("Execution Output");
   const outLog = outputText || `Output Vector: [${subExp?.samples?.[0]?.output || "Successfully executed"}]`;
-  const outLines = outLog.split("\n");
+  const outLines = sanitizeText(outLog).split("\n");
   ensureSpace(40);
 
   // Draw header bar for output
@@ -328,6 +483,10 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   drawHeading("Conclusion");
   drawParagraph(conclusionText);
 
+  // SIGNATURES Section
+  ensureSpace(70);
+  currentY -= 30;
+  
   
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
