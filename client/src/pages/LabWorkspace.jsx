@@ -13,6 +13,7 @@ import WorkspaceRightSidebar from "../components/WorkspaceRightSidebar";
 import CollapsedRightSidebar from "../components/CollapsedRightSidebar";
 import { generateJournalPdf } from "../utils/journalPdfGenerator";
 import { runJsInWebWorker } from "../workers/jsWorkerHelper";
+import { runPythonInWebWorker } from "../workers/pythonWorkerHelper";
 
 const COMPILER_MAP = {
   c: "gcc-head-c",
@@ -690,28 +691,16 @@ SELECT * FROM student;
       // For Python: detect unsupported third-party packages and show a clear message
       if (isPython) {
         const unsupportedPackages = [
-          "pandas",
-          "numpy",
-          "matplotlib",
-          "scipy",
-          "sklearn",
           "tensorflow",
           "torch",
           "keras",
-          "seaborn",
-          "plotly",
           "cv2",
-          "PIL",
           "flask",
           "django",
           "fastapi",
           "requests",
-          "bs4",
-          "beautifulsoup4",
-          "sqlalchemy",
           "pymongo",
           "boto3",
-          "pydantic",
           "celery",
           "aiohttp",
         ];
@@ -728,8 +717,8 @@ SELECT * FROM student;
           setConsoleTab("errors");
           setConsoleErrors(
             `⚠ Third-party package(s) not supported: ${pkgList}\n\n` +
-              `The online runner only supports Python's standard library.\n` +
-              `Packages like pandas, numpy, etc. require a local environment.\n\n` +
+              `The online runner supports Python's standard library and scientific libraries (numpy, pandas, matplotlib, etc.).\n` +
+              `Heavy packages like tensorflow, torch, flask, etc. require a local environment.\n\n` +
               `✦ Run locally:\n` +
               `  pip install ${[...new Set(found)].join(" ")}\n` +
               `  python your_file.py`,
@@ -742,6 +731,8 @@ SELECT * FROM student;
 
       if (editorLanguage === "javascript") {
         data = await runJsInWebWorker(code);
+      } else if (["python", "python3", "py"].includes(editorLanguage)) {
+        data = await runPythonInWebWorker(code, normalizedStdin);
       } else {
         // Use Wandbox for all other languages via our server
         const res = await fetch(`/api/run`, {

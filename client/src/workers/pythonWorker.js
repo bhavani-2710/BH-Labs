@@ -1,0 +1,106 @@
+// Intercept uncaught errors
+self.addEventListener("error", (event) => {
+  self.postMessage({
+    type: "stderr",
+    content: (event.message || "Unknown runtime error") + "\n",
+  });
+  self.postMessage({ type: "finished", status: "1" });
+});
+
+self.addEventListener("unhandledrejection", (event) => {
+  const reason = event.reason;
+  const errMsg =
+    reason && reason.stack
+      ? reason.stack
+      : reason && reason.message
+        ? reason.message
+        : String(reason);
+  self.postMessage({
+    type: "stderr",
+    content: "Unhandled Rejection: " + errMsg + "\n",
+  });
+  self.postMessage({ type: "finished", status: "1" });
+});
+
+importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js");
+
+let pyodide = null;
+async function initPyodide() {
+  pyodide = await loadPyodide({
+    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.1/full/",
+    stdout: (text) => {
+      self.postMessage({ type: "stdout", content: text + "\n" });
+    },
+    stderr: (text) => {
+      self.postMessage({ type: "stderr", content: text + "\n" });
+    },
+  });
+}
+
+const pyodidePromise = initPyodide();
+
+self.onmessage = async function (e) {
+  if (e.data.type === "run") {
+    const userCode = e.data.code;
+    const stdin = e.data.stdin || "";
+
+    try {
+      await pyodidePromise;
+
+      // Register a JavaScript helper module for reading stdin lines
+      const stdinLines = stdin
+        .split(/\r?\n/)
+        .map((line) => line.trimEnd());
+      
+      let stdinIndex = 0;
+
+      pyodide.registerJsModule("stdin_helper", {
+        readline: () => {
+          if (stdinIndex < stdinLines.length) {
+            return stdinLines[stdinIndex++];
+          }
+          return "";
+        },
+      });
+
+      // Override builtins.input in Python to read from our stdin helper
+      // It prints the prompt and the entered value to simulate console output.
+      await pyodide.runPythonAsync(`
+import builtins
+import stdin_helper
+
+def custom_input(prompt=""):
+    if prompt:
+        print(prompt, end="")
+    val = stdin_helper.readline()
+    print(val)
+    return val
+
+builtins.input = custom_input
+      `);
+
+      // Load packages imported in the user code (e.g. numpy, pandas, matplotlib)
+      try {
+        await pyodide.loadPackagesFromImports(userCode);
+      } catch (pkgErr) {
+        self.postMessage({
+          type: "stderr",
+          content: "Warning loading imports: " + pkgErr.message + "\n",
+        });
+      }
+
+      // Execute user code
+      await pyodide.runPythonAsync(userCode);
+      self.postMessage({ type: "finished", status: "0" });
+    } catch (err) {
+      const errMsg =
+        err && err.stack
+          ? err.stack
+          : err && err.message
+            ? err.message
+            : String(err);
+      self.postMessage({ type: "stderr", content: errMsg + "\n" });
+      self.postMessage({ type: "finished", status: "1" });
+    }
+  }
+};
