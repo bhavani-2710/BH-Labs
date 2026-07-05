@@ -152,7 +152,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     font: helveticaBold,
     color: purpleColor
   });
-  currentY -= 18;
+  currentY -= 25; // Increased from 18 to 25
 
   const titleText = `${sanitizeText(subExp?.title) || "Experiment"} Implementation`;
   currentPage.drawText(titleText, {
@@ -162,12 +162,12 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     font: helveticaBold,
     color: darkTextColor
   });
-  currentY -= 25;
+  currentY -= 35; // Increased from 25 to 35 (adds space before Aim)
 
 
-  // Function to wrap and draw block texts (No background, just colored text)
+  // Function to wrap and draw block texts
   const drawHeading = (text) => {
-    ensureSpace(35);
+    ensureSpace(45); // Increased from 35 for more top margin
     currentPage.drawText(text.toUpperCase(), {
       x: MARGIN_LEFT,
       y: currentY - 8,
@@ -175,7 +175,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
       font: helveticaBold,
       color: purpleColor
     });
-    currentY -= 18;
+    currentY -= 25; // Increased from 18 to 25 (adds space below header)
   };
 
   const drawParagraph = (text, isMonospace = false, customFontSize = 9, customLineHeight = 13) => {
