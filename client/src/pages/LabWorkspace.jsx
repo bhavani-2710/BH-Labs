@@ -5,7 +5,11 @@ import {
   ArrowLeft,
   Loader2,
   X,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
+
 import monacoCustomTheme from "../utils/monacoCustomTheme";
 import CollapsedLeftSidebar from "../components/CollapsedLeftSidebar";
 import WorkspaceLeftSidebar from "../components/WorkspaceLeftSidebar";
@@ -14,6 +18,7 @@ import CollapsedRightSidebar from "../components/CollapsedRightSidebar";
 import { generateJournalPdf } from "../utils/journalPdfGenerator";
 import { runJsInWebWorker } from "../workers/jsWorkerHelper";
 import { runPythonInWebWorker } from "../workers/pythonWorkerHelper";
+import ThemeToggle from "../components/ThemeToggle";
 
 const COMPILER_MAP = {
   c: "gcc-head-c",
@@ -51,9 +56,11 @@ export default function LabWorkspace({
   onSaveCode,
   savedCode,
 }) {
+  const { theme, toggleTheme } = useTheme();
   const subExp =
     experiment?.subExperiments?.find((s) => s.part === subPart) ||
     experiment?.subExperiments?.[0];
+
 
   const [activeLeftTab, setActiveLeftTab] = useState("theory");
   const [activeRightTab, setActiveRightTab] = useState("assistant");
@@ -884,30 +891,27 @@ SELECT * FROM student;
   const toggleRight = () => setRightCollapsed((prev) => !prev);
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-[#FAFAFA] selection:bg-[#5521FF]/20 font-sans text-[13px] text-[#18181B]">
+    <div className="h-screen flex flex-col overflow-hidden bg-[#FAFAFA] dark:bg-slate-950 selection:bg-[#5521FF]/20 font-sans text-[13px] text-[#18181B] dark:text-slate-100 transition-colors duration-200">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-1.5 border-b border-[#E4E4E7] bg-white z-50 shrink-0 relative h-11">
+      <header className="flex items-center justify-between px-4 py-1.5 border-b border-[#E4E4E7] dark:border-transparent bg-white dark:bg-slate-900 z-50 shrink-0 relative h-11 transition-colors duration-200">
         <div className="flex items-center gap-2">
           <button
-            className="text-[11px] flex items-center justify-center gap-1 font-semibold text-[#71717A] bg-none border-none cursor-pointer px-2 py-1 rounded-[6px] transition-colors duration-150 font-sans tracking-wide hover:bg-[#F4F4F5] hover:text-[#18181B]"
+            className="text-[11px] flex items-center justify-center gap-1 font-semibold text-[#71717A] dark:text-slate-400 bg-none border-none cursor-pointer px-2 py-1 rounded-[6px] transition-colors duration-150 font-sans tracking-wide hover:bg-[#F4F4F5] dark:hover:bg-slate-800 hover:text-[#18181B] dark:hover:text-slate-200"
             onClick={onBack}
           >
             <ArrowLeft size={16} /> <span>Back</span>
           </button>
-          <div className="w-[1px] h-[18px] bg-[#E4E4E7] shrink-0" />
+          <div className="w-[1px] h-3.5 bg-slate-200 dark:bg-slate-800" />
+          <ThemeToggle />
           <nav className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-[#71717A] uppercase">
             <span onClick={onBack}></span>
-            <span className="text-[#D4D4D8] text-[10px]">›</span>
-            <span className="text-[#18181B] font-bold cursor-default">
-              {subExp?.title || "Bubble Sort"}
-            </span>
           </nav>
         </div>
 
         {/* Language selector — dropdown if multiple, static pill if single */}
         {supportedLanguages.length > 1 ? (
           <select
-            className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] border border-[#E4E4E7] rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] uppercase tracking-widest whitespace-nowrap cursor-pointer outline-none transition-colors duration-150 hover:border-[#5521FF] hover:text-[#5521FF] focus:border-[#5521FF] focus:ring-2 focus:ring-[#5521FF]/15 max-[900px]:hidden"
+            className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap cursor-pointer outline-none transition-colors duration-150 hover:border-[#5521FF] hover:text-[#5521FF] focus:border-[#5521FF] focus:ring-2 focus:ring-[#5521FF]/15 max-[900px]:hidden"
             value={editorLanguage}
             onChange={handleLanguageChange}
           >
@@ -918,26 +922,26 @@ SELECT * FROM student;
             ))}
           </select>
         ) : (
-          <div className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] border border-[#E4E4E7] rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] uppercase tracking-widest whitespace-nowrap hidden md:block">
+          <div className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap hidden md:block transition-colors duration-200">
             {editorLanguage.toUpperCase()} Language
           </div>
         )}
 
         <div className="flex items-center gap-2.5">
-          <div className="text-[10px] font-semibold text-[#71717A] uppercase tracking-wider flex items-center gap-1">
+          <div className="text-[10px] font-semibold text-[#71717A] dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
             <span className="w-[5px] h-[5px] rounded-full bg-[#22C55E] shrink-0" />{" "}
             {saveStatus}
           </div>
-          <div className="w-[1px] h-[18px] bg-[#E4E4E7] shrink-0" />
+          <div className="w-[1px] h-[18px] bg-[#E4E4E7] dark:bg-slate-800 shrink-0" />
           <button
-            className="bg-[#22C55E]/10 text-[#166534] border border-[#22C55E]/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#22C55E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-[#22C55E]/10 dark:bg-emerald-950/20 text-[#166534] dark:text-emerald-400 border border-[#22C55E]/30 dark:border-emerald-900/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#22C55E]/20 dark:hover:bg-emerald-950/40 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleRunCode}
             disabled={isRunning}
           >
             {isRunning ? "Running..." : "Run"}
           </button>
           <button
-            className="bg-[#5521FF]/10 text-[#5521FF] border border-[#5521FF]/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#5521FF]/20"
+            className="bg-[#5521FF]/10 dark:bg-[#5521FF]/20 text-[#5521FF] dark:text-violet-300 border border-[#5521FF]/30 dark:border-[#5521FF]/40 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#5521FF]/20 dark:hover:bg-[#5521FF]/30"
             onClick={handleSolveQuestion}
           >
             Solve Question
@@ -947,7 +951,7 @@ SELECT * FROM student;
               onClick={toggleWorkspaceCompleted}
               onMouseEnter={() => setIsDoneHovered(true)}
               onMouseLeave={() => setIsDoneHovered(false)}
-              className={`border px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-all duration-150 font-sans ${isDone ? (isDoneHovered ? "bg-[#EF4444] border-[#EF4444] text-white" : "bg-[#10B981] border-[#10B981] text-white") : "bg-[#F4F4F5] text-[#18181B] border-[#E4E4E7] hover:bg-[#E4E4E7]"}`}
+              className={`border px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-all duration-150 font-sans ${isDone ? (isDoneHovered ? "bg-[#EF4444] border-[#EF4444] text-white" : "bg-[#10B981] border-[#10B981] text-white") : "bg-[#F4F4F5] dark:bg-slate-800 text-[#18181B] dark:text-slate-200 border-[#E4E4E7] dark:border-transparent hover:bg-[#E4E4E7] dark:hover:bg-slate-700"}`}
             >
               {isDone
                 ? isDoneHovered
@@ -973,7 +977,7 @@ SELECT * FROM student;
             defaultSize={35}
             minSize={35}
             maxSize={35}
-            className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
+            className="bg-white dark:bg-black border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
           >
             <CollapsedLeftSidebar
               setActiveLeftTab={setActiveLeftTab}
@@ -985,7 +989,7 @@ SELECT * FROM student;
             defaultSize={"25%"}
             minSize={"25%"}
             maxSize={"35%"}
-            className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
+            className="bg-white dark:bg-black border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
           >
             <WorkspaceLeftSidebar
               activeLeftTab={activeLeftTab}
@@ -997,7 +1001,7 @@ SELECT * FROM student;
         )}
 
         <Separator className="group relative w-1 cursor-col-resize">
-          <div className="absolute inset-0 bg-[#E4E4E7] group-hover:bg-[#5521FF] transition-colors" />
+          <div className="absolute inset-0 bg-[#E4E4E7] dark:bg-slate-900 group-hover:bg-[#5521FF] transition-colors" />
         </Separator>
 
         {/* CENTER */}
@@ -1005,7 +1009,7 @@ SELECT * FROM student;
           defaultSize={"50%"}
           minSize={"30%"}
           maxSize={"90%"}
-          className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0"
+          className="bg-white border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0"
         >
           <Group orientation="vertical">
             <Panel
@@ -1013,8 +1017,8 @@ SELECT * FROM student;
               minSize={"20%"}
               className="flex flex-col min-h-0"
             >
-              <div className="flex items-center bg-[#F4F4F5] border-b border-[#E4E4E7] h-[34px] shrink-0">
-                <div className="flex items-center gap-1.25 px-3.5 h-full bg-white border-r border-[#E4E4E7] font-mono text-[11px] text-[#18181B]">
+              <div className="flex items-center bg-[#F4F4F5] dark:bg-[#0f0f0f] border-b border-[#E4E4E7] dark:border-slate-900 h-[34px] shrink-0">
+                <div className="flex items-center gap-1.25 px-3.5 h-full bg-white dark:bg-black border-r border-[#E4E4E7] dark:border-slate-900 font-mono text-[11px] text-[#18181B] dark:text-white">
                   <span className="text-[#5521FF] text-xs">◉</span>
                   <span>main.{EXTENSION_MAP[editorLanguage] || "c"}</span>
                 </div>
@@ -1022,7 +1026,7 @@ SELECT * FROM student;
               <div className="flex-1 min-h-0 overflow-hidden">
                 <Editor
                   beforeMount={monacoCustomTheme}
-                  theme="bh-light"
+                  theme={theme === "dark" ? "bh-dark" : "bh-light"}
                   height="100%"
                   language={MONACO_LANG_MAP[editorLanguage] || "c"}
                   value={code}
@@ -1057,7 +1061,7 @@ SELECT * FROM student;
             </Panel>
 
             <Separator className="group relative h-1 cursor-row-resize">
-              <div className="absolute inset-0 bg-[#E4E4E7] group-hover:bg-[#5521FF] transition-colors" />
+              <div className="absolute inset-0 bg-[#E4E4E7] dark:bg-slate-800 group-hover:bg-[#5521FF] transition-colors" />
             </Separator>
 
             {/* CONSOLE SECTION */}
@@ -1065,33 +1069,33 @@ SELECT * FROM student;
               defaultSize={"28%"}
               minSize={"5%"}
               maxSize={"80%"}
-              className="flex flex-col min-h-0 border-t border-[#E4E4E7] bg-[#F4F4F5]"
+              className="flex flex-col min-h-0 border-t border-[#E4E4E7] dark:border-transparent bg-[#F4F4F5] dark:bg-slate-900 transition-colors duration-200"
             >
-              <div className="flex items-center gap-3 px-3 border-b border-[#E4E4E7] bg-[#F9F9FB] shrink-0">
+              <div className="flex items-center gap-3 px-3 border-b border-[#E4E4E7] dark:border-transparent bg-[#F9F9FB] dark:bg-slate-950 shrink-0 transition-colors duration-200">
                 <button
-                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "input" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "input" ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400" : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"}`}
                   onClick={() => setConsoleTab("input")}
                 >
                   Input
                 </button>
                 <button
-                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "output" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "output" ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400" : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"}`}
                   onClick={() => setConsoleTab("output")}
                 >
                   Output
                 </button>
                 <button
-                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "errors" ? "text-[#5521FF] border-[#5521FF]" : "text-[#71717A] border-transparent hover:text-[#18181B]"}`}
+                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "errors" ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400" : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"}`}
                   onClick={() => setConsoleTab("errors")}
                 >
                   Errors{consoleErrors ? " (1)" : ""}
                 </button>
               </div>
-              <div className="flex-1 min-h-0 p-2.5 px-3 font-mono text-[11px] text-[#71717A] overflow-auto leading-relaxed custom-scrollbar">
+              <div className="flex-1 min-h-0 p-2.5 px-3 font-mono text-[11px] text-[#71717A] dark:text-slate-300 overflow-auto leading-relaxed custom-scrollbar">
                 {consoleTab === "input" && (
                   <div className="flex flex-col h-full gap-2.5">
                     {/* Test Case Selector Tabs */}
-                    <div className="flex flex-wrap items-center gap-1.5 shrink-0 select-none pb-1 border-b border-[#E4E4E7]/40">
+                    <div className="flex flex-wrap items-center gap-1.5 shrink-0 select-none pb-1 border-b border-[#E4E4E7]/40 dark:border-transparent/40">
                       {testCases.map((tc, idx) => (
                         <div
                           key={idx}
@@ -1101,8 +1105,8 @@ SELECT * FROM student;
                           }}
                           className={`group relative flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] border text-[11px] font-semibold transition-all duration-150 cursor-pointer ${
                             activeTestCaseIdx === idx
-                              ? "bg-white border-[#E4E4E7] text-[#5521FF] shadow-[0_1px_2px_rgba(0,0,0,0.05)] font-bold"
-                              : "bg-transparent border-transparent text-[#71717A] hover:bg-[#E4E4E7]/40 hover:text-[#18181B]"
+                              ? "bg-white dark:bg-slate-800 border-[#E4E4E7] dark:border-transparent text-[#5521FF] dark:text-violet-400 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-none font-bold"
+                              : "bg-transparent border-transparent text-[#71717A] dark:text-slate-400 hover:bg-[#E4E4E7]/40 dark:hover:bg-slate-800/40 hover:text-[#18181B] dark:hover:text-slate-200"
                           }`}
                         >
                           <span className="p-[3px] rounded-full bg-[#5521ff]"></span>
@@ -1110,7 +1114,7 @@ SELECT * FROM student;
                           {testCases.length > 1 && (
                             <button
                               onClick={(e) => deleteTestCase(idx, e)}
-                              className="opacity-0 group-hover:opacity-100 text-[#A1A1AA] hover:text-red-500 font-bold transition-all duration-150 p-0 text-[12px] leading-none shrink-0"
+                              className="opacity-0 group-hover:opacity-100 text-[#A1A1AA] dark:text-slate-500 hover:text-red-500 font-bold transition-all duration-150 p-0 text-[12px] leading-none shrink-0"
                               title="Delete this test case"
                             >
                               <X size={12} />
@@ -1125,7 +1129,7 @@ SELECT * FROM student;
                           setActiveTestCaseIdx(nextIdx);
                           setStdinInput("");
                         }}
-                        className="px-2 py-1 rounded-[6px] border border-dashed border-[#D4D4D8] hover:border-[#5521FF] hover:text-[#5521FF] text-[#71717A] text-[10px] font-semibold transition-all duration-150 cursor-pointer flex items-center justify-center gap-0.5"
+                        className="px-2 py-1 rounded-[6px] border border-dashed border-[#D4D4D8] dark:border-transparent hover:border-[#5521FF] dark:hover:border-violet-400 hover:text-[#5521FF] dark:hover:text-violet-400 text-[#71717A] dark:text-slate-400 text-[10px] font-semibold transition-all duration-150 cursor-pointer flex items-center justify-center gap-0.5"
                       >
                         + Add Case
                       </button>
@@ -1145,7 +1149,7 @@ SELECT * FROM student;
                           });
                         }}
                         placeholder="Type program input here (one value per line)..."
-                        className="w-full h-full bg-transparent border-none resize-none outline-none font-mono text-[12px] text-[#18181B] leading-relaxed"
+                        className="w-full h-full bg-transparent border-none resize-none outline-none font-mono text-[12px] text-[#18181B] dark:text-slate-200 leading-relaxed"
                       />
                     </div>
                   </div>
@@ -1176,7 +1180,7 @@ SELECT * FROM student;
         </Panel>
 
         <Separator className="group relative w-1 cursor-col-resize">
-          <div className="absolute inset-0 bg-[#E4E4E7] group-hover:bg-[#5521FF] transition-colors" />
+          <div className="absolute inset-0 bg-[#E4E4E7] dark:bg-slate-900 group-hover:bg-[#5521FF] transition-colors" />
         </Separator>
 
         {/* RIGHT */}
@@ -1221,20 +1225,20 @@ SELECT * FROM student;
 
       {/* Journal Preview Modal */}
       {showJournalModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-[#FAFAFA] w-full max-w-[900px] h-[90vh] rounded-[24px] shadow-2xl flex flex-col overflow-hidden border border-slate-200/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm">
+          <div className="bg-[#FAFAFA] dark:bg-slate-900 w-full max-w-[900px] h-[90vh] rounded-[24px] shadow-2xl flex flex-col overflow-hidden border border-slate-200/50 dark:border-transparent transition-colors duration-200">
             {/* Header */}
-            <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-transparent px-6 py-4 flex items-center justify-between shadow-sm transition-colors duration-200">
               <div className="flex items-center space-x-3.5">
                 <button
                   onClick={() => setShowJournalModal(false)}
-                  className="text-slate-500 hover:text-slate-800 border border-slate-200 p-2 bg-white hover:bg-slate-50 rounded-full transition-all flex items-center justify-center cursor-pointer active:scale-95"
+                  className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border border-slate-200 dark:border-transparent p-2 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-all flex items-center justify-center cursor-pointer active:scale-95"
                   title="Close Preview"
                 >
-                  <ArrowLeft className="w-4 h-4 text-slate-600" />
+                  <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                 </button>
                 <div>
-                  <h1 className="font-bold text-slate-800 text-sm leading-tight">
+                  <h1 className="font-bold text-slate-800 dark:text-slate-200 text-sm leading-tight">
                     Practical Journal Preview
                   </h1>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
@@ -1253,7 +1257,7 @@ SELECT * FROM student;
                 </button>
                 <button
                   onClick={() => setShowJournalModal(false)}
-                  className="text-slate-400 hover:text-slate-600 p-2 rounded-full cursor-pointer transition-all hover:bg-slate-100"
+                  className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1261,11 +1265,11 @@ SELECT * FROM student;
             </div>
 
             {/* Preview Frame */}
-            <div className="flex-1 p-6 flex items-center justify-center bg-slate-100/50">
+            <div className="flex-1 p-6 flex items-center justify-center bg-slate-100/50 dark:bg-slate-950 transition-colors duration-200">
               {isGeneratingJournal ? (
                 <div className="flex flex-col items-center space-y-3">
                   <Loader2 className="w-8 h-8 text-[#630ed4] animate-spin" />
-                  <span className="text-slate-500 font-semibold text-xs">
+                  <span className="text-slate-500 dark:text-slate-400 font-semibold text-xs">
                     Generating Journal PDF...
                   </span>
                 </div>
@@ -1273,7 +1277,7 @@ SELECT * FROM student;
                 <iframe
                   src={`${journalPdfUrl}#navpanes=0&toolbar=1`}
                   title="Practical Journal PDF Preview"
-                  className="w-full h-full border border-slate-200 rounded-[20px] shadow-lg bg-white"
+                  className="w-full h-full border border-slate-200 dark:border-transparent rounded-[20px] shadow-lg bg-white"
                 />
               ) : (
                 <span className="text-slate-400 text-xs font-semibold">

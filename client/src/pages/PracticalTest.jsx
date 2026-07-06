@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+﻿import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, Clock, AlertTriangle, X, HelpCircle } from "lucide-react";
 import { renderQuestionText } from "../utils/renderQuestionText";
@@ -286,14 +286,14 @@ export default function PracticalTest({
 
   // ── Render ──────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex transition-colors duration-200">
       {/* Main Content — full width, no sidebar */}
       <main className="flex-1 flex flex-col h-screen">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
-          <h2 className="text-lg font-bold text-slate-800">{testTitle}</h2>
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-transparent flex items-center justify-between px-8 shrink-0 transition-colors duration-200">
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">{testTitle}</h2>
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xs">
+            <div className="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center text-violet-700 dark:text-violet-400 font-bold text-xs">
               {initials}
             </div>
           </div>
@@ -303,7 +303,7 @@ export default function PracticalTest({
         <div className="pb-8 px-8 h-fit overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* ── Question Card ─────────────────────────────────── */}
-            <div className="flex-1 bg-white shadow-sm border border-slate-100 p-8 min-h-[600px] relative rounded-3xl">
+            <div className="flex-1 bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-transparent p-8 min-h-[600px] relative rounded-3xl transition-colors duration-200">
               {/* Watermark */}
               <div
                 className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none"
@@ -314,10 +314,10 @@ export default function PracticalTest({
 
               {/* Question Text */}
               <div className="flex items-start space-x-2 mb-8">
-                <span className="font-bold text-slate-900">
+                <span className="font-bold text-slate-900 dark:text-slate-100">
                   {currentIndex + 1}.
                 </span>
-                <h3 className="font-bold text-slate-900">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100">
                   {renderQuestionText(currentQuestion.text)}
                 </h3>
               </div>
@@ -339,14 +339,14 @@ export default function PracticalTest({
                         className={`relative flex items-center justify-center w-5 h-5 rounded-full border-2 transition-colors ${
                           isSelected
                             ? "border-[#5521FF]"
-                            : "border-slate-400 group-hover:border-violet-300"
+                            : "border-slate-400 dark:border-transparent group-hover:border-violet-300"
                         }`}
                       >
                         {isSelected && (
                           <div className="w-2.5 h-2.5 bg-[#5521FF] rounded-full" />
                         )}
                       </div>
-                      <span className="text-sm text-slate-700">
+                      <span className="text-sm text-slate-700 dark:text-slate-200">
                         {renderQuestionText(opt)}
                       </span>
                     </label>
@@ -389,49 +389,49 @@ export default function PracticalTest({
 
             {/* ── Stats Panel ───────────────────────────────────── */}
             <aside className="w-full lg:w-[360px] space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+              <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-transparent p-6 transition-colors duration-200">
                 {/* Student Info */}
                 <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 flex items-center justify-center font-bold text-sm shrink-0">
                     {initials}
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-800 text-sm">
+                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
                       {studentName}
                     </h4>
-                    <p className="text-[10px] text-slate-500 font-medium">
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                       {testTitle}
                     </p>
                   </div>
                 </div>
 
-                <hr className="border-slate-100 mb-6" />
+                <hr className="border-slate-100 dark:border-transparent mb-6" />
 
                 {/* Legend */}
                 <div className="mb-4">
-                  <p className="text-sm font-bold text-slate-800 mb-3">
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
                     Questions
                   </p>
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center space-x-1.5">
                       <div className="w-3 h-3 bg-blue-600 rounded-sm" />
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">
                         Answered
                       </span>
                     </div>
                     <div className="flex items-center space-x-1.5">
                       <div className="w-3 h-3 bg-red-600 rounded-sm" />
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">
                         Not Answered
                       </span>
                     </div>
                     <div className="flex items-center space-x-1.5">
                       <div className="w-3 h-3 bg-purple-800 rounded-sm" />
-                      <span className="text-[10px] text-slate-500">Review</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">Review</span>
                     </div>
                     <div className="flex items-center space-x-1.5">
-                      <div className="w-3 h-3 bg-slate-100 border border-slate-200 rounded-sm" />
-                      <span className="text-[10px] text-slate-500">
+                      <div className="w-3 h-3 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-transparent rounded-sm" />
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">
                         Not Visited
                       </span>
                     </div>
@@ -495,36 +495,36 @@ export default function PracticalTest({
 
                 {/* Score Summary (after submit) */}
                 {submitted && (
-                  <div className="mt-8 pt-6 border-t border-slate-100 space-y-3">
-                    <p className="text-sm font-bold text-slate-800">Results</p>
+                  <div className="mt-8 pt-6 border-t border-slate-100 dark:border-transparent space-y-3">
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Results</p>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Correct</span>
-                      <span className="font-bold text-emerald-600">
+                      <span className="text-slate-500 dark:text-slate-400">Correct</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
                         {stats.correct}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Incorrect</span>
-                      <span className="font-bold text-red-600">
+                      <span className="text-slate-500 dark:text-slate-400">Incorrect</span>
+                      <span className="font-bold text-red-600 dark:text-red-400">
                         {stats.incorrect}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Unanswered</span>
-                      <span className="font-bold text-slate-600">
+                      <span className="text-slate-500 dark:text-slate-400">Unanswered</span>
+                      <span className="font-bold text-slate-600 dark:text-slate-300">
                         {stats.unanswered}
                       </span>
                     </div>
-                    <hr className="border-slate-100" />
+                    <hr className="border-slate-100 dark:border-transparent" />
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Score</span>
-                      <span className="font-bold text-[#5521FF]">
+                      <span className="text-slate-500 dark:text-slate-400">Score</span>
+                      <span className="font-bold text-[#5521FF] dark:text-violet-400">
                         {stats.correct}/{totalQuestions}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Time Taken</span>
-                      <span className="font-bold text-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Time Taken</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
                         {formatTime(elapsed)}
                       </span>
                     </div>
@@ -540,11 +540,11 @@ export default function PracticalTest({
       <div
         className={`fixed bottom-6 right-6 shadow-lg border p-4 rounded-xl z-50 flex flex-col items-end transition-colors ${
           remaining <= 120
-            ? "bg-red-50 border-red-200"
-            : "bg-white border-slate-100"
+            ? "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-transparent"
+            : "bg-white dark:bg-slate-900 border-slate-100 dark:border-transparent"
         }`}
       >
-        <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
+        <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
           Time Remaining
         </p>
         <div className="flex items-center space-x-2">
@@ -553,7 +553,7 @@ export default function PracticalTest({
           />
           <span
             className={`text-2xl font-bold font-mono tracking-tight ${
-              remaining <= 120 ? "text-red-600" : "text-[#5521FF]"
+              remaining <= 120 ? "text-red-600 dark:text-red-400" : "text-[#5521FF] dark:text-violet-400"
             }`}
           >
             {formatTime(remaining)}
@@ -564,24 +564,24 @@ export default function PracticalTest({
       {/* ── Navigation Blocker Modal ──────────────────────────────── */}
       {showBlockerModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md mx-4 overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-transparent w-full max-w-md mx-4 overflow-hidden transition-colors">
             {/* Modal Header */}
             <div className="p-6 pb-4 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-500" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                   Leave this test?
                 </h3>
-                <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                   Your test is still in progress. If you leave now, all your
                   answers will be lost and you won't be able to resume.
                 </p>
               </div>
               <button
                 onClick={() => setShowBlockerModal(false)}
-                className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -591,7 +591,7 @@ export default function PracticalTest({
             <div className="p-6 pt-2 flex items-center gap-3 justify-end">
               <button
                 onClick={() => setShowBlockerModal(false)}
-                className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors cursor-pointer"
+                className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-transparent text-slate-700 dark:text-slate-200 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Continue Test
               </button>
@@ -615,24 +615,24 @@ export default function PracticalTest({
       {/* ── Submit Confirmation Modal ─────────────────────────────── */}
       {showSubmitConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md mx-4 overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-transparent w-full max-w-md mx-4 overflow-hidden transition-colors">
             {/* Modal Header */}
             <div className="p-6 pb-4 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center shrink-0">
                 <HelpCircle className="w-5 h-5 text-[#5521FF]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                   Submit Answers?
                 </h3>
-                <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                   Are you sure you want to submit your answers? You will not be
                   able to modify them or resume the test once submitted.
                 </p>
               </div>
               <button
                 onClick={() => setShowSubmitConfirm(false)}
-                className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -642,7 +642,7 @@ export default function PracticalTest({
             <div className="p-6 pt-2 flex items-center gap-3 justify-end">
               <button
                 onClick={() => setShowSubmitConfirm(false)}
-                className="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg border border-slate-200 dark:border-transparent text-slate-700 dark:text-slate-200 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Cancel
               </button>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -26,7 +26,7 @@ const INSTRUCTIONS = [
     text: (
       <>
         Use the{" "}
-        <span className="font-bold text-slate-900">"Mark for Review"</span>{" "}
+        <span className="font-bold text-slate-900 dark:text-slate-300">"Mark for Review"</span>{" "}
         button to flag questions you want to revisit later.
       </>
     ),
@@ -43,7 +43,7 @@ const INSTRUCTIONS = [
     text: (
       <>
         The test will{" "}
-        <span className="font-bold text-slate-900">auto-submit</span>{" "}
+        <span className="font-bold text-slate-900 dark:text-slate-300">auto-submit</span>{" "}
         immediately when the timer reaches zero. Any unsubmitted progress will
         be saved automatically.
       </>
@@ -131,9 +131,9 @@ export default function TestInstruction({
   // ── Render ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F6F7FB] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-violet-200 border-t-[#5521FF] animate-spin" />
-        <p className="text-sm font-semibold text-slate-500 animate-pulse text-center px-4">
+      <div className="min-h-screen bg-[#F6F7FB] dark:bg-slate-950 flex flex-col items-center justify-center gap-4 transition-colors">
+        <div className="w-12 h-12 rounded-full border-4 border-violet-200 dark:border-violet-900 border-t-[#5521FF] animate-spin" />
+        <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 animate-pulse text-center px-4">
           Building your customized practical test...
         </p>
       </div>
@@ -141,7 +141,7 @@ export default function TestInstruction({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F6F7FB] relative">
+    <div className="min-h-screen flex flex-col bg-[#F6F7FB] dark:bg-slate-950 relative transition-colors duration-200">
       {/* ── Background blobs ──────────────────────────────────────── */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] bg-[#5521FF] opacity-[0.03] blur-[120px] rounded-full" />
@@ -149,31 +149,31 @@ export default function TestInstruction({
       </div>
 
       {/* ── Top Header Bar ────────────────────────────────────────── */}
-      <header className="bg-white sticky top-0 z-50 border-b border-slate-200 px-4 md:px-10 h-16 flex justify-between items-center w-full">
+      <header className="bg-white dark:bg-slate-900 sticky top-0 z-50 border-b border-slate-200 dark:border-transparent px-4 md:px-10 h-16 flex justify-between items-center w-full transition-colors duration-200">
         <div className="flex items-center gap-4">
           <button
             onClick={handleBack}
-            className="flex items-center gap-1 text-slate-500 hover:text-[#5521FF] transition-colors text-sm font-medium cursor-pointer"
+            className="flex items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-[#5521FF] dark:hover:text-violet-400 transition-colors text-sm font-medium cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
             Back
           </button>
-          <div className="h-6 w-px bg-slate-200 hidden md:block" />
-          <h1 className="text-xl font-semibold text-slate-900">{testTitle}</h1>
+          <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden md:block" />
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{testTitle}</h1>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Online indicator */}
-          <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
+          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-transparent transition-colors">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-            <span className="text-xs font-medium text-slate-500">Online</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Online</span>
           </div>
           {/* Header icons */}
           <div className="hidden md:flex gap-1">
-            <button className="text-slate-500 hover:bg-slate-100 p-2 rounded-full cursor-pointer transition-colors">
+            <button className="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full cursor-pointer transition-colors">
               <Timer className="w-5 h-5" />
             </button>
-            <button className="text-slate-500 hover:bg-slate-100 p-2 rounded-full cursor-pointer transition-colors">
+            <button className="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full cursor-pointer transition-colors">
               <HelpCircle className="w-5 h-5" />
             </button>
           </div>
@@ -183,28 +183,28 @@ export default function TestInstruction({
       {/* ── Main Content ──────────────────────────────────────────── */}
       <main className="flex-grow flex items-center justify-center p-4 md:p-10">
         <div className="w-full max-w-[800px]">
-          <section className="bg-white rounded-2xl overflow-hidden flex flex-col shadow-sm border border-slate-200">
+          <section className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden flex flex-col shadow-sm border border-slate-200 dark:border-transparent transition-colors duration-200">
             {/* ── Card Header ─────────────────────────────────────── */}
-            <div className="p-8 pb-6 border-b border-slate-200">
-              <p className="text-[#5521FF] font-bold text-xs tracking-widest uppercase mb-2">
+            <div className="p-8 pb-6 border-b border-slate-200 dark:border-transparent">
+              <p className="text-[#5521FF] dark:text-violet-400 font-bold text-xs tracking-widest uppercase mb-2">
                 BEFORE YOU BEGIN
               </p>
-              <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">
+              <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">
                 Test Instructions
               </h2>
             </div>
 
             {/* ── Stats Strip ─────────────────────────────────────── */}
-            <div className="grid grid-cols-2 md:grid-cols-4 bg-slate-50 border-b border-slate-200">
+            <div className="grid grid-cols-2 md:grid-cols-4 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-transparent transition-colors">
               {stats.map((stat, idx) => (
                 <div
                   key={idx}
                   className={`p-5 flex flex-col items-center justify-center gap-1 ${
-                    idx < stats.length - 1 ? "border-r border-slate-200" : ""
-                  } ${idx >= 2 ? "border-t md:border-t-0 border-slate-200" : ""}`}
+                    idx < stats.length - 1 ? "border-r border-slate-200 dark:border-transparent" : ""
+                  } ${idx >= 2 ? "border-t md:border-t-0 border-slate-200 dark:border-transparent" : ""}`}
                 >
                   {stat.icon}
-                  <span className="text-sm font-medium text-slate-900">
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-200">
                     {stat.label}
                   </span>
                 </div>
@@ -216,10 +216,10 @@ export default function TestInstruction({
               <div className="space-y-4">
                 {INSTRUCTIONS.map((instr, idx) => (
                   <div key={idx} className="flex gap-4">
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-violet-100 text-[#5521FF] flex items-center justify-center font-bold text-sm">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-950/40 text-[#5521FF] dark:text-violet-400 flex items-center justify-center font-bold text-sm">
                       {idx + 1}
                     </span>
-                    <p className="text-base text-slate-600 pt-1 leading-relaxed">
+                    <p className="text-base text-slate-600 dark:text-slate-300 pt-1 leading-relaxed">
                       {instr.text}
                     </p>
                   </div>
@@ -227,13 +227,13 @@ export default function TestInstruction({
               </div>
 
               {/* ── Warning Box ─────────────────────────────────── */}
-              <div className="bg-amber-50 rounded-lg p-5 flex gap-4 border border-amber-200">
-                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-5 flex gap-4 border border-amber-200 dark:border-transparent">
+                <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <h4 className="font-bold text-amber-900 text-sm">
+                  <h4 className="font-bold text-amber-900 dark:text-amber-400 text-sm">
                     Important: Negative Marking Active
                   </h4>
-                  <p className="text-amber-800 text-sm leading-relaxed">
+                  <p className="text-amber-800 dark:text-amber-500 text-sm leading-relaxed">
                     For every incorrect answer, 1 mark will be deducted from
                     your total score. Unattempted questions will not be
                     penalized.
@@ -243,15 +243,15 @@ export default function TestInstruction({
             </div>
 
             {/* ── Footer Actions ──────────────────────────────────── */}
-            <div className="p-8 bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="p-8 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-transparent flex flex-col md:flex-row items-center justify-between gap-6 transition-colors">
               <label className="flex items-center gap-3 cursor-pointer group select-none">
                 <input
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="w-5 h-5 rounded border-slate-300 text-[#5521FF] focus:ring-[#5521FF] cursor-pointer transition-all accent-[#5521FF]"
+                  className="w-5 h-5 rounded border-slate-300 dark:border-transparent text-[#5521FF] focus:ring-[#5521FF] cursor-pointer transition-all accent-[#5521FF]"
                 />
-                <span className="text-slate-500 text-sm font-medium group-hover:text-slate-900 transition-colors">
+                <span className="text-slate-500 dark:text-slate-400 text-sm font-medium group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
                   I have read and understood the instructions
                 </span>
               </label>
