@@ -1,16 +1,28 @@
 const Subject = require("../models/Subject");
+const Department = require("../models/Departments");
 
 /**
  * getSubjects
- * Returns all subject documents from the database.
+ * Returns all subjects, with departments populated.
+ * Supports optional query param: ?department=<departmentId>
  *
  * @route  GET /api/subjects
- * @param  {import("express").Request}  req
- * @param  {import("express").Response} res
+ * @route  GET /api/subjects?department=<id>
  */
 const getSubjects = async (req, res) => {
   try {
-    const subjects = await Subject.find();
+    const { department } = req.query;
+
+    let query = {};
+    if (department) {
+      // Filter subjects that have an entry in the departments array matching this dept id
+      query = { "departments.department": department };
+    }
+
+    const subjects = await Subject.find(query).populate(
+      "departments.department",
+      "name code"
+    );
     res.status(200).json(subjects);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -19,15 +31,16 @@ const getSubjects = async (req, res) => {
 
 /**
  * getSubjectById
- * Returns a single subject document by its MongoDB _id.
+ * Returns a single subject by its MongoDB _id, with departments populated.
  *
  * @route  GET /api/subjects/:id
- * @param  {import("express").Request}  req - Expects `req.params.id`.
- * @param  {import("express").Response} res
  */
 const getSubjectById = async (req, res) => {
   try {
-    const subject = await Subject.findById(req.params.id);
+    const subject = await Subject.findById(req.params.id).populate(
+      "departments.department",
+      "name code"
+    );
 
     if (!subject) {
       return res.status(404).json({ message: "Subject not found" });
@@ -42,15 +55,15 @@ const getSubjectById = async (req, res) => {
 /**
  * createSubject
  * Creates a new subject document from the request body.
+ * Body: { name, code, departments: [{ department: <id>, semester }], description?, syllabusPdf? }
  *
  * @route  POST /api/subjects
- * @param  {import("express").Request}  req - Body: { name, code, semester, description? }.
- * @param  {import("express").Response} res
  */
 const createSubject = async (req, res) => {
   try {
     const subject = await Subject.create(req.body);
-    res.status(201).json(subject);
+    const populated = await subject.populate("departments.department", "name code");
+    res.status(201).json(populated);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -58,19 +71,16 @@ const createSubject = async (req, res) => {
 
 /**
  * updateSubject
- * Updates an existing subject document by its MongoDB _id and returns the
- * updated document.
+ * Updates an existing subject by its MongoDB _id and returns the updated document.
  *
  * @route  PUT /api/subjects/:id
- * @param  {import("express").Request}  req - Expects `req.params.id` and update fields in body.
- * @param  {import("express").Response} res
  */
 const updateSubject = async (req, res) => {
   try {
     const subject = await Subject.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
-    });
+    }).populate("departments.department", "name code");
 
     if (!subject) {
       return res.status(404).json({ message: "Subject not found" });
@@ -84,11 +94,9 @@ const updateSubject = async (req, res) => {
 
 /**
  * deleteSubject
- * Permanently removes a subject document by its MongoDB _id.
+ * Permanently removes a subject by its MongoDB _id.
  *
  * @route  DELETE /api/subjects/:id
- * @param  {import("express").Request}  req - Expects `req.params.id`.
- * @param  {import("express").Response} res
  */
 const deleteSubject = async (req, res) => {
   try {
@@ -110,4 +118,4 @@ module.exports = {
   createSubject,
   updateSubject,
   deleteSubject,
-};
+};

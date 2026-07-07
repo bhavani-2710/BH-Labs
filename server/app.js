@@ -11,6 +11,7 @@ const compilerRoutes = require("./routes/compilerRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const practicalTestRoutes = require("./routes/practicalTestRoutes");
 const vivaRoutes = require("./routes/vivaRoutes");
+const departmentRoutes = require("./routes/departmentRoutes");
 
 // Connect to MongoDB
 connectDB();
@@ -35,6 +36,7 @@ app.get("/api/health", (req, res) => {
 // ── Data routes ───────────────────────────────────────────────────────────────
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/experiments", experimentRoutes);
+app.use("/api/departments", departmentRoutes);
 
 // ── Feature routes ────────────────────────────────────────────────────────────
 app.use("/api/run", compilerRoutes);        // Wandbox code execution proxy

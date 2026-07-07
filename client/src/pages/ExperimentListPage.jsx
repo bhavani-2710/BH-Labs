@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Share2,
   Download,
@@ -20,6 +20,7 @@ export default function ExperimentListPage({
   subjects = [],
   experiments = [],
   onSelectExperiment,
+  deptId,
 }) {
   const [expandedExperiments, setExpandedExperiments] = useState(new Set());
   const [isSyllabusOpen, setIsSyllabusOpen] = useState(false);
@@ -119,7 +120,22 @@ export default function ExperimentListPage({
                 {currentSubject?.name || "Subject Name"}
               </h1>
               <p className="text-slate-400 dark:text-slate-500 font-medium text-[11px] uppercase tracking-wider">
-                {total} Experiments · Semester {currentSubject?.semester || 3}
+                {total} Experiments
+                {currentSubject?.departments?.length > 0 && (() => {
+                  if (deptId) {
+                    const matched = currentSubject.departments.find(
+                      (d) => String(d.department?._id || d.department) === String(deptId)
+                    );
+                    if (matched) {
+                      const deptCode = matched.department?.code || matched.department?.name || String(matched.department);
+                      return ` · ${deptCode} (Sem ${matched.semester})`;
+                    }
+                  }
+                  return " · " + currentSubject.departments.map(d => {
+                    const dept = d.department?.code || d.department?.name || String(d.department);
+                    return `${dept} (Sem ${d.semester})`;
+                  }).join(" · ");
+                })()}
               </p>
             </div>
             <button className="px-4 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full text-slate-600 dark:text-slate-400 text-xs font-bold shadow-sm hover:border-slate-300 transition-colors">

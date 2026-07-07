@@ -1,5 +1,21 @@
 const mongoose = require("mongoose");
 
+const departmentSemesterSchema = new mongoose.Schema(
+  {
+    department: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      required: true,
+    },
+    semester: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+  },
+  { _id: false } 
+);
+
 const subjectSchema = new mongoose.Schema(
   {
     name: {
@@ -14,10 +30,13 @@ const subjectSchema = new mongoose.Schema(
       uppercase: true,
       trim: true,
     },
-    semester: {
-      type: Number,
+    departments: {
+      type: [departmentSemesterSchema],
       required: true,
-      min: 1,
+      validate: {
+        validator: (arr) => Array.isArray(arr) && arr.length > 0,
+        message: "At least one department (with semester) is required.",
+      },
     },
     description: {
       type: String,

@@ -28,12 +28,12 @@ function SubjectsListWrapper({ experiments, subjects }) {
       experiments={experiments}
       subjects={subjects}
       onNavigate={(page, params) => {
-        if (page === "subject-detail") navigate(`/subject/${params.subjectId}`);
+        if (page === "subject-detail") navigate(`/subject/${params.subjectId}${params.deptId ? `?dept=${params.deptId}` : ""}`);
         else if (page === "test-instructions")
           navigate(`/test-instructions/${params.subjectId}`);
         else navigate(`/${page}`);
       }}
-      onSelectSubject={(subjectId) => navigate(`/subject/${subjectId}`)}
+      onSelectSubject={(subjectId, deptId) => navigate(`/subject/${subjectId}${deptId ? `?dept=${deptId}` : ""}`)}
     />
   );
 }
@@ -50,7 +50,11 @@ function SubjectDetailWrapper({
   setSubjectSpecificExperiments,
 }) {
   const { subjectId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const searchParams = new URLSearchParams(location.search);
+  const deptId = searchParams.get("dept");
 
   useEffect(() => {
     if (!subjectId) return;
@@ -73,6 +77,7 @@ function SubjectDetailWrapper({
       subjectId={subjectId}
       subjects={subjects}
       experiments={subjectSpecificExperiments}
+      deptId={deptId}
       onNavigate={(page, params) => {
         if (page === "workspace") {
           navigate(`/workspace/${params.experimentId}/${params.part || "a"}`);
