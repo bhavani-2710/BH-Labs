@@ -47,6 +47,72 @@ const MONACO_LANG_MAP = {
   sql: "sql",
 };
 
+const runWebDesignSandboxFromCodes = (htmlCode, jsCode) => {
+  let mergedSource = htmlCode || "";
+  const js = jsCode || "";
+
+  // Script block that overrides console.log to capture logs in our console tab
+  const consoleOverrideScript = `
+    <script>
+      (function() {
+        const _log = console.log;
+        const _error = console.error;
+        const _warn = console.warn;
+        
+        function sendLog(type, args) {
+          const message = args.map(arg => {
+            if (typeof arg === 'object') {
+              try { return JSON.stringify(arg); } catch(e) { return String(arg); }
+            }
+            return String(arg);
+          }).join(' ');
+          window.parent.postMessage({ type: 'iframe-console', logType: type, message }, '*');
+        }
+
+        console.log = function(...args) {
+          _log.apply(console, args);
+          sendLog('log', args);
+        };
+        console.warn = function(...args) {
+          _warn.apply(console, args);
+          sendLog('warn', args);
+        };
+        console.error = function(...args) {
+          _error.apply(console, args);
+          sendLog('error', args);
+        };
+        
+        window.addEventListener('error', function(e) {
+          window.parent.postMessage({ type: 'iframe-error', message: e.message }, '*');
+        });
+      })();
+    </script>
+  `;
+
+  // Inject console override at the very beginning of <head> or <html>
+  if (mergedSource.includes("<head>")) {
+    mergedSource = mergedSource.replace("<head>", `<head>${consoleOverrideScript}`);
+  } else if (mergedSource.includes("<html>")) {
+    mergedSource = mergedSource.replace("<html>", `<html>${consoleOverrideScript}`);
+  } else {
+    mergedSource = consoleOverrideScript + mergedSource;
+  }
+
+  // Inject the user's script
+  const userScriptTag = `<script>${js}</script>`;
+  if (mergedSource.includes('<script src="script.js"></script>')) {
+    mergedSource = mergedSource.replace('<script src="script.js"></script>', userScriptTag);
+  } else if (mergedSource.includes("<script src='script.js'></script>")) {
+    mergedSource = mergedSource.replace("<script src='script.js'></script>", userScriptTag);
+  } else if (mergedSource.includes("</body>")) {
+    mergedSource = mergedSource.replace("</body>", `${userScriptTag}</body>`);
+  } else {
+    mergedSource = mergedSource + userScriptTag;
+  }
+
+  return mergedSource;
+};
+
 export default function LabWorkspace({
   onBack,
   experiment,
@@ -138,6 +204,73 @@ function main() {
 main();
 `;
 
+      case "html":
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Web Page</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    /* ── Layout ── */
+    header {
+      background: #35424a;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    footer {
+      background: #35424a;
+      color: #fff;
+      text-align: center;
+      padding: 0.75rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>My Web Page</h1>
+  </header>
+
+  <main>
+    <section>
+      <h2>Welcome</h2>
+      <p>Start editing this page and click <strong>Run</strong> to see the live preview.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 My Page</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+`;
+
       case "sql":
         return `-- Write your SQL queries below.
 -- Create tables, insert data, and run SELECT queries.
@@ -210,6 +343,13 @@ SELECT * FROM student;
     return filtered.length > 0 ? filtered : ["c"];
   }, [subExp, refSolKeys]);
 
+  const isWebDesign = useMemo(() => {
+    return refSolKeys.includes("html") && refSolKeys.includes("javascript");
+  }, [refSolKeys]);
+
+  const [webDesignActiveFile, setWebDesignActiveFile] = useState("html");
+  const [iframeSrcDoc, setIframeSrcDoc] = useState("");
+
   const [editorLanguage, setEditorLanguage] = useState(
     supportedLanguages[0] || "c",
   );
@@ -259,7 +399,12 @@ SELECT * FROM student;
         const bytes = await generateJournalPdf({
           experiment,
           subPart,
-          codeText: code,
+          codeText: isWebDesign
+            ? JSON.stringify({
+              html: codeByLang.html || "",
+              javascript: codeByLang.javascript || "",
+            })
+            : code,
           outputText: consoleOutput,
         });
         if (!active) return;
@@ -281,7 +426,7 @@ SELECT * FROM student;
     return () => {
       active = false;
     };
-  }, [showJournalModal, experiment, subPart, code, consoleOutput]);
+  }, [showJournalModal, experiment, subPart, code, consoleOutput, codeByLang, isWebDesign]);
 
   const handleDownloadJournalPdf = () => {
     if (!journalPdfBlob) return;
@@ -346,26 +491,52 @@ SELECT * FROM student;
   // Runs when experiment/subPart changes — pre-fill starter code for all languages
   useEffect(() => {
     const initial = {};
-    supportedLanguages.forEach((lang) => {
-      initial[lang] = getTemplate(lang);
-    });
-
-    // Default language: prefer the first referenceSolution key if it's
-    // among the supported languages, otherwise the first supported language.
     const defaultLang =
       refSolKeys.length > 0 && supportedLanguages.includes(refSolKeys[0])
         ? refSolKeys[0]
         : supportedLanguages[0] || "c";
 
-    if (savedCode) {
-      initial[defaultLang] = savedCode;
-    }
+    const isWD = refSolKeys.includes("html") && refSolKeys.includes("javascript");
 
-    setCodeByLang(initial);
-    setConsoleOutput("");
-    setConsoleErrors("");
-    setEditorLanguage(defaultLang);
-    setCode(savedCode || initial[defaultLang] || "");
+    if (isWD) {
+      initial["html"] = getTemplate("html");
+      initial["javascript"] = getTemplate("javascript");
+
+      let savedObj = null;
+      if (savedCode) {
+        try {
+          savedObj = JSON.parse(savedCode);
+        } catch (e) {
+          console.error("Failed to parse saved Web Design code:", e);
+        }
+      }
+
+      if (savedObj) {
+        if (savedObj.html !== undefined) initial["html"] = savedObj.html;
+        if (savedObj.javascript !== undefined) initial["javascript"] = savedObj.javascript;
+      }
+
+      setCodeByLang(initial);
+      setConsoleOutput("");
+      setConsoleErrors("");
+      setEditorLanguage("javascript");
+      setWebDesignActiveFile("html");
+      setCode(initial["html"] || "");
+    } else {
+      supportedLanguages.forEach((lang) => {
+        initial[lang] = getTemplate(lang);
+      });
+
+      if (savedCode) {
+        initial[defaultLang] = savedCode;
+      }
+
+      setCodeByLang(initial);
+      setConsoleOutput("");
+      setConsoleErrors("");
+      setEditorLanguage(defaultLang);
+      setCode(savedCode || initial[defaultLang] || "");
+    }
 
     setChatMessages([
       {
@@ -440,8 +611,48 @@ SELECT * FROM student;
     };
   }, [experiment?._id, subPart]);
 
-  // Runs when language changes — load from codeByLang or starter template
+  // Handle messages from sandboxed iframe
   useEffect(() => {
+    const handleMessage = (event) => {
+      if (!event.data) return;
+      if (event.data.type === "iframe-console") {
+        const { logType, message } = event.data;
+        if (logType === "error") {
+          setConsoleErrors((prev) => (prev ? prev + "\n" : "") + message);
+        } else {
+          setConsoleOutput((prev) => (prev ? prev + "\n" : "") + message);
+        }
+      } else if (event.data.type === "iframe-error") {
+        const { message } = event.data;
+        setConsoleErrors((prev) => (prev ? prev + "\n" : "") + `Runtime Error: ${message}`);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  // Sync console tab for Web Design
+  useEffect(() => {
+    if (isWebDesign) {
+      setConsoleTab("preview");
+    } else {
+      setConsoleTab("input");
+    }
+  }, [isWebDesign]);
+
+  const handleTabChange = (targetFile) => {
+    setWebDesignActiveFile(targetFile);
+    setCode(codeByLang[targetFile] || "");
+  };
+
+  // Runs when language changes — load from codeByLang or starter template
+  // Runs when language changes — load from codeByLang or starter template
+  // Skip entirely for Web Design: code is controlled by webDesignActiveFile, not editorLanguage
+  useEffect(() => {
+    if (isWebDesign) return;
     if (
       codeByLang[editorLanguage] !== undefined &&
       codeByLang[editorLanguage] !== ""
@@ -450,7 +661,7 @@ SELECT * FROM student;
     } else {
       setCode(getTemplate(editorLanguage));
     }
-  }, [editorLanguage]);
+  }, [editorLanguage, isWebDesign]);
 
   // Keep editorLanguage in sync if supportedLanguages list shifts
   useEffect(() => {
@@ -492,7 +703,7 @@ SELECT * FROM student;
       setCode(current);
       setCodeByLang((prev) => ({
         ...prev,
-        [editorLanguage]: current,
+        [isWebDesign ? webDesignActiveFile : editorLanguage]: current,
       }));
 
       // ~60 FPS
@@ -501,6 +712,128 @@ SELECT * FROM student;
   };
 
   const handleSolveQuestion = async () => {
+    if (isWebDesign) {
+      const refHtml = getReferenceSolution("html");
+      const refJs = getReferenceSolution("javascript");
+
+      if (!refHtml && !refJs) {
+        alert("No solution available for this experiment.");
+        return;
+      }
+
+      const initial = {
+        html: refHtml || "",
+        javascript: refJs || "",
+      };
+
+      setCodeByLang(initial);
+
+      // Stream the code of the currently active file tab
+      const activeRef = webDesignActiveFile === "html" ? initial.html : initial.javascript;
+      await streamCode(activeRef);
+
+      // Save the combined code
+      const serialized = JSON.stringify(initial);
+      if (onSaveCode) {
+        onSaveCode(experiment._id, subPart, serialized);
+      }
+
+      // Open AI assistant tab
+      setActiveRightTab("assistant");
+
+      // Initialize streaming explanation in chat
+      setChatMessages((prev) => [
+        ...prev,
+        { sender: "user", text: "Explain the solved HTML & JavaScript code for me." },
+        { sender: "ai", text: "Analyzing the solution code..." },
+      ]);
+      setIsAiTyping(true);
+
+      try {
+        const res = await fetch(`/api/explain`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            experimentTitle: subExp?.title,
+            problemStatement: subExp?.problemStatement,
+            algorithm: subExp?.algorithm,
+            code: `<!-- index.html -->\n${initial.html}\n\n// script.js\n${initial.javascript}`,
+            language: "html/javascript",
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to load explanation from server");
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let explanation = "";
+        setIsAiTyping(false);
+
+        // Update last message to start empty for streaming
+        setChatMessages((prev) => {
+          const next = [...prev];
+          if (next.length > 0) {
+            next[next.length - 1] = { sender: "ai", text: "" };
+          }
+          return next;
+        });
+
+        let buffer = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          let boundary = buffer.indexOf("\n");
+          while (boundary !== -1) {
+            const line = buffer.substring(0, boundary).trim();
+            buffer = buffer.substring(boundary + 1);
+            boundary = buffer.indexOf("\n");
+
+            if (line.startsWith("data: ")) {
+              const dataStr = line.slice(6).trim();
+              if (dataStr === "[DONE]") continue;
+              try {
+                const json = JSON.parse(dataStr);
+                const text = json.choices?.[0]?.delta?.content || "";
+                if (text) {
+                  explanation += text;
+                  setChatMessages((prev) => {
+                    const next = [...prev];
+                    if (
+                      next.length > 0 &&
+                      next[next.length - 1].sender === "ai"
+                    ) {
+                      next[next.length - 1] = { sender: "ai", text: explanation };
+                    }
+                    return next;
+                  });
+                }
+              } catch (err) {
+                // Ignore partial JSON parsing errors
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        setIsAiTyping(false);
+        setChatMessages((prev) => {
+          const next = [...prev];
+          if (next.length > 0 && next[next.length - 1].sender === "ai") {
+            next[next.length - 1] = {
+              sender: "ai",
+              text: `Error generating explanation: ${err.message}`,
+            };
+          }
+          return next;
+        });
+      }
+      return;
+    }
+
     const refSol = getReferenceSolution(editorLanguage);
     if (!refSol) {
       alert("No solution available for this language.");
@@ -661,6 +994,36 @@ SELECT * FROM student;
   };
 
   const handleRunCode = async () => {
+    if (isWebDesign) {
+      setIsRunning(true);
+      setConsoleOutput("");
+      setConsoleErrors("");
+      setConsoleTab("preview");
+
+      const htmlVal = codeByLang.html || "";
+      const jsVal = codeByLang.javascript || "";
+
+      // Save code first
+      if (onSaveCode) {
+        onSaveCode(
+          experiment._id,
+          subPart,
+          JSON.stringify({
+            html: htmlVal,
+            javascript: jsVal,
+          })
+        );
+      }
+
+      setTimeout(() => {
+        const merged = runWebDesignSandboxFromCodes(htmlVal, jsVal);
+        setIframeSrcDoc(merged);
+        setIsRunning(false);
+        setSaveStatus("Saved");
+      }, 500);
+      return;
+    }
+
     if (!code.trim()) {
       setConsoleOutput("Error: Code is empty.");
       setConsoleErrors("Please write some code before running.");
@@ -673,11 +1036,11 @@ SELECT * FROM student;
     setConsoleErrors("");
     const stdinPreview = stdinInput
       ? stdinInput
-          .trim()
-          .split("\n")
-          .filter((l) => l.trim())
-          .map((l, i) => `  [${i + 1}] ${l}`)
-          .join("\n")
+        .trim()
+        .split("\n")
+        .filter((l) => l.trim())
+        .map((l, i) => `  [${i + 1}] ${l}`)
+        .join("\n")
       : "";
     setConsoleOutput(
       `$ Running ${editorLanguage.toUpperCase()} code...${stdinPreview ? `\n$ Input provided:\n${stdinPreview}` : ""}\n$ Compiling...\n\n`,
@@ -686,10 +1049,10 @@ SELECT * FROM student;
     try {
       const normalizedStdin = stdinInput
         ? stdinInput
-            .split(/\r?\n/)
-            .map((line) => line.trimEnd())
-            .join("\n")
-            .trimEnd() + "\n"
+          .split(/\r?\n/)
+          .map((line) => line.trimEnd())
+          .join("\n")
+          .trimEnd() + "\n"
         : "";
 
       const isPython = ["python", "python3", "py"].includes(editorLanguage);
@@ -724,11 +1087,11 @@ SELECT * FROM student;
           setConsoleTab("errors");
           setConsoleErrors(
             `⚠ Third-party package(s) not supported: ${pkgList}\n\n` +
-              `The online runner supports Python's standard library and scientific libraries (numpy, pandas, matplotlib, etc.).\n` +
-              `Heavy packages like tensorflow, torch, flask, etc. require a local environment.\n\n` +
-              `✦ Run locally:\n` +
-              `  pip install ${[...new Set(found)].join(" ")}\n` +
-              `  python your_file.py`,
+            `The online runner supports Python's standard library and scientific libraries (numpy, pandas, matplotlib, etc.).\n` +
+            `Heavy packages like tensorflow, torch, flask, etc. require a local environment.\n\n` +
+            `✦ Run locally:\n` +
+            `  pip install ${[...new Set(found)].join(" ")}\n` +
+            `  python your_file.py`,
           );
           return;
         }
@@ -909,7 +1272,11 @@ SELECT * FROM student;
         </div>
 
         {/* Language selector — dropdown if multiple, static pill if single */}
-        {supportedLanguages.length > 1 ? (
+        {isWebDesign ? (
+          <div className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap hidden md:block transition-colors duration-200">
+            JAVASCRIPT Language
+          </div>
+        ) : supportedLanguages.length > 1 ? (
           <select
             className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap cursor-pointer outline-none transition-colors duration-150 hover:border-[#5521FF] hover:text-[#5521FF] focus:border-[#5521FF] focus:ring-2 focus:ring-[#5521FF]/15 max-[900px]:hidden"
             value={editorLanguage}
@@ -977,7 +1344,7 @@ SELECT * FROM student;
             defaultSize={35}
             minSize={35}
             maxSize={35}
-            className="bg-white dark:bg-black border border-[#E4E4E7] dark:border-slate-800 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
+            className="bg-white dark:bg-black border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
           >
             <CollapsedLeftSidebar
               setActiveLeftTab={setActiveLeftTab}
@@ -1018,30 +1385,78 @@ SELECT * FROM student;
               className="flex flex-col min-h-0"
             >
               <div className="flex items-center bg-[#F4F4F5] dark:bg-[#0f0f0f] border-b border-[#E4E4E7] dark:border-slate-900 h-[34px] shrink-0">
-                <div className="flex items-center gap-1.25 px-3.5 h-full bg-white dark:bg-black border-r border-[#E4E4E7] dark:border-slate-900 font-mono text-[11px] text-[#18181B] dark:text-white">
-                  <span className="text-[#5521FF] text-xs">◉</span>
-                  <span>main.{EXTENSION_MAP[editorLanguage] || "c"}</span>
-                </div>
+                {isWebDesign ? (
+                  <>
+                    <button
+                      onClick={() => handleTabChange("html")}
+                      className={`flex items-center gap-2 px-4 h-full border-r border-[#E4E4E7] dark:border-slate-900 font-mono text-[11px] transition-all cursor-pointer ${webDesignActiveFile === "html"
+                          ? "bg-white dark:bg-black text-[#18181B] dark:text-white font-bold"
+                          : "text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-slate-900/50"
+                        }`}
+                    >
+                      <span className="text-orange-500 text-xs">◉</span>
+                      <span>index.html</span>
+                    </button>
+                    <button
+                      onClick={() => handleTabChange("javascript")}
+                      className={`flex items-center gap-2 px-4 h-full border-r border-[#E4E4E7] dark:border-slate-900 font-mono text-[11px] transition-all cursor-pointer ${webDesignActiveFile === "javascript"
+                          ? "bg-white dark:bg-black text-[#18181B] dark:text-white font-bold"
+                          : "text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-slate-900/50"
+                        }`}
+                    >
+                      <span className="text-yellow-500 text-xs">◉</span>
+                      <span>script.js</span>
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-1.25 px-3.5 h-full bg-white dark:bg-black border-r border-[#E4E4E7] dark:border-slate-900 font-mono text-[11px] text-[#18181B] dark:text-white">
+                    <span className="text-[#5521FF] text-xs">◉</span>
+                    <span>main.{EXTENSION_MAP[editorLanguage] || "c"}</span>
+                  </div>
+                )}
               </div>
               <div className="flex-1 min-h-0 overflow-hidden">
                 <Editor
                   beforeMount={monacoCustomTheme}
                   theme={theme === "dark" ? "bh-dark" : "bh-light"}
                   height="100%"
-                  language={MONACO_LANG_MAP[editorLanguage] || "c"}
+                  language={isWebDesign ? webDesignActiveFile : (MONACO_LANG_MAP[editorLanguage] || "c")}
                   value={code}
                   onChange={(value) => {
                     const newCode = value || "";
                     setCode(newCode);
-                    setCodeByLang((prev) => ({
-                      ...prev,
-                      [editorLanguage]: newCode,
-                    }));
-                    setSaveStatus("Saving...");
-                    if (onSaveCode) {
-                      onSaveCode(experiment._id, subPart, newCode);
+
+                    if (isWebDesign) {
+                      setCodeByLang((prev) => {
+                        const updated = {
+                          ...prev,
+                          [webDesignActiveFile]: newCode,
+                        };
+                        setSaveStatus("Saving...");
+                        if (onSaveCode) {
+                          onSaveCode(
+                            experiment._id,
+                            subPart,
+                            JSON.stringify({
+                              html: updated.html || "",
+                              javascript: updated.javascript || "",
+                            })
+                          );
+                        }
+                        setTimeout(() => setSaveStatus("Saved"), 600);
+                        return updated;
+                      });
+                    } else {
+                      setCodeByLang((prev) => ({
+                        ...prev,
+                        [editorLanguage]: newCode,
+                      }));
+                      setSaveStatus("Saving...");
+                      if (onSaveCode) {
+                        onSaveCode(experiment._id, subPart, newCode);
+                      }
+                      setTimeout(() => setSaveStatus("Saved"), 600);
                     }
-                    setTimeout(() => setSaveStatus("Saved"), 600);
                   }}
                   options={{
                     minimap: { enabled: false },
@@ -1072,27 +1487,86 @@ SELECT * FROM student;
               className="flex flex-col min-h-0 border-t border-[#E4E4E7] dark:border-transparent bg-[#F4F4F5] dark:bg-slate-900 transition-colors duration-200"
             >
               <div className="flex items-center gap-3 px-3 border-b border-[#E4E4E7] dark:border-transparent bg-[#F9F9FB] dark:bg-slate-950 shrink-0 transition-colors duration-200">
-                <button
-                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "input" ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400" : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"}`}
-                  onClick={() => setConsoleTab("input")}
-                >
-                  Input
-                </button>
-                <button
-                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "output" ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400" : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"}`}
-                  onClick={() => setConsoleTab("output")}
-                >
-                  Output
-                </button>
-                <button
-                  className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "errors" ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400" : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"}`}
-                  onClick={() => setConsoleTab("errors")}
-                >
-                  Errors{consoleErrors ? " (1)" : ""}
-                </button>
+                {isWebDesign ? (
+                  <>
+                    <button
+                      className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "preview"
+                          ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400"
+                          : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"
+                        }`}
+                      onClick={() => setConsoleTab("preview")}
+                    >
+                      Preview
+                    </button>
+                    <button
+                      className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "output"
+                          ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400"
+                          : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"
+                        }`}
+                      onClick={() => setConsoleTab("output")}
+                    >
+                      Console
+                    </button>
+                    <button
+                      className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "errors"
+                          ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400"
+                          : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"
+                        }`}
+                      onClick={() => setConsoleTab("errors")}
+                    >
+                      Errors{consoleErrors ? ` (${consoleErrors.split('\n').filter(Boolean).length})` : ""}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "input"
+                          ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400"
+                          : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"
+                        }`}
+                      onClick={() => setConsoleTab("input")}
+                    >
+                      Input
+                    </button>
+                    <button
+                      className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "output"
+                          ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400"
+                          : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"
+                        }`}
+                      onClick={() => setConsoleTab("output")}
+                    >
+                      Output
+                    </button>
+                    <button
+                      className={`text-[10px] font-bold tracking-wider uppercase py-1.5 px-0.5 border-none bg-none cursor-pointer font-sans border-b-2 transition-colors duration-150 ${consoleTab === "errors"
+                          ? "text-[#5521FF] dark:text-violet-400 border-[#5521FF] dark:border-violet-400"
+                          : "text-[#71717A] dark:text-slate-400 border-transparent hover:text-[#18181B] dark:hover:text-slate-200"
+                        }`}
+                      onClick={() => setConsoleTab("errors")}
+                    >
+                      Errors{consoleErrors ? " (1)" : ""}
+                    </button>
+                  </>
+                )}
               </div>
               <div className="flex-1 min-h-0 p-2.5 px-3 font-mono text-[11px] text-[#71717A] dark:text-slate-300 overflow-auto leading-relaxed custom-scrollbar">
-                {consoleTab === "input" && (
+                {consoleTab === "preview" && isWebDesign && (
+                  <div className="w-full h-full bg-white relative rounded-[8px] overflow-hidden border border-slate-200 dark:border-slate-800">
+                    {iframeSrcDoc ? (
+                      <iframe
+                        srcDoc={iframeSrcDoc}
+                        title="Web Design Preview"
+                        sandbox="allow-scripts allow-modals allow-popups allow-forms"
+                        className="w-full h-full border-none bg-white"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-[#A1A1AA] italic bg-white dark:bg-slate-900">
+                        Click "Run" to render preview
+                      </div>
+                    )}
+                  </div>
+                )}
+                {consoleTab === "input" && !isWebDesign && (
                   <div className="flex flex-col h-full gap-2.5">
                     {/* Test Case Selector Tabs */}
                     <div className="flex flex-wrap items-center gap-1.5 shrink-0 select-none pb-1 border-b border-[#E4E4E7]/40 dark:border-transparent/40">
@@ -1103,11 +1577,10 @@ SELECT * FROM student;
                             setActiveTestCaseIdx(idx);
                             setStdinInput(tc);
                           }}
-                          className={`group relative flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] border text-[11px] font-semibold transition-all duration-150 cursor-pointer ${
-                            activeTestCaseIdx === idx
+                          className={`group relative flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] border text-[11px] font-semibold transition-all duration-150 cursor-pointer ${activeTestCaseIdx === idx
                               ? "bg-white dark:bg-slate-800 border-[#E4E4E7] dark:border-transparent text-[#5521FF] dark:text-violet-400 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-none font-bold"
                               : "bg-transparent border-transparent text-[#71717A] dark:text-slate-400 hover:bg-[#E4E4E7]/40 dark:hover:bg-slate-800/40 hover:text-[#18181B] dark:hover:text-slate-200"
-                          }`}
+                            }`}
                         >
                           <span className="p-[3px] rounded-full bg-[#5521ff]"></span>
                           <span>Case {idx + 1}</span>
@@ -1161,7 +1634,7 @@ SELECT * FROM student;
                     </pre>
                   ) : (
                     <span className="italic text-[#A1A1AA]">
-                      Click "Run" to compile and execute your code.
+                      {isWebDesign ? "No console logs printed." : 'Click "Run" to compile and execute your code.'}
                     </span>
                   ))}
                 {consoleTab === "errors" &&
@@ -1189,7 +1662,7 @@ SELECT * FROM student;
             defaultSize={35}
             minSize={35}
             maxSize={35}
-            className="bg-white border border-[#E4E4E7] dark:border-slate-800 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
+            className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
           >
             <CollapsedRightSidebar
               setActiveRightTab={setActiveRightTab}
