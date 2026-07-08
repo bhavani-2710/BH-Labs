@@ -2,6 +2,7 @@ import { LayoutDashboard, BookOpen, Mic2, FileSpreadsheet, Settings, LogOut, Arr
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { Card, CardContent } from "../components/ui/card";
+import ThemeToggle from "../components/ThemeToggle";
 import { Progress } from "../components/ui/progress";
 
 export default function Dashboard({ 
