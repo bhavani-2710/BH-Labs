@@ -17,7 +17,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import { Card, CardContent } from "../components/ui/card";
 import { Progress } from "../components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
-import ThemeToggle from "../components/ThemeToggle";
+
 
 export default function ExperimentListPage({
   onNavigate,
