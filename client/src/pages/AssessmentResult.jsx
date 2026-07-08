@@ -22,6 +22,7 @@ import {
   House,
 } from "lucide-react";
 import { renderQuestionText } from "../utils/renderQuestionText";
+import { Card, CardContent } from "../components/ui/card";
 
 /**
  * CircularGauge
@@ -258,7 +259,7 @@ export default function AssessmentResult({
         {/* Hero Section: Score & Peer Comparison */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Score display card */}
-          <div className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl p-8 md:p-10 border border-slate-200/80 dark:border-transparent shadow-sm flex flex-col md:flex-row items-center gap-10 transition-colors duration-200">
+          <Card className="lg:col-span-8 rounded-2xl p-8 md:p-10 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center gap-10">
             <CircularGauge percentage={percentage} />
             <div className="text-center md:text-left">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400 rounded-full text-xs font-bold mb-4 uppercase tracking-wider">
@@ -272,7 +273,7 @@ export default function AssessmentResult({
                 {performanceInfo.desc}
               </p>
             </div>
-          </div>
+          </Card>
 
           {/* Peer Comparison Card */}
           <div className="lg:col-span-4 bg-[#3525cd] text-white rounded-2xl p-8 shadow-md flex flex-col justify-between relative overflow-hidden">
@@ -315,39 +316,45 @@ export default function AssessmentResult({
 
         {/* Stats Breakdown Row */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-transparent shadow-sm flex items-center gap-4 transition-colors duration-200">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[#1b1b24] dark:text-slate-100">{correct}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
-                Correct Answers
-              </p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-transparent shadow-sm flex items-center gap-4 transition-colors duration-200">
-            <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 flex items-center justify-center">
-              <XCircle className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[#1b1b24] dark:text-slate-100">{incorrect}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
-                Incorrect Answers
-              </p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-transparent shadow-sm flex items-center gap-4 transition-colors duration-200">
-            <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center">
-              <MinusCircle className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[#1b1b24] dark:text-slate-100">{unanswered}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
-                Skipped Questions
-              </p>
-            </div>
-          </div>
+          <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-[#1b1b24]">{correct}</p>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider text-left">
+                  Correct Answers
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                <XCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-[#1b1b24]">{incorrect}</p>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider text-left">
+                  Incorrect Answers
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center">
+                <MinusCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-[#1b1b24]">{unanswered}</p>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider text-left">
+                  Skipped Questions
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         {/* Performance Insights */}
@@ -420,123 +427,125 @@ export default function AssessmentResult({
         </section>
 
         {/* Detailed Question Review */}
-        <section className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200/80 dark:border-transparent shadow-sm space-y-6 transition-colors duration-200">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-transparent">
-            <div>
-              <h2 className="text-xl font-bold text-[#1b1b24] dark:text-slate-100">
-                Question-by-Question Analysis
-              </h2>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                Review the AI-generated questions from subexperiments, your
-                answers, and the correct options.
-              </p>
+        <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+          <CardContent className="p-8 space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div>
+                <h2 className="text-xl font-bold text-[#1b1b24]">
+                  Question-by-Question Analysis
+                </h2>
+                <p className="text-xs text-slate-400 mt-1 text-left">
+                  Review the AI-generated questions from subexperiments, your
+                  answers, and the correct options.
+                </p>
+              </div>
+              <div className="flex items-center gap-4 text-xs font-semibold">
+                <span className="flex items-center gap-1.5 text-emerald-600">
+                  <CheckCircle2 className="w-4 h-4" /> Correct
+                </span>
+                <span className="flex items-center gap-1.5 text-red-600">
+                  <XCircle className="w-4 h-4" /> Incorrect
+                </span>
+                <span className="flex items-center gap-1.5 text-slate-400">
+                  <MinusCircle className="w-4 h-4" /> Skipped
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-4 text-xs font-semibold">
-              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="w-4 h-4" /> Correct
-              </span>
-              <span className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
-                <XCircle className="w-4 h-4" /> Incorrect
-              </span>
-              <span className="flex items-center gap-1.5 text-slate-400 dark:text-slate-500">
-                <MinusCircle className="w-4 h-4" /> Skipped
-              </span>
-            </div>
-          </div>
 
-          <div className="space-y-6 divide-y divide-slate-100 dark:divide-slate-800">
-            {finalQuestions.map((q, idx) => {
-              const userAnswerIdx = finalAnswers[idx];
-              const isUnanswered = userAnswerIdx === undefined;
-              const isCorrect =
-                !isUnanswered && userAnswerIdx === q.correctIndex;
+            <div className="space-y-6 divide-y divide-slate-100">
+              {finalQuestions.map((q, idx) => {
+                const userAnswerIdx = finalAnswers[idx];
+                const isUnanswered = userAnswerIdx === undefined;
+                const isCorrect =
+                  !isUnanswered && userAnswerIdx === q.correctIndex;
 
-              let statusIcon = (
-                <MinusCircle className="w-5 h-5 text-slate-400 dark:text-slate-500 shrink-0 mt-1" />
-              );
-              if (!isUnanswered) {
-                statusIcon = isCorrect ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-1" />
-                ) : (
-                  <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-1" />
+                let statusIcon = (
+                  <MinusCircle className="w-5 h-5 text-slate-400 shrink-0 mt-1" />
                 );
-              }
+                if (!isUnanswered) {
+                  statusIcon = isCorrect ? (
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-1" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-1" />
+                  );
+                }
 
-              return (
-                <div
-                  key={idx}
-                  className={`pt-6 first:pt-0 ${idx > 0 ? "mt-6" : ""}`}
-                >
-                  <div className="flex items-start gap-4">
-                    {statusIcon}
-                    <div className="flex-1 space-y-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <span className="font-bold text-slate-800 dark:text-slate-200 text-sm mt-0.5">
-                          Question {idx + 1}
-                        </span>
-                        {!isUnanswered && (
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isCorrect ? "bg-emerald-100 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-400" : "bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-400"}`}
-                          >
-                            {isCorrect ? "Correct" : "Incorrect"}
+                return (
+                  <div
+                    key={idx}
+                    className={`pt-6 first:pt-0 ${idx > 0 ? "mt-6" : ""}`}
+                  >
+                    <div className="flex items-start gap-4">
+                      {statusIcon}
+                      <div className="flex-1 space-y-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <span className="font-bold text-slate-800 text-sm mt-0.5">
+                            Question {idx + 1}
                           </span>
-                        )}
-                        {isUnanswered && (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                            Skipped
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-relaxed text-left">
-                        {renderQuestionText(q.text)}
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-2">
-                        {q.options.map((opt, optIdx) => {
-                          const isCorrectOpt = optIdx === q.correctIndex;
-                          const isUserSel = optIdx === userAnswerIdx;
-
-                          let optStyle =
-                            "border-slate-200 dark:border-transparent text-slate-600 dark:text-slate-300 bg-slate-50/40 dark:bg-slate-800/40 hover:bg-slate-50/80 dark:hover:bg-slate-800/60";
-                          let optIcon = null;
-
-                          if (isCorrectOpt) {
-                            optStyle =
-                              "border-emerald-200 dark:border-transparent text-emerald-800 dark:text-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/20 font-medium";
-                            optIcon = (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                            );
-                          } else if (isUserSel && !isCorrect) {
-                            optStyle =
-                              "border-red-200 dark:border-transparent text-red-800 dark:text-red-300 bg-red-50/50 dark:bg-red-950/20 font-medium";
-                            optIcon = (
-                              <XCircle className="w-3.5 h-3.5 text-red-600 dark:text-red-400 shrink-0" />
-                            );
-                          }
-
-                          return (
-                            <div
-                              key={optIdx}
-                              className={`flex items-center justify-between p-3 rounded-xl border text-xs transition-colors duration-150 text-left ${optStyle}`}
+                          {!isUnanswered && (
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isCorrect ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}
                             >
-                              <div className="flex items-center gap-2">
-                                <span className="font-bold text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest mr-1">
-                                  {String.fromCharCode(65 + optIdx)}
-                                </span>
-                                <span>{renderQuestionText(opt)}</span>
+                              {isCorrect ? "Correct" : "Incorrect"}
+                            </span>
+                          )}
+                          {isUnanswered && (
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500">
+                              Skipped
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm font-semibold text-slate-900 leading-relaxed text-left">
+                          {renderQuestionText(q.text)}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-2">
+                          {q.options.map((opt, optIdx) => {
+                            const isCorrectOpt = optIdx === q.correctIndex;
+                            const isUserSel = optIdx === userAnswerIdx;
+
+                            let optStyle =
+                              "border-slate-200 text-slate-600 bg-slate-50/40 hover:bg-slate-50/80";
+                            let optIcon = null;
+
+                            if (isCorrectOpt) {
+                              optStyle =
+                                "border-emerald-200 text-emerald-800 bg-emerald-50/50 font-medium";
+                              optIcon = (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                              );
+                            } else if (isUserSel && !isCorrect) {
+                              optStyle =
+                                "border-red-200 text-red-800 bg-red-50/50 font-medium";
+                              optIcon = (
+                                <XCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                              );
+                            }
+
+                            return (
+                              <div
+                                key={optIdx}
+                                className={`flex items-center justify-between p-3 rounded-xl border text-xs transition-colors duration-150 text-left ${optStyle}`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-[10px] text-slate-400 uppercase tracking-widest mr-1">
+                                    {String.fromCharCode(65 + optIdx)}
+                                  </span>
+                                  <span>{renderQuestionText(opt)}</span>
+                                </div>
+                                {optIcon}
                               </div>
-                              {optIcon}
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Action Footer */}
         <footer className="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">

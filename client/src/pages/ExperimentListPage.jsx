@@ -9,10 +9,13 @@ import {
   ExternalLink,
   CheckCircle2,
   X,
+  Trash2,
 } from "lucide-react";
 import muLogo from "../assets/mu-logo.png";
 import Sidebar from "../components/Sidebar";
-import ThemeToggle from "../components/ThemeToggle";
+import { Card, CardContent } from "../components/ui/card";
+import { Progress } from "../components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 
 export default function ExperimentListPage({
   onNavigate,
@@ -22,6 +25,23 @@ export default function ExperimentListPage({
   onSelectExperiment,
   deptId,
 }) {
+  // Delete experiment handler
+  const handleDelete = async (expId) => {
+    try {
+      const response = await fetch(`/api/experiments/${expId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete experiment');
+      }
+      // Optimistically remove from UI by updating state if needed
+      // Assuming parent re-fetches experiments, we simply reload
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert('Error deleting experiment');
+    }
+  };
   const [expandedExperiments, setExpandedExperiments] = useState(new Set());
   const [isSyllabusOpen, setIsSyllabusOpen] = useState(false);
 
@@ -159,9 +179,9 @@ export default function ExperimentListPage({
                   const hasSubs = subExperiments.length > 0;
 
                   return (
-                    <div
+                    <Card
                       key={exp._id}
-                      className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-200"
+                      className="rounded-lg overflow-hidden"
                       data-purpose={`experiment-card-${num}`}
                     >
                       <div
@@ -201,12 +221,11 @@ export default function ExperimentListPage({
                                 >
                                   {doneCount} / {subExperiments.length} Done
                                 </span>
-                                <div className="w-20 bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mt-1 overflow-hidden transition-colors">
-                                  <div
-                                    className={`h-full transition-all ${allDone ? "bg-emerald-500" : "bg-[#5521FF]"}`}
-                                    style={{ width: `${pct}%` }}
-                                  ></div>
-                                </div>
+                                <Progress
+                                  value={pct}
+                                  className="w-20 h-1.5 mt-1"
+                                  indicatorClassName={allDone ? "bg-emerald-500" : "bg-[#5521FF]"}
+                                />
                               </div>
                             );
                           })()}
@@ -252,7 +271,7 @@ export default function ExperimentListPage({
                           </div>
                         </div>
                       )}
-                    </div>
+                    </Card>
                   );
                 })
               ) : (
@@ -384,43 +403,25 @@ export default function ExperimentListPage({
         </div>
       </main>
 
-      {isSyllabusOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm"
-          onClick={() => setIsSyllabusOpen(false)}
-        >
-          <div 
-            className="bg-white dark:bg-slate-900 rounded-sm shadow-xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-transparent transition-all"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-transparent bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
-              <div>
-                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                  {currentSubject?.name || "Subject"} - Syllabus Preview
-                </h3>
-                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-                  Mumbai University Curriculum
-                </p>
-              </div>
-              <button
-                onClick={() => setIsSyllabusOpen(false)}
-                className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-300 font-bold transition-all cursor-pointer border border-slate-200 dark:border-slate-750"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {/* Modal Body / PDF Preview */}
-            <div className="flex-1 bg-slate-100 dark:bg-slate-950 relative">
-              <iframe
-                src={currentSubject?.syllabusPdf ? `${currentSubject.syllabusPdf}#navpanes=0` : ""}
-                title="Syllabus PDF Preview"
-                className="w-full h-full border-0 bg-white"
-              />
-            </div>
+      <Dialog open={isSyllabusOpen} onOpenChange={setIsSyllabusOpen}>
+        <DialogContent className="max-w-4xl h-[85vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <DialogTitle className="text-sm font-bold text-slate-800 text-left">
+              {currentSubject?.name || "Subject"} - Syllabus Preview
+            </DialogTitle>
+            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider text-left">
+              Mumbai University Curriculum
+            </p>
+          </DialogHeader>
+          <div className="flex-1 bg-slate-100 relative">
+            <iframe
+              src={currentSubject?.syllabusPdf ? `${currentSubject.syllabusPdf}#navpanes=0` : ""}
+              title="Syllabus PDF Preview"
+              className="w-full h-full border-0"
+            />
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

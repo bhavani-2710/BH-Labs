@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 
 const WorkspaceRightSidebar = ({
   activeRightTab,
@@ -25,33 +26,37 @@ const WorkspaceRightSidebar = ({
 }) => {
   const [revealedHints, setRevealedHints] = useState(0);
   return (
-    <div className="bg-white dark:bg-slate-900 border border-[#E4E4E7] dark:border-transparent rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 transition-colors duration-200">
-      <div className="flex gap-[3px] p-1 bg-[#F4F4F5] dark:bg-slate-900 border-b border-[#E4E4E7] dark:border-transparent shrink-0 transition-colors duration-200">
+    <Tabs
+      value={activeRightTab}
+      onValueChange={setActiveRightTab}
+      className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1"
+    >
+      <TabsList className="flex gap-[3px] p-1 bg-[#F4F4F5] border-b border-[#E4E4E7] shrink-0 h-auto rounded-none">
         {[
           ["assistant", "Assistant"],
           ["hints", "Hints"],
           ["viva", "Viva"],
         ].map(([key, label]) => (
-          <button
+          <TabsTrigger
             key={key}
-            className={`flex-1 py-1 px-0 rounded-[5px] border-none cursor-pointer text-[10px] font-bold tracking-wider uppercase transition-colors duration-150 font-sans ${activeRightTab === key ? "bg-[#5521FF] text-white" : "bg-transparent text-[#71717A] dark:text-slate-400 hover:bg-[#EBEBEB] dark:hover:bg-slate-800 hover:text-[#18181B] dark:hover:text-slate-200"}`}
-            onClick={() => setActiveRightTab(key)}
+            value={key}
+            className={`flex-1 py-1 px-0 rounded-[5px] border-none cursor-pointer text-[10px] font-bold tracking-wider uppercase transition-colors duration-150 font-sans data-[state=active]:bg-[#5521FF] data-[state=active]:text-white bg-transparent text-[#71717A] hover:bg-[#EBEBEB] hover:text-[#18181B] shadow-none`}
           >
             {label}
-          </button>
+          </TabsTrigger>
         ))}
-      </div>
+      </TabsList>
 
-      <div className="flex-1 overflow-y-auto p-[18px] custom-scrollbar flex flex-col">
-        {activeRightTab === "assistant" && (
+      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+        <TabsContent value="assistant" className="p-[18px] mt-0 flex-1 flex flex-col gap-2.5">
           <div className="flex flex-col h-full gap-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 mb-2 shrink-0">
                 <div className="w-6.5 h-6.5 rounded-[6px] bg-[#5521FF] flex items-center justify-center text-white text-[12px] font-bold shrink-0">
                   AI
                 </div>
-                <div>
-                  <div className="text-[11px] font-bold text-[#18181B] dark:text-slate-200">
+                <div className="text-left">
+                  <div className="text-[11px] font-bold text-[#18181B]">
                     Bh.AI Assistant
                   </div>
                   <div className="text-[9px] text-[#22C55E] flex items-center gap-[3px]">
@@ -126,149 +131,145 @@ const WorkspaceRightSidebar = ({
               </div>
             </div>
           </div>
-        )}
+        </TabsContent>
 
-        {activeRightTab === "hints" && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <div className="flex justify-between items-center pb-1.5 border-b border-[#E4E4E7] dark:border-transparent mb-0.5">
-                <span className="text-[10px] font-bold text-[#71717A] dark:text-slate-400 uppercase tracking-wider">
-                  Available Hints
-                </span>
-              </div>
-              <button
-                onClick={toggleSidebar}
-                title="Collapse"
-                className="p-2 mb-2 rounded-lg cursor-pointer text-[#71717A] dark:text-slate-400 transition-colors hover:bg-[#F4F4F5] dark:hover:bg-slate-800 hover:text-[#5521FF] dark:hover:text-violet-400"
-              >
-                <PanelRightClose size={18} />
-              </button>
+        <TabsContent value="hints" className="p-[18px] mt-0 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center pb-1.5 border-b border-[#E4E4E7] mb-0.5">
+              <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
+                Available Hints
+              </span>
             </div>
-            {subExp?.hints.map((hint, idx) => {
-              const revealed = idx < revealedHints;
-              return (
-                <div
-                  key={idx}
-                  className={`border border-[#E4E4E7] dark:border-transparent rounded-lg p-2.5 text-[11px] transition-colors duration-150 ${revealed ? "bg-[#F9F9FB] dark:bg-slate-800 text-[#334155] dark:text-slate-200" : "bg-[#FAFAFA] dark:bg-slate-900/60 text-[#71717A] dark:text-slate-400"}`}
-                >
-                  <div className="text-[10px] font-bold mb-1">
-                    Hint {idx + 1}
-                  </div>
-                  {revealed ? (
-                    <p className="text-[11px] leading-relaxed">{hint}</p>
-                  ) : (
-                    <button
-                      className="bg-[#5521FF] text-white border-none rounded-[5px] px-2.5 py-1 text-[10px] font-bold cursor-pointer font-sans mt-1 hover:bg-[#5521FF]/85"
-                      onClick={() =>
-                        setRevealedHints((p) => Math.max(p, idx + 1))
-                      }
-                    >
-                      Reveal Hint
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+            <button
+              onClick={toggleSidebar}
+              title="Collapse"
+              className="p-2 mb-2 rounded-lg cursor-pointer text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#5521FF]"
+            >
+              <PanelRightClose size={18} />
+            </button>
           </div>
-        )}
-
-        {activeRightTab === "viva" && (
-          <div className="flex flex-col gap-3">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 pb-1.5 border-b border-[#E4E4E7] dark:border-transparent mb-0.5 shrink-0">
-                <span className="text-[10px] font-bold text-[#71717A] dark:text-slate-400 uppercase tracking-wider">
-                  Viva Q&amp;A
-                </span>
-                {vivaQAPairs.length > 0 && (
-                  <span className="text-[10px] font-bold text-[#5521FF] dark:text-violet-400 bg-[#F0ECFF] dark:bg-[#1a1438] px-2 py-[2px] rounded-full border border-[#5521FF]/15 dark:border-transparent">
-                    {vivaQAPairs.length} questions
-                  </span>
+          {subExp?.hints.map((hint, idx) => {
+            const revealed = idx < revealedHints;
+            return (
+              <div
+                key={idx}
+                className={`border border-[#E4E4E7] rounded-lg p-2.5 text-[11px] transition-colors duration-150 text-left ${revealed ? "bg-[#F9F9FB] text-[#334155]" : "bg-[#FAFAFA] text-[#71717A]"}`}
+              >
+                <div className="text-[10px] font-bold mb-1">
+                  Hint {idx + 1}
+                </div>
+                {revealed ? (
+                  <p className="text-[11px] leading-relaxed">{hint}</p>
+                ) : (
+                  <button
+                    className="bg-[#5521FF] text-white border-none rounded-[5px] px-2.5 py-1 text-[10px] font-bold cursor-pointer font-sans mt-1 hover:bg-[#5521FF]/85"
+                    onClick={() =>
+                      setRevealedHints((p) => Math.max(p, idx + 1))
+                    }
+                  >
+                    Reveal Hint
+                  </button>
                 )}
               </div>
-              <button
-                onClick={toggleSidebar}
-                title="Collapse"
-                className="p-2 mb-2 rounded-lg cursor-pointer text-[#71717A] dark:text-slate-400 transition-colors hover:bg-[#F4F4F5] dark:hover:bg-slate-800 hover:text-[#5521FF] dark:hover:text-violet-400"
-              >
-                <PanelRightClose size={18} />
-              </button>
+            );
+          })}
+        </TabsContent>
+
+        <TabsContent value="viva" className="p-[18px] mt-0 flex flex-col gap-3">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 pb-1.5 border-b border-[#E4E4E7] mb-0.5 shrink-0">
+              <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
+                Viva Q&amp;A
+              </span>
+              {vivaQAPairs.length > 0 && (
+                <span className="text-[10px] font-bold text-[#5521FF] bg-[#F0ECFF] px-2 py-[2px] rounded-full border border-[#5521FF]/15">
+                  {vivaQAPairs.length} questions
+                </span>
+              )}
             </div>
-
-            {/* Loading */}
-            {vivaQALoading && (
-              <div className="flex flex-col items-center justify-center py-8 gap-3">
-                <Loader2 className="w-5 h-5 text-[#5521FF] animate-spin" />
-                <p className="text-[11px] text-[#71717A] font-medium text-center">
-                  Generating viva questions…
-                </p>
-              </div>
-            )}
-
-            {/* Error */}
-            {!vivaQALoading && vivaQAError && (
-              <div className="bg-red-50 border border-red-100 rounded-lg p-3 text-[11px] text-red-600">
-                {vivaQAError}
-              </div>
-            )}
-
-            {/* Q&A Accordion */}
-            {!vivaQALoading && vivaQAPairs.length > 0 && (
-              <div className="flex flex-col gap-2">
-                {vivaQAPairs.map((qa, idx) => {
-                  const isOpen = expandedQA === idx;
-                  return (
-                    <div
-                      key={idx}
-                      className={`border rounded-lg overflow-hidden transition-all duration-150 ${
-                        isOpen
-                          ? "border-[#5521FF]/40 dark:border-violet-900/40 shadow-[0_2px_12px_rgba(85,33,255,0.08)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
-                          : "border-[#E4E4E7] dark:border-transparent hover:border-[#5521FF]/30 dark:hover:border-violet-450/30"
-                      }`}
-                    >
-                      {/* Question row */}
-                      <button
-                        className="w-full text-left px-3 py-2.5 flex items-start gap-2 bg-transparent border-none cursor-pointer"
-                        onClick={() => setExpandedQA(isOpen ? null : idx)}
-                      >
-                        <span
-                          className={`shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black mt-[1px] ${
-                            isOpen
-                              ? "bg-[#5521FF] text-white"
-                              : "bg-[#F4F4F5] dark:bg-slate-800 text-[#71717A] dark:text-slate-400"
-                          }`}
-                        >
-                          {idx + 1}
-                        </span>
-                        <span className="text-[11px] font-semibold text-[#18181B] dark:text-slate-200 leading-snug flex-1">
-                          {qa.question}
-                        </span>
-                        <span
-                          className={`text-[#A1A1AA] text-[10px] shrink-0 mt-[1px] transition-transform duration-150 ${
-                            isOpen ? "rotate-180" : ""
-                          }`}
-                        >
-                          ▾
-                        </span>
-                      </button>
-
-                      {/* Answer */}
-                      {isOpen && (
-                        <div className="px-3 pb-3 pt-0.5 border-t border-[#F0ECFF] dark:border-transparent bg-[#FAFAFE] dark:bg-slate-950 transition-colors duration-200">
-                          <p className="text-[11px] text-[#3730A3] dark:text-violet-300 leading-relaxed">
-                            {qa.answer}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <button
+              onClick={toggleSidebar}
+              title="Collapse"
+              className="p-2 mb-2 rounded-lg cursor-pointer text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#5521FF]"
+            >
+              <PanelRightClose size={18} />
+            </button>
           </div>
-        )}
+
+          {/* Loading */}
+          {vivaQALoading && (
+            <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <Loader2 className="w-5 h-5 text-[#5521FF] animate-spin" />
+              <p className="text-[11px] text-[#71717A] font-medium text-center">
+                Generating viva questions…
+              </p>
+            </div>
+          )}
+
+          {/* Error */}
+          {!vivaQALoading && vivaQAError && (
+            <div className="bg-red-50 border border-red-100 rounded-lg p-3 text-[11px] text-red-600">
+              {vivaQAError}
+            </div>
+          )}
+
+          {/* Q&A Accordion */}
+          {!vivaQALoading && vivaQAPairs.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {vivaQAPairs.map((qa, idx) => {
+                const isOpen = expandedQA === idx;
+                return (
+                  <div
+                    key={idx}
+                    className={`border rounded-lg overflow-hidden transition-all duration-150 ${
+                      isOpen
+                        ? "border-[#5521FF]/40 shadow-[0_2px_12px_rgba(85,33,255,0.08)]"
+                        : "border-[#E4E4E7] hover:border-[#5521FF]/30"
+                    }`}
+                  >
+                    {/* Question row */}
+                    <button
+                      className="w-full text-left px-3 py-2.5 flex items-start gap-2 bg-transparent border-none cursor-pointer"
+                      onClick={() => setExpandedQA(isOpen ? null : idx)}
+                    >
+                      <span
+                        className={`shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black mt-[1px] ${
+                          isOpen
+                            ? "bg-[#5521FF] text-white"
+                            : "bg-[#F4F4F5] text-[#71717A]"
+                        }`}
+                      >
+                        {idx + 1}
+                      </span>
+                      <span className="text-[11px] font-semibold text-[#18181B] leading-snug flex-1">
+                        {qa.question}
+                      </span>
+                      <span
+                        className={`text-[#A1A1AA] text-[10px] shrink-0 mt-[1px] transition-transform duration-150 ${
+                          isOpen ? "rotate-180" : ""
+                        }`}
+                      >
+                        ▾
+                      </span>
+                    </button>
+
+                    {/* Answer */}
+                    {isOpen && (
+                      <div className="px-3 pb-3 pt-0.5 border-t border-[#F0ECFF] bg-[#FAFAFE] text-left">
+                        <p className="text-[11px] text-[#3730A3] leading-relaxed">
+                          {qa.answer}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
       </div>
-    </div>
+    </Tabs>
   );
 };
 

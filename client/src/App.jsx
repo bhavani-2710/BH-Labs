@@ -60,7 +60,7 @@ function SubjectDetailWrapper({
     if (!subjectId) return;
     const fetchSubjectExperiments = async () => {
       try {
-        const res = await fetch(`/api/experiments/subject/${subjectId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/experiments/subject/${subjectId}`);
         if (res.ok) {
           const data = await res.json();
           setSubjectSpecificExperiments(data);
@@ -237,8 +237,8 @@ export default function App() {
     const fetchAll = async () => {
       try {
         const [subjectsRes, experimentsRes] = await Promise.all([
-          fetch(`/api/subjects`),
-          fetch(`/api/experiments`),
+          fetch(`${import.meta.env.VITE_API_URL}/subjects`),
+          fetch(`${import.meta.env.VITE_API_URL}/experiments`),
         ]);
         if (!subjectsRes.ok || !experimentsRes.ok)
           throw new Error("Failed to load data");

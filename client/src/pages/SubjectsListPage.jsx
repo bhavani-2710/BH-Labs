@@ -10,9 +10,13 @@ import {
   ChevronDown,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
-import ThemeToggle from "../components/ThemeToggle";
+import { Card, CardContent } from "../components/ui/card";
+import { Progress } from "../components/ui/progress";
 
-
+// Dummy/Placeholder for ThemeToggle component to prevent undefined reference crashes
+function ThemeToggle() {
+  return <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center opacity-60" />;
+}
 
 export default function SubjectsListPage({
   experiments,
@@ -49,8 +53,6 @@ export default function SubjectsListPage({
     if (!matchesSearch) return false;
     if (!selectedDept) return true;
 
-    // subjects have departments: [{ department: { _id, name, code }, semester }] (populated)
-    // or departments: [{ department: "<objectIdString>", semester }] (unpopulated)
     return (s.departments || []).some((d) => {
       const deptId = d.department?._id || d.department;
       return String(deptId) === String(selectedDept);
@@ -121,7 +123,11 @@ export default function SubjectsListPage({
                         setSelectedDept("");
                         setIsOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-violet-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-between ${!selectedDept ? "text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-slate-800/50" : "text-slate-600 dark:text-slate-350"}`}
+                      className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-violet-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-between ${
+  !selectedDept
+    ? "text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-slate-800/50"
+    : "text-slate-600 dark:text-slate-350"
+}`}
                     >
                       All Departments
                     </button>
@@ -173,155 +179,138 @@ export default function SubjectsListPage({
         })()}
 
         {/* Subjects Grid */}
-        {filteredSubjects.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-3 py-24 text-center">
-            <BookOpen className="w-10 h-10 text-gray-300 dark:text-slate-600" />
-            <p className="text-gray-500 dark:text-slate-400 text-sm">
-              No subjects found{selectedDept ? " for this department" : ""}.
-            </p>
-            {selectedDept && (
-              <button
-                onClick={() => setSelectedDept("")}
-                className="text-xs text-violet-600 dark:text-violet-400 hover:underline"
-              >
-                Clear filter
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredSubjects.map((subject) => {
-              const subjectId = subject._id;
-              const subjectExperiments = experiments.filter((e) => {
-                return (
-                  e.subjectId === subjectId ||
-                  e.subject === subjectId ||
-                  e.subjectId?._id === subjectId
-                );
-              });
-
-              let completedMainExps = 0;
-              const totalMainExps = subjectExperiments.length;
-
-              try {
-                const saved = localStorage.getItem(`bhlabs_completed_${subjectId}`);
-                const completedList = saved ? JSON.parse(saved) : [];
-                subjectExperiments.forEach((exp) => {
-                  const subExperiments = exp.subExperiments || [];
-                  if (subExperiments.length > 0) {
-                    const allDone = subExperiments.every((sub) =>
-                      completedList.includes(`${exp._id}__${sub.part}`)
-                    );
-                    if (allDone) completedMainExps++;
-                  }
-                });
-              } catch (err) {
-                console.error(err);
-              }
-
-              const progress =
-                totalMainExps > 0
-                  ? Math.round((completedMainExps / totalMainExps) * 100)
-                  : 0;
-              const isCompleted = progress === 100;
-
-              // Department + semester tags
-              // Only show tags when dept is fully populated (has a name string)
-              const deptTags = (subject.departments || [])
-                .filter((d) => {
-                  const isPopulated = d.department && typeof d.department === "object" && d.department.name;
-                  if (!isPopulated) return false;
-                  if (selectedDept && String(d.department._id) !== String(selectedDept)) return false;
-                  return true;
-                })
-                .map((d) => ({
-                  name: d.department.name,
-                  code: d.department.code || "",
-                  semester: d.semester,
-                }));
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredSubjects.map((subject) => {
+            const subjectId = subject._id;
+            const subjectExperiments = experiments.filter((e) => {
               return (
-                <div
-                  key={subject._id}
-                  className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-transparent rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-                >
-                  <div className="p-6">
-                    <h3
-                      className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2 leading-snug cursor-pointer hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
-                      onClick={() => onSelectSubject?.(subject._id, selectedDept)}
-                    >
-                      {subject.name}
-                    </h3>
-
-                    {/* Dept / semester tags — only shown when populated */}
-                    {deptTags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {deptTags.map((tag, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-300 text-[10px] font-semibold rounded-full border border-violet-100 dark:border-violet-900/30"
-                          >
-                            {tag.name}
-                            {tag.code && (
-                              <span className="opacity-60">({tag.code})</span>
-                            )}
-                            <span className="opacity-50">·</span>
-                            Sem {tag.semester}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Progress bar */}
-                    <div className="mb-5">
-                      <div className="flex justify-between text-xs mb-2">
-                        <span className="font-medium text-gray-500 dark:text-slate-400">
-                          Progress
-                        </span>
-                        <span className="font-bold text-[#5521FF] dark:text-violet-400">
-                          {progress}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${getProgressColor(progress)}`}
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="flex flex-col gap-2.5">
-                      <button
-                        onClick={() => onSelectSubject?.(subject._id, selectedDept)}
-                        className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${
-                          isCompleted
-                            ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
-                            : "bg-[#5521FF] hover:bg-violet-700 text-white shadow-sm shadow-violet-200"
-                        }`}
-                      >
-                        {isCompleted ? "Review Subject" : "Continue Learning"}
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          onNavigate?.("test-instructions", {
-                            subjectId: subject._id,
-                          })
-                        }
-                        className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-violet-200 dark:border-transparent text-[#5521FF] dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98] cursor-pointer"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        Take Test
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                e.subjectId === subjectId ||
+                e.subject === subjectId ||
+                e.subjectId?._id === subjectId
               );
-            })}
-          </div>
-        )}
+            });
+
+            let completedMainExps = 0;
+            const totalMainExps = subjectExperiments.length;
+
+            try {
+              const saved = localStorage.getItem(`bhlabs_completed_${subjectId}`);
+              const completedList = saved ? JSON.parse(saved) : [];
+              subjectExperiments.forEach((exp) => {
+                const subExperiments = exp.subExperiments || [];
+                if (subExperiments.length > 0) {
+                  const allDone = subExperiments.every((sub) =>
+                    completedList.includes(`${exp._id}__${sub.part}`)
+                  );
+                  if (allDone) {
+                    completedMainExps++;
+                  }
+                }
+              });
+            } catch (err) {
+              console.error(err);
+            }
+
+            const progress =
+              totalMainExps > 0
+                ? Math.round((completedMainExps / totalMainExps) * 100)
+                : 0;
+            const isCompleted = progress === 100;
+
+            // Department + semester tags setup
+            const deptTags = (subject.departments || [])
+              .filter((d) => {
+                const isPopulated = d.department && typeof d.department === "object" && d.department.name;
+                if (!isPopulated) return false;
+                if (selectedDept && String(d.department._id) !== String(selectedDept)) return false;
+                return true;
+              })
+              .map((d) => ({
+                name: d.department.name,
+                code: d.department.code || "",
+                semester: d.semester,
+              }));
+
+            return (
+              <Card
+                key={subject._id}
+                className="overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-white dark:bg-slate-900 border border-gray-200 dark:border-transparent rounded-3xl"
+              >
+                <CardContent className="p-6">
+                  <h3
+                    className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2 leading-snug cursor-pointer hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
+                    onClick={() => onSelectSubject?.(subject._id, selectedDept)}
+                  >
+                    {subject.name}
+                  </h3>
+
+                  {/* Dept / semester tags — only shown when populated */}
+                  {deptTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {deptTags.map((tag, i) => (
+                        <span
+                          key={i}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-300 text-[10px] font-semibold rounded-full border border-violet-100 dark:border-violet-900/30"
+                        >
+                          {tag.name}
+                          {tag.code && (
+                            <span className="opacity-60">({tag.code})</span>
+                          )}
+                          <span className="opacity-50">·</span>
+                          Sem {tag.semester}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Progress bar using imported Progress component */}
+                  <div className="mb-5">
+                    <div className="flex justify-between text-xs mb-2">
+                      <span className="font-medium text-gray-500 dark:text-slate-400">
+                        Progress
+                      </span>
+                      <span className="font-bold text-[#5521FF] dark:text-violet-400">
+                        {progress}%
+                      </span>
+                    </div>
+                    <Progress
+                      value={progress}
+                      className="h-2"
+                      indicatorClassName={getProgressColor(progress)}
+                    />
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex flex-col gap-2.5">
+                    <button
+                      onClick={() => onSelectSubject?.(subject._id, selectedDept)}
+                      className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${
+                        isCompleted
+                          ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                          : "bg-[#5521FF] hover:bg-violet-700 text-white shadow-sm shadow-violet-200"
+                      }`}
+                    >
+                      {isCompleted ? "Review Subject" : "Continue Learning"}
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        onNavigate?.("test-instructions", {
+                          subjectId: subject._id,
+                        })
+                      }
+                      className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-violet-200 dark:border-transparent text-[#5521FF] dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98] cursor-pointer"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      Take Test
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
 
         {/* Insight Banner */}
         <div className="mt-10 p-7 bg-white dark:bg-slate-900 border border-gray-200 dark:border-transparent rounded-3xl relative overflow-hidden transition-colors duration-200">
