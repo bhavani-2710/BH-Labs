@@ -12,6 +12,7 @@ const chatRoutes = require("./routes/chatRoutes");
 const practicalTestRoutes = require("./routes/practicalTestRoutes");
 const vivaRoutes = require("./routes/vivaRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
+const imageRoutes = require("./routes/imageRoutes");
 
 // Connect to MongoDB
 connectDB();
@@ -39,6 +40,7 @@ app.use("/api/experiments", experimentRoutes);
 app.use("/api/departments", departmentRoutes);
 
 // ── Feature routes ────────────────────────────────────────────────────────────
+app.use("/api/image", imageRoutes);
 app.use("/api/run", compilerRoutes);        // Wandbox code execution proxy
 app.use("/api", chatRoutes);               // AI explain + chat assistant (streaming)
 app.use("/api/practical-test", practicalTestRoutes);  // Practical test question generation

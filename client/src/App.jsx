@@ -10,6 +10,7 @@ import PracticalJournal from "./pages/PracticalJournal";
 import PracticalTest from "./pages/PracticalTest";
 import TestInstruction from "./pages/TestInstruction";
 import AssessmentResult from "./pages/AssessmentResult";
+import Playground from "./pages/Playground";
 
 // ====================== ROUTE WRAPPER COMPONENTS ======================
 // Each wrapper reads URL params, wires up navigation callbacks, and passes
@@ -294,6 +295,7 @@ export default function App() {
               if (page === "subjects") navigate("/subjects");
               else if (page === "subject-detail")
                 navigate(`/subject/${params.subjectId}`);
+              else navigate(`/${page}`);
             }}
           />
         }
@@ -356,6 +358,11 @@ export default function App() {
       />
 
       <Route path="/assessment-result" element={<AssessmentResult />} />
+
+      <Route
+        path="/playground"
+        element={<Playground experiments={experiments} />}
+      />
 
       <Route
         path="*"

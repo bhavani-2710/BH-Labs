@@ -1,5 +1,5 @@
-﻿import { useNavigate } from "react-router-dom";
-import { LayoutDashboard, BookOpen, Mic2, FileSpreadsheet, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { LayoutDashboard, BookOpen, Terminal, Settings, LogOut, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
 
@@ -70,6 +70,17 @@ export default function Sidebar({ activePage, onNavigate, experiments = [] }) {
           >
             <BookOpen className="w-4 h-4 shrink-0" />
             <span>Subjects</span>
+          </button>
+          <button
+            onClick={() => handleNavigate("playground")}
+            className={`w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-xl transition-all text-left cursor-pointer ${
+              activePage === "playground"
+                ? "bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
+            }`}
+          >
+            <Terminal className="w-4 h-4 shrink-0" />
+            <span>Playground</span>
           </button>
         </nav>
       </div>
