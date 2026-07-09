@@ -19,6 +19,7 @@ import CollapsedRightSidebar from "../components/CollapsedRightSidebar";
 import { generateJournalPdf } from "../utils/journalPdfGenerator";
 import { runJsInWebWorker } from "../workers/jsWorkerHelper";
 import { runPythonInWebWorker } from "../workers/pythonWorkerHelper";
+import { runCInWebWorker } from "../workers/cWorkerHelper";
 import ThemeToggle from "../components/ThemeToggle";
 
 const COMPILER_MAP = {
@@ -1064,8 +1065,9 @@ SELECT * FROM student;
         .map((l, i) => `  [${i + 1}] ${l}`)
         .join("\n")
       : "";
+    const isCLangRun = ["c", "cpp"].includes(editorLanguage);
     setConsoleOutput(
-      `$ Running ${editorLanguage.toUpperCase()} code...${stdinPreview ? `\n$ Input provided:\n${stdinPreview}` : ""}\n$ Compiling...\n\n`,
+      `$ Running ${editorLanguage.toUpperCase()} code...${stdinPreview ? `\n$ Input provided:\n${stdinPreview}` : ""}\n${isCLangRun ? "$ Initializing Clang compiler (first run may take ~30s)..." : "$ Compiling..."}\n\n`,
     );
 
     try {
@@ -1125,8 +1127,10 @@ SELECT * FROM student;
         data = await runJsInWebWorker(code);
       } else if (["python", "python3", "py"].includes(editorLanguage)) {
         data = await runPythonInWebWorker(code, normalizedStdin);
+      } else if (["c", "cpp"].includes(editorLanguage)) {
+        data = await runCInWebWorker(code, editorLanguage, normalizedStdin);
       } else {
-        // Use Wandbox for all other languages via our server
+        // Use Wandbox for Java, SQL, and other languages via our server
         const res = await fetch(`/api/run`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1140,7 +1144,7 @@ SELECT * FROM student;
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
         data = await res.json();
       }
-
+      console.log(data)
       let out = "";
       if (data.compiler_message)
         out += `[compiler]\n${data.compiler_message}\n\n`;
