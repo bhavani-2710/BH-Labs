@@ -12,7 +12,7 @@ function sanitizeText(str) {
 
 export async function generateJournalPdf({ experiment, subPart = "a", codeText, outputText }) {
   const subExp = experiment?.subExperiments?.find(s => s.part === subPart) || experiment?.subExperiments?.[0];
-  
+
   // Extract reference solution from DB
   let referenceSolutionCode = "";
   if (subExp?.referenceSolution) {
@@ -38,7 +38,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   );
 
   const pdfDoc = await PDFDocument.create();
-  
+
   // Font definitions
   const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -96,7 +96,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     }
   };
 
-  // 1. HEADER (Title & Logo / Metadata)
+  // 1. HEADER (Title & Logo / Metadata Info Card)
   currentPage.drawText("BH.Lab", {
     x: MARGIN_LEFT,
     y: currentY - 5,
@@ -105,32 +105,64 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     color: purpleColor
   });
 
+  // Metadata Card (Right side)
+  const metaWidth = 190;
+  const metaHeight = 52;
+  const metaX = PAGE_WIDTH - MARGIN_RIGHT - metaWidth;
+  const metaY = currentY - metaHeight + 12;
 
-  // Metadata block (Right side)
-  const metaX = PAGE_WIDTH - MARGIN_RIGHT - 180;
-  currentPage.drawText("Student Name: Rahul Sharma", {
+  // Background Box
+  currentPage.drawRectangle({
     x: metaX,
-    y: currentY,
-    size: 9,
+    y: metaY,
+    width: metaWidth,
+    height: metaHeight,
+    color: lightGrayBg,
+    borderColor: borderLineColor,
+    borderWidth: 1
+  });
+
+  // Left Accent strip
+  currentPage.drawLine({
+    start: { x: metaX, y: metaY },
+    end: { x: metaX, y: metaY + metaHeight },
+    thickness: 3,
+    color: purpleColor
+  });
+
+  currentPage.drawText("STUDENT RECORD", {
+    x: metaX + 12,
+    y: metaY + 40,
+    size: 7.5,
     font: helveticaBold,
+    color: purpleColor
+  });
+
+  currentPage.drawText("Name: Rahul Sharma", {
+    x: metaX + 12,
+    y: metaY + 26,
+    size: 8.5,
+    font: helveticaFont,
     color: darkTextColor
   });
+
   currentPage.drawText("Roll No: ENG-2026-042", {
-    x: metaX,
-    y: currentY - 14,
-    size: 9,
-    font: helveticaBold,
-    color: darkTextColor
-  });
-  currentPage.drawText("Date: October 24, 2026", {
-    x: metaX,
-    y: currentY - 28,
-    size: 9,
-    font: helveticaBold,
+    x: metaX + 12,
+    y: metaY + 15,
+    size: 8.5,
+    font: helveticaFont,
     color: darkTextColor
   });
 
-  currentY -= 45;
+  currentPage.drawText("Date: October 24, 2026", {
+    x: metaX + 12,
+    y: metaY + 4,
+    size: 8.5,
+    font: helveticaFont,
+    color: darkTextColor
+  });
+
+  currentY -= 55;
 
   // Decorative divider line
   currentPage.drawLine({
@@ -152,7 +184,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     font: helveticaBold,
     color: purpleColor
   });
-  currentY -= 25; // Increased from 18 to 25
+  currentY -= 25;
 
   const titleText = `${sanitizeText(subExp?.title) || "Experiment"} Implementation`;
   currentPage.drawText(titleText, {
@@ -162,34 +194,53 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     font: helveticaBold,
     color: darkTextColor
   });
-  currentY -= 35; // Increased from 25 to 35 (adds space before Aim)
+  currentY -= 35;
 
 
   // Function to wrap and draw block texts
   const drawHeading = (text) => {
-    ensureSpace(45); // Increased from 35 for more top margin
-    currentPage.drawText(text.toUpperCase(), {
+    ensureSpace(45);
+
+    // Draw left colored accent block
+    currentPage.drawRectangle({
       x: MARGIN_LEFT,
       y: currentY - 8,
-      size: 10,
+      width: 4,
+      height: 10,
+      color: purpleColor
+    });
+
+    currentPage.drawText(text.toUpperCase(), {
+      x: MARGIN_LEFT + 10,
+      y: currentY - 7,
+      size: 9.5,
       font: helveticaBold,
       color: purpleColor
     });
-    currentY -= 25; // Increased from 18 to 25 (adds space below header)
+
+    // Horizontal divider line
+    currentPage.drawLine({
+      start: { x: MARGIN_LEFT, y: currentY - 14 },
+      end: { x: PAGE_WIDTH - MARGIN_RIGHT, y: currentY - 14 },
+      thickness: 0.5,
+      color: borderLineColor
+    });
+
+    currentY -= 26;
   };
 
   const drawParagraph = (text, isMonospace = false, customFontSize = 9, customLineHeight = 13) => {
     const font = isMonospace ? courierFont : helveticaFont;
     const lines = [];
     const sanitized = sanitizeText(text);
-    
+
     const paragraphs = sanitized.split("\n");
     for (let p of paragraphs) {
       if (p.trim() === "" && isMonospace) {
         lines.push("");
         continue;
       }
-      
+
       const words = p.split(" ");
       let currentLine = "";
       for (let word of words) {
@@ -236,26 +287,26 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   // FLOWCHART Section
   if (subExp?.flowchart?.nodes && subExp.flowchart.nodes.length > 0) {
     drawHeading("Flowchart");
-    
+
     const nodes = subExp.flowchart.nodes;
     const edges = subExp.flowchart.edges || [];
-    
+
     // Position layout coordinates (vertical flow)
     const nodeCoords = {};
     const cx = MARGIN_LEFT + CONTENT_WIDTH / 2;
-    
+
     // Ensure sufficient vertical space for the flowchart block
     const flowchartHeight = nodes.length * 45 + 10;
     ensureSpace(flowchartHeight + 10);
-    
+
     let nodeY = currentY - 20;
-    
+
     // Step 1: Assign positions and draw connection lines first (drawn behind shapes)
     for (let i = 0; i < nodes.length; i++) {
       nodeCoords[nodes[i].id] = { x: cx, y: nodeY };
       nodeY -= 45;
     }
-    
+
     // Draw connecting edges
     for (let edge of edges) {
       const src = nodeCoords[edge.source];
@@ -268,11 +319,11 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
           thickness: 1,
           color: purpleColor
         });
-        
+
         // Draw arrowhead at target
         currentPage.drawLine({ start: { x: tgt.x, y: tgt.y + 12 }, end: { x: tgt.x - 3, y: tgt.y + 17 }, thickness: 1, color: purpleColor });
         currentPage.drawLine({ start: { x: tgt.x, y: tgt.y + 12 }, end: { x: tgt.x + 3, y: tgt.y + 17 }, thickness: 1, color: purpleColor });
-        
+
         // Draw label if available
         if (edge.label) {
           const edgeLabel = sanitizeText(edge.label);
@@ -286,15 +337,15 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
         }
       }
     }
-    
+
     // Step 2: Draw node shapes and text labels
     for (let node of nodes) {
       const coords = nodeCoords[node.id];
       if (!coords) continue;
-      
+
       const { x, y } = coords;
       const type = node.type?.toLowerCase();
-      
+
       if (type === "start" || type === "end") {
         // Capsule shape
         currentPage.drawRectangle({
@@ -350,7 +401,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
           borderWidth: 1
         });
       }
-      
+
       // Node Text
       const label = sanitizeText(node.label || "");
       const fontSize = 7.5;
@@ -363,7 +414,7 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
         color: darkTextColor
       });
     }
-    
+
     // Set currentY to the bottom of the flowchart section
     currentY -= flowchartHeight;
     currentY -= 15;
@@ -371,82 +422,237 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
 
   // SOURCE CODE Section
   drawHeading("Source Code");
-  
-  // Use the reference solution from DB for the source code printout in the PDF record sheet
-  const code = referenceSolutionCode || codeText || "// No source code available";
-  const codeLines = sanitizeText(code).split("\n");
-  ensureSpace(40);
-  
-  // Draw header bar for source code
-  currentPage.drawRectangle({
-    x: MARGIN_LEFT,
-    y: currentY - 15,
-    width: CONTENT_WIDTH,
-    height: 15,
-    color: rgb(0.12, 0.12, 0.12)
-  });
-  currentPage.drawText("solution_source_code", {
-    x: MARGIN_LEFT + 10,
-    y: currentY - 11,
-    size: 7,
-    font: courierBold,
-    color: rgb(0.7, 0.7, 0.7)
-  });
-  currentY -= 15;
 
-  for (let line of codeLines) {
-    const lineWrapped = [];
-    let remaining = line;
-    const maxChars = 75; // Approx limit for Courier at size 8
-    while (remaining.length > maxChars) {
-      lineWrapped.push(remaining.substring(0, maxChars));
-      remaining = remaining.substring(maxChars);
-    }
-    lineWrapped.push(remaining);
+  if (subExp?.isExecutable === false && subExp?.files && subExp.files.length > 0) {
+    for (const file of subExp.files) {
+      const filename = file.filename || "file";
+      const code = file.content || "";
+      const codeLines = sanitizeText(code).split("\n");
+      ensureSpace(40);
 
-    for (let subLine of lineWrapped) {
-      ensureSpace(12);
+      // Print the file name in bold above the code block
+      currentPage.drawText(filename, {
+        x: MARGIN_LEFT,
+        y: currentY - 5,
+        size: 9.5,
+        font: helveticaBold,
+        color: darkTextColor
+      });
+      currentY -= 15;
+
+      // Draw colored top accent border
       currentPage.drawRectangle({
         x: MARGIN_LEFT,
-        y: currentY - 10,
+        y: currentY - 3,
         width: CONTENT_WIDTH,
-        height: 12,
-        color: rgb(0.11, 0.11, 0.11)
+        height: 3,
+        color: purpleColor
       });
-      currentPage.drawText(subLine, {
-        x: MARGIN_LEFT + 10,
-        y: currentY - 8,
-        size: 8,
-        font: courierFont,
-        color: rgb(0.85, 0.85, 0.85)
-      });
-      currentY -= 12;
+      currentY -= 3;
+
+      let lineNum = 1;
+      for (let line of codeLines) {
+        const lineWrapped = [];
+        let remaining = line;
+        const maxChars = 70; // Adjusted for line numbers layout
+        while (remaining.length > maxChars) {
+          lineWrapped.push(remaining.substring(0, maxChars));
+          remaining = remaining.substring(maxChars);
+        }
+        lineWrapped.push(remaining);
+
+        for (let i = 0; i < lineWrapped.length; i++) {
+          const subLine = lineWrapped[i];
+          ensureSpace(12);
+
+          // Line background
+          currentPage.drawRectangle({
+            x: MARGIN_LEFT,
+            y: currentY - 10,
+            width: CONTENT_WIDTH,
+            height: 12,
+            color: rgb(0.09, 0.09, 0.1) // Charcoal theme
+          });
+
+          // Draw vertical divider between gutter and code
+          currentPage.drawLine({
+            start: { x: MARGIN_LEFT + 25, y: currentY - 10 },
+            end: { x: MARGIN_LEFT + 25, y: currentY + 2 },
+            thickness: 0.5,
+            color: rgb(0.2, 0.2, 0.25)
+          });
+
+          // Line numbers on the left
+          if (i === 0) {
+            const numStr = String(lineNum).padStart(3, " ");
+            currentPage.drawText(numStr, {
+              x: MARGIN_LEFT + 5,
+              y: currentY - 8,
+              size: 7.5,
+              font: courierFont,
+              color: rgb(0.45, 0.45, 0.45)
+            });
+          }
+
+          // Code text
+          currentPage.drawText(subLine, {
+            x: MARGIN_LEFT + 32,
+            y: currentY - 8,
+            size: 8,
+            font: courierFont,
+            color: rgb(0.85, 0.85, 0.9)
+          });
+
+          currentY -= 12;
+        }
+        lineNum++;
+      }
+      currentY -= 15;
     }
+  } else {
+    // Use the reference solution from DB for the source code printout in the PDF record sheet
+    const code = referenceSolutionCode || codeText || "// No source code available";
+    const codeLines = sanitizeText(code).split("\n");
+    ensureSpace(40);
+
+    // Resolve single filename based on language
+    let filename = "main.c";
+    if (subExp?.referenceSolution) {
+      const solutions = subExp.referenceSolution;
+      let keys = [];
+      if (typeof solutions.keys === "function") {
+        keys = Array.from(solutions.keys());
+      } else if (solutions) {
+        keys = Object.keys(solutions);
+      }
+      if (keys.length > 0) {
+        const ext = keys[0];
+        if (ext === "python") filename = "main.py";
+        else if (ext === "javascript") filename = "main.js";
+        else if (ext === "sql") filename = "query.sql";
+        else if (ext === "java") filename = "Main.java";
+        else filename = `main.${ext}`;
+      }
+    }
+
+    // Print the file name in bold above the code block
+    currentPage.drawText(filename, {
+      x: MARGIN_LEFT,
+      y: currentY - 5,
+      size: 9.5,
+      font: helveticaBold,
+      color: darkTextColor
+    });
+    currentY -= 15;
+
+    // Draw colored top accent border
+    currentPage.drawRectangle({
+      x: MARGIN_LEFT,
+      y: currentY - 3,
+      width: CONTENT_WIDTH,
+      height: 3,
+      color: purpleColor
+    });
+    currentY -= 3;
+
+    let lineNum = 1;
+    for (let line of codeLines) {
+      const lineWrapped = [];
+      let remaining = line;
+      const maxChars = 70; // Adjusted for line numbers layout
+      while (remaining.length > maxChars) {
+        lineWrapped.push(remaining.substring(0, maxChars));
+        remaining = remaining.substring(maxChars);
+      }
+      lineWrapped.push(remaining);
+
+      for (let i = 0; i < lineWrapped.length; i++) {
+        const subLine = lineWrapped[i];
+        ensureSpace(12);
+
+        // Line background
+        currentPage.drawRectangle({
+          x: MARGIN_LEFT,
+          y: currentY - 10,
+          width: CONTENT_WIDTH,
+          height: 12,
+          color: rgb(0.09, 0.09, 0.1) // Charcoal theme
+        });
+
+        // Draw vertical divider between gutter and code
+        currentPage.drawLine({
+          start: { x: MARGIN_LEFT + 25, y: currentY - 10 },
+          end: { x: MARGIN_LEFT + 25, y: currentY + 2 },
+          thickness: 0.5,
+          color: rgb(0.2, 0.2, 0.25)
+        });
+
+        // Line numbers on the left
+        if (i === 0) {
+          const numStr = String(lineNum).padStart(3, " ");
+          currentPage.drawText(numStr, {
+            x: MARGIN_LEFT + 5,
+            y: currentY - 8,
+            size: 7.5,
+            font: courierFont,
+            color: rgb(0.45, 0.45, 0.45)
+          });
+        }
+
+        // Code text
+        currentPage.drawText(subLine, {
+          x: MARGIN_LEFT + 32,
+          y: currentY - 8,
+          size: 8,
+          font: courierFont,
+          color: rgb(0.85, 0.85, 0.9)
+        });
+
+        currentY -= 12;
+      }
+      lineNum++;
+    }
+    currentY -= 15;
   }
-  currentY -= 15;
 
   // EXECUTION OUTPUT Section
   drawHeading("Execution Output");
-  const outLog = outputText || `Output Vector: [${subExp?.samples?.[0]?.output || "Successfully executed"}]`;
+
+  let outLog = outputText;
+  if (!outLog) {
+    if (subExp?.isExecutable === false) {
+      if (subExp?.samples && subExp.samples.length > 0) {
+        outLog = subExp.samples.map(s => s.output).filter(Boolean).join("\n---\n");
+      } else {
+        outLog = "Successfully executed";
+      }
+    } else {
+      outLog = `Output Vector: [${subExp?.samples?.[0]?.output || "Successfully executed"}]`;
+    }
+  }
+
   const outLines = sanitizeText(outLog).split("\n");
   ensureSpace(40);
 
-  // Draw header bar for output
-  currentPage.drawRectangle({
-    x: MARGIN_LEFT,
-    y: currentY - 15,
-    width: CONTENT_WIDTH,
-    height: 15,
-    color: rgb(0.1, 0.1, 0.11)
-  });
+  // Bold log header
   currentPage.drawText("terminal_output.log", {
-    x: MARGIN_LEFT + 10,
-    y: currentY - 11,
-    size: 7,
-    font: courierBold,
-    color: rgb(0.7, 0.7, 0.7)
+    x: MARGIN_LEFT,
+    y: currentY - 5,
+    size: 9.5,
+    font: helveticaBold,
+    color: darkTextColor
   });
   currentY -= 15;
+
+  // Draw colored top-border line for output window (green for success/terminal)
+  currentPage.drawRectangle({
+    x: MARGIN_LEFT,
+    y: currentY - 3,
+    width: CONTENT_WIDTH,
+    height: 3,
+    color: rgb(0.2, 0.85, 0.6)
+  });
+  currentY -= 3;
 
   for (let line of outLines) {
     const lineWrapped = [];
@@ -465,14 +671,14 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
         y: currentY - 10,
         width: CONTENT_WIDTH,
         height: 12,
-        color: rgb(0.09, 0.09, 0.1)
+        color: rgb(0.09, 0.09, 0.1) // Charcoal theme
       });
       currentPage.drawText(subLine, {
         x: MARGIN_LEFT + 10,
         y: currentY - 8,
         size: 8,
         font: courierFont,
-        color: rgb(0.2, 0.85, 0.6) // greenish terminal output color
+        color: rgb(0.2, 0.85, 0.6) // Green text
       });
       currentY -= 12;
     }
@@ -486,8 +692,8 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   // SIGNATURES Section
   ensureSpace(70);
   currentY -= 30;
-  
-  
+
+
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
 }

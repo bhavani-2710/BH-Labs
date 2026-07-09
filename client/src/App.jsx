@@ -105,13 +105,28 @@ function WorkspaceWrapper({ experiments, subjects, codeStore, onSaveCode }) {
   const navigate = useNavigate();
   const experiment = experiments.find((e) => e._id === experimentId);
   const subject = subjects.find((s) => s._id === experiment?.subjectId);
+  const subPart = part || "a";
+
+  const subExp =
+    experiment?.subExperiments?.find((s) => s.part === subPart) ||
+    experiment?.subExperiments?.[0];
+
+  if (subExp && subExp.isExecutable === false) {
+    return (
+      <PracticalJournal
+        experiment={experiment}
+        subPart={subPart}
+        onBack={() => navigate(-1)}
+      />
+    );
+  }
 
   return (
     <LabWorkspace
       experiment={experiment}
       subject={subject}
-      subPart={part || "a"}
-      savedCode={codeStore[`${experimentId}_${part || "a"}`] || ""}
+      subPart={subPart}
+      savedCode={codeStore[`${experimentId}_${subPart}`] || ""}
       onSaveCode={onSaveCode}
       onBack={() => navigate(-1)}
       onNavigate={(page, params) => {

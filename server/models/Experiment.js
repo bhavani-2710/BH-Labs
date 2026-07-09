@@ -10,6 +10,17 @@ const sampleSchema = new mongoose.Schema(
   },
 );
 
+const fileSchema = new mongoose.Schema(
+  {
+    filename: { type: String, required: true },
+    content: { type: String, required: true },
+    language: { type: String, default: "" },
+  },
+  {
+    _id: false,
+  },
+);
+
 const subExperimentSchema = new mongoose.Schema(
   {
     part: {
@@ -47,10 +58,15 @@ const subExperimentSchema = new mongoose.Schema(
         },
       ],
     },
+
+     files: {
+      type: [fileSchema],
+      default: undefined,
+    },
     referenceSolution: {
       type: Map,
       of: String, 
-      default: {},
+      default: undefined,
     },
     samples: {
       type: [sampleSchema],
@@ -69,6 +85,10 @@ const subExperimentSchema = new mongoose.Schema(
       enum: ["Easy", "Medium", "Hard"],
       default: "Easy",
     },
+    isExecutable: {
+      type: Boolean,
+      default: false,
+    }
   },
   {
     _id: false,
