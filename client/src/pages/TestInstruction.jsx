@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -184,29 +184,29 @@ export default function TestInstruction({
       {/* ── Main Content ──────────────────────────────────────────── */}
       <main className="flex-grow flex items-center justify-center p-4 md:p-10">
         <div className="w-full max-w-[800px]">
-          <Card className="rounded-2xl overflow-hidden flex flex-col shadow-sm border border-slate-200 bg-white">
+          <Card className="rounded-2xl overflow-hidden flex flex-col shadow-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
             <CardContent className="p-0 flex flex-col">
               {/* ── Card Header ─────────────────────────────────────── */}
-              <div className="p-8 pb-6 border-b border-slate-200">
-                <p className="text-[#5521FF] font-bold text-xs tracking-widest uppercase mb-2">
+              <div className="p-8 pb-6 border-b border-slate-200 dark:border-slate-800">
+                <p className="text-[#5521FF] dark:text-violet-400 font-bold text-xs tracking-widest uppercase mb-2">
                   BEFORE YOU BEGIN
                 </p>
-                <h2 className="text-2xl font-semibold text-slate-900 tracking-tight text-left">
+                <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight text-left">
                   Test Instructions
                 </h2>
               </div>
 
               {/* ── Stats Strip ─────────────────────────────────────── */}
-              <div className="grid grid-cols-2 md:grid-cols-4 bg-slate-50 border-b border-slate-200">
+              <div className="grid grid-cols-2 md:grid-cols-4 bg-slate-50 dark:bg-slate-950/40 border-b border-slate-200 dark:border-slate-800">
                 {stats.map((stat, idx) => (
                   <div
                     key={idx}
                     className={`p-5 flex flex-col items-center justify-center gap-1 ${
-                      idx < stats.length - 1 ? "border-r border-slate-200" : ""
-                    } ${idx >= 2 ? "border-t md:border-t-0 border-slate-200" : ""}`}
+                      idx < stats.length - 1 ? "border-r border-slate-200 dark:border-slate-800" : ""
+                    } ${idx >= 2 ? "border-t md:border-t-0 border-slate-200 dark:border-slate-800" : ""}`}
                   >
                     {stat.icon}
-                    <span className="text-sm font-medium text-slate-900">
+                    <span className="text-sm font-medium text-slate-900 dark:text-slate-200">
                       {stat.label}
                     </span>
                   </div>
@@ -218,10 +218,10 @@ export default function TestInstruction({
                 <div className="space-y-4">
                   {INSTRUCTIONS.map((instr, idx) => (
                     <div key={idx} className="flex gap-4">
-                      <span className="flex-shrink-0 w-8 h-8 rounded-full bg-violet-100 text-[#5521FF] flex items-center justify-center font-bold text-sm">
+                      <span className="flex-shrink-0 w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-950/40 text-[#5521FF] dark:text-violet-400 flex items-center justify-center font-bold text-sm">
                         {idx + 1}
                       </span>
-                      <p className="text-base text-slate-600 pt-1 leading-relaxed text-left">
+                      <p className="text-base text-slate-600 dark:text-slate-300 pt-1 leading-relaxed text-left">
                         {instr.text}
                       </p>
                     </div>
@@ -229,13 +229,13 @@ export default function TestInstruction({
                 </div>
 
                 {/* ── Warning Box ─────────────────────────────────── */}
-                <div className="bg-amber-50 rounded-lg p-5 flex gap-4 border border-amber-200">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-5 flex gap-4 border border-amber-200 dark:border-amber-900/50">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                   <div className="space-y-1 text-left">
-                    <h4 className="font-bold text-amber-900 text-sm">
+                    <h4 className="font-bold text-amber-900 dark:text-amber-300 text-sm">
                       Important: Negative Marking Active
                     </h4>
-                    <p className="text-amber-800 text-sm leading-relaxed">
+                    <p className="text-amber-800 dark:text-amber-400 text-sm leading-relaxed">
                       For every incorrect answer, 1 mark will be deducted from
                       your total score. Unattempted questions will not be
                       penalized.
@@ -245,15 +245,15 @@ export default function TestInstruction({
               </div>
 
               {/* ── Footer Actions ──────────────────────────────────── */}
-              <div className="p-8 bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="p-8 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
                 <label className="flex items-center gap-3 cursor-pointer group select-none">
                   <input
                     type="checkbox"
                     checked={agreed}
                     onChange={(e) => setAgreed(e.target.checked)}
-                    className="w-5 h-5 rounded border-slate-300 text-[#5521FF] focus:ring-[#5521FF] cursor-pointer transition-all accent-[#5521FF]"
+                    className="w-5 h-5 rounded border-slate-300 dark:border-slate-700 text-[#5521FF] focus:ring-[#5521FF] cursor-pointer transition-all accent-[#5521FF] dark:bg-slate-950"
                   />
-                  <span className="text-slate-500 text-sm font-medium group-hover:text-slate-900 transition-colors">
+                  <span className="text-slate-500 dark:text-slate-400 text-sm font-medium group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
                     I have read and understood the instructions
                   </span>
                 </label>

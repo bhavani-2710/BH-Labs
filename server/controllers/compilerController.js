@@ -29,8 +29,16 @@ const runCode = async (req, res) => {
       finalCode = code.replace(/\bpublic\s+class\s+(\w+)/g, "class $1");
     }
 
+    // For SQL/SQLite compilations, since Wandbox executes sqlite3 in non-interactive batch mode
+    // (cat prog.sql | sqlite3), stdin is ignored. We append stdin directly to the code to run it.
+    if (compiler.includes("sqlite") && stdin) {
+      finalCode = code + "\n" + stdin;
+    }
+
     const wandboxBody = { compiler, code: finalCode };
-    if (stdin) wandboxBody.stdin = stdin;
+    if (stdin && !compiler.includes("sqlite")) {
+      wandboxBody.stdin = stdin;
+    }
 
     const response = await fetch("https://wandbox.org/api/compile.json", {
       method: "POST",

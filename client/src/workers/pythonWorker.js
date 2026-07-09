@@ -72,7 +72,12 @@ self.onmessage = async function (e) {
 import builtins
 import sys
 import io
+import warnings
 import stdin_helper
+
+# Suppress deprecation warnings (e.g. Pandas Pyarrow dependency warning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 
 def custom_input(prompt=""):
     if prompt:

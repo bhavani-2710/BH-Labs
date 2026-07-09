@@ -1,4 +1,4 @@
-﻿import { useMemo } from "react";
+import { useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Terminal,
@@ -212,7 +212,7 @@ export default function AssessmentResult({
   return (
     <div className="min-h-screen bg-[#F6F7FB] dark:bg-slate-950 text-[#1b1b24] dark:text-slate-100 font-sans transition-colors duration-200">
       {/* ── Top Navigation Bar ──────────────────────────────────────────── */}
-      <nav className="fixed top-0 w-full h-16 z-50 flex justify-between items-center px-6 md:px-10 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-transparent shadow-sm transition-colors duration-200">
+      <nav className="fixed top-0 w-full h-16 z-50 flex justify-between items-center px-6 md:px-10 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors duration-200">
         <div className="flex items-center gap-4">
           <h1 className="text-lg font-bold text-[#1b1b24] dark:text-slate-100 tracking-tight">
             {displayTitle}
@@ -259,7 +259,7 @@ export default function AssessmentResult({
         {/* Hero Section: Score & Peer Comparison */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Score display card */}
-          <Card className="lg:col-span-8 rounded-2xl p-8 md:p-10 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center gap-10">
+          <Card className="lg:col-span-8 rounded-2xl p-8 md:p-10 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center gap-10">
             <CircularGauge percentage={percentage} />
             <div className="text-center md:text-left">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400 rounded-full text-xs font-bold mb-4 uppercase tracking-wider">
@@ -316,40 +316,40 @@ export default function AssessmentResult({
 
         {/* Stats Breakdown Row */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+          <Card className="rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
             <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#1b1b24]">{correct}</p>
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider text-left">
+                <p className="text-2xl font-bold text-[#1b1b24] dark:text-slate-100">{correct}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-left">
                   Correct Answers
                 </p>
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+          <Card className="rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
             <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-rose-400 flex items-center justify-center">
                 <XCircle className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#1b1b24]">{incorrect}</p>
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider text-left">
+                <p className="text-2xl font-bold text-[#1b1b24] dark:text-slate-100">{incorrect}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-left">
                   Incorrect Answers
                 </p>
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+          <Card className="rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
             <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 flex items-center justify-center">
                 <MinusCircle className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#1b1b24]">{unanswered}</p>
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider text-left">
+                <p className="text-2xl font-bold text-[#1b1b24] dark:text-slate-100">{unanswered}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-left">
                   Skipped Questions
                 </p>
               </div>
@@ -427,14 +427,14 @@ export default function AssessmentResult({
         </section>
 
         {/* Detailed Question Review */}
-        <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+        <Card className="rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
           <CardContent className="p-8 space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
               <div>
-                <h2 className="text-xl font-bold text-[#1b1b24]">
+                <h2 className="text-xl font-bold text-[#1b1b24] dark:text-slate-100">
                   Question-by-Question Analysis
                 </h2>
-                <p className="text-xs text-slate-400 mt-1 text-left">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 text-left">
                   Review the AI-generated questions from subexperiments, your
                   answers, and the correct options.
                 </p>
@@ -479,23 +479,23 @@ export default function AssessmentResult({
                       {statusIcon}
                       <div className="flex-1 space-y-4">
                         <div className="flex items-start justify-between gap-4">
-                          <span className="font-bold text-slate-800 text-sm mt-0.5">
+                          <span className="font-bold text-slate-800 dark:text-slate-200 text-sm mt-0.5">
                             Question {idx + 1}
                           </span>
                           {!isUnanswered && (
                             <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isCorrect ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isCorrect ? "bg-emerald-100 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-400" : "bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-rose-300"}`}
                             >
                               {isCorrect ? "Correct" : "Incorrect"}
                             </span>
                           )}
                           {isUnanswered && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                               Skipped
                             </span>
                           )}
                         </div>
-                        <div className="text-sm font-semibold text-slate-900 leading-relaxed text-left">
+                        <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-relaxed text-left">
                           {renderQuestionText(q.text)}
                         </div>
 
@@ -505,20 +505,20 @@ export default function AssessmentResult({
                             const isUserSel = optIdx === userAnswerIdx;
 
                             let optStyle =
-                              "border-slate-200 text-slate-600 bg-slate-50/40 hover:bg-slate-50/80";
+                              "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 bg-slate-50/40 dark:bg-slate-900/40 hover:bg-slate-50/80 dark:hover:bg-slate-900/80";
                             let optIcon = null;
 
                             if (isCorrectOpt) {
                               optStyle =
-                                "border-emerald-200 text-emerald-800 bg-emerald-50/50 font-medium";
+                                "border-emerald-200 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/30 font-medium";
                               optIcon = (
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                               );
                             } else if (isUserSel && !isCorrect) {
                               optStyle =
-                                "border-red-200 text-red-800 bg-red-50/50 font-medium";
+                                "border-red-200 dark:border-red-800/40 text-red-800 dark:text-rose-300 bg-red-50/50 dark:bg-red-950/30 font-medium";
                               optIcon = (
-                                <XCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                                <XCircle className="w-3.5 h-3.5 text-red-600 dark:text-rose-450 shrink-0" />
                               );
                             }
 

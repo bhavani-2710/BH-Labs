@@ -56,7 +56,7 @@ export default function PracticalJournal({
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-950 flex flex-col items-center transition-colors duration-200">
       {/* Sticky Header Top Menu */}
-      <header className="sticky top-0 z-50 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-transparent px-6 py-4 flex items-center justify-between shadow-sm no-print transition-colors duration-200">
+      <header className="sticky top-0 z-50 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between shadow-sm no-print transition-colors duration-200">
         <div className="flex items-center space-x-3.5">
           <button 
             onClick={onBack}
@@ -88,7 +88,7 @@ export default function PracticalJournal({
           <iframe 
             src={pdfUrl} 
             title="Practical Journal PDF Preview"
-            className="w-full h-[calc(100vh-140px)] border border-slate-200 dark:border-transparent rounded-[20px] shadow-2xl bg-white"
+            className="w-full h-[calc(100vh-140px)] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-2xl bg-white dark:bg-slate-900"
           />
         ) : (
           <div className="text-slate-500 dark:text-slate-400 font-semibold animate-pulse text-sm">

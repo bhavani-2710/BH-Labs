@@ -168,7 +168,7 @@ const renderTextWithInlineFormatting = (text) => {
   return parts.map((part, idx) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={idx} className="font-bold text-[#1E1B4B]">
+        <strong key={idx} className="font-bold text-[#1E1B4B] dark:text-violet-300">
           {part.slice(2, -2)}
         </strong>
       );
@@ -177,7 +177,7 @@ const renderTextWithInlineFormatting = (text) => {
       return (
         <code
           key={idx}
-          className="font-mono bg-[#5521FF]/8 px-1 py-[1px] rounded text-[9.5px] text-[#4F46E5] font-semibold"
+          className="font-mono bg-[#5521FF]/8 dark:bg-violet-950/40 px-1 py-[1px] rounded text-[9.5px] text-[#4F46E5] dark:text-violet-300 font-semibold"
         >
           {part.slice(1, -1)}
         </code>
@@ -185,7 +185,7 @@ const renderTextWithInlineFormatting = (text) => {
     }
     if (part.startsWith("*") && part.endsWith("*")) {
       return (
-        <em key={idx} className="italic text-[#475569]">
+        <em key={idx} className="italic text-[#475569] dark:text-slate-400">
           {part.slice(1, -1)}
         </em>
       );
@@ -217,13 +217,13 @@ const renderTable = (tableLines, key) => {
 
   return (
     <div key={`table-container-${key}`} className="overflow-x-auto my-2 w-full">
-      <table className="w-full border-collapse text-[10px] leading-[1.4] border border-[#E4E4E7] bg-white rounded-[6px] overflow-hidden">
+      <table className="w-full border-collapse text-[10px] leading-[1.4] border border-[#E4E4E7] dark:border-slate-800 bg-white dark:bg-slate-900 rounded-[6px] overflow-hidden">
         <thead>
-          <tr className="bg-[#F4F4F5] border-b-2 border-b-[#E4E4E7]">
+          <tr className="bg-[#F4F4F5] dark:bg-slate-950 border-b-2 border-b-[#E4E4E7] dark:border-b-slate-850">
             {headerCells.map((cell, idx) => (
               <th
                 key={idx}
-                className="px-2 py-1.5 text-left font-bold text-[#18181B] border-r border-[#E4E4E7]"
+                className="px-2 py-1.5 text-left font-bold text-[#18181B] dark:text-slate-100 border-r border-[#E4E4E7] dark:border-slate-800"
               >
                 {renderTextWithInlineFormatting(cell)}
               </th>
@@ -234,12 +234,12 @@ const renderTable = (tableLines, key) => {
           {bodyRows.map((row, rowIdx) => (
             <tr
               key={rowIdx}
-              className={`border-b border-[#E4E4E7] ${rowIdx % 2 === 0 ? "bg-white" : "bg-[#FAF9FF]"}`}
+              className={`border-b border-[#E4E4E7] dark:border-slate-800 ${rowIdx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-[#FAF9FF] dark:bg-slate-900/50"}`}
             >
               {row.map((cell, cellIdx) => (
                 <td
                   key={cellIdx}
-                  className="px-2 py-1.5 text-[#3F3F46] border-r border-[#E4E4E7]"
+                  className="px-2 py-1.5 text-[#3F3F46] dark:text-slate-300 border-r border-[#E4E4E7] dark:border-slate-800"
                 >
                   {renderTextWithInlineFormatting(cell)}
                 </td>
@@ -404,7 +404,7 @@ export default function MarkdownRenderer({ text }) {
             renderedLines.push(
               <div
                 key={`h-${i}`}
-                className={`font-bold text-[#1E1B4B] mt-2 mb-1 ${fontSizeClass} leading-[1.4]`}
+                className={`font-bold text-[#1E1B4B] dark:text-violet-300 mt-2 mb-1 ${fontSizeClass} leading-[1.4]`}
               >
                 {renderTextWithInlineFormatting(content)}
               </div>,

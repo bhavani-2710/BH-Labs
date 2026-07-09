@@ -12,6 +12,7 @@ const chatRoutes = require("./routes/chatRoutes");
 const practicalTestRoutes = require("./routes/practicalTestRoutes");
 const vivaRoutes = require("./routes/vivaRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
+const imageRoutes = require("./routes/imageRoutes");
 
 // Connect to MongoDB
 connectDB();
@@ -21,6 +22,15 @@ const app = express();
 // ── Core middleware ──────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
+
+// Cross-origin isolation headers — required for @wasmer/sdk (SharedArrayBuffer).
+// Using "credentialless" instead of "require-corp" so cross-origin CDN
+// resources (Wasmer registry, Pyodide CDN, etc.) are not blocked.
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+  next();
+});
 
 // Enable request logging in development only
 if (process.env.NODE_ENV !== "production") {
@@ -39,6 +49,7 @@ app.use("/api/experiments", experimentRoutes);
 app.use("/api/departments", departmentRoutes);
 
 // ── Feature routes ────────────────────────────────────────────────────────────
+app.use("/api/image", imageRoutes);
 app.use("/api/run", compilerRoutes);        // Wandbox code execution proxy
 app.use("/api", chatRoutes);               // AI explain + chat assistant (streaming)
 app.use("/api/practical-test", practicalTestRoutes);  // Practical test question generation

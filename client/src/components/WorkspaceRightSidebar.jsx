@@ -29,9 +29,9 @@ const WorkspaceRightSidebar = ({
     <Tabs
       value={activeRightTab}
       onValueChange={setActiveRightTab}
-      className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1"
+      className="bg-white dark:bg-slate-900 border border-[#E4E4E7] dark:border-slate-800 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1"
     >
-      <TabsList className="flex gap-[3px] p-1 bg-[#F4F4F5] border-b border-[#E4E4E7] shrink-0 h-auto rounded-none">
+      <TabsList className="flex gap-[3px] p-1 bg-[#F4F4F5] dark:bg-slate-900 border-b border-[#E4E4E7] dark:border-slate-800 shrink-0 h-auto rounded-none">
         {[
           ["assistant", "Assistant"],
           ["hints", "Hints"],
@@ -40,7 +40,7 @@ const WorkspaceRightSidebar = ({
           <TabsTrigger
             key={key}
             value={key}
-            className={`flex-1 py-1 px-0 rounded-[5px] border-none cursor-pointer text-[10px] font-bold tracking-wider uppercase transition-colors duration-150 font-sans data-[state=active]:bg-[#5521FF] data-[state=active]:text-white bg-transparent text-[#71717A] hover:bg-[#EBEBEB] hover:text-[#18181B] shadow-none`}
+            className={`flex-1 py-1 px-0 rounded-[5px] border-none cursor-pointer text-[10px] font-bold tracking-wider uppercase transition-colors duration-150 font-sans data-[state=active]:bg-[#5521FF] data-[state=active]:text-white bg-transparent text-[#71717A] dark:text-slate-400 hover:bg-[#EBEBEB] dark:hover:bg-slate-800 hover:text-[#18181B] dark:hover:text-slate-200 shadow-none`}
           >
             {label}
           </TabsTrigger>
@@ -56,7 +56,7 @@ const WorkspaceRightSidebar = ({
                   AI
                 </div>
                 <div className="text-left">
-                  <div className="text-[11px] font-bold text-[#18181B]">
+                  <div className="text-[11px] font-bold text-[#18181B] dark:text-slate-100">
                     Bh.AI Assistant
                   </div>
                   <div className="text-[9px] text-[#22C55E] flex items-center gap-[3px]">
@@ -135,15 +135,15 @@ const WorkspaceRightSidebar = ({
 
         <TabsContent value="hints" className="p-[18px] mt-0 flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <div className="flex justify-between items-center pb-1.5 border-b border-[#E4E4E7] mb-0.5">
-              <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
+            <div className="flex justify-between items-center pb-1.5 border-b border-[#E4E4E7] dark:border-slate-800 mb-0.5">
+              <span className="text-[10px] font-bold text-[#71717A] dark:text-slate-450 uppercase tracking-wider">
                 Available Hints
               </span>
             </div>
             <button
               onClick={toggleSidebar}
               title="Collapse"
-              className="p-2 mb-2 rounded-lg cursor-pointer text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#5521FF]"
+              className="p-2 mb-2 rounded-lg cursor-pointer text-[#71717A] dark:text-slate-400 transition-colors hover:bg-[#F4F4F5] dark:hover:bg-slate-800 hover:text-[#5521FF] dark:hover:text-violet-400"
             >
               <PanelRightClose size={18} />
             </button>
@@ -153,9 +153,9 @@ const WorkspaceRightSidebar = ({
             return (
               <div
                 key={idx}
-                className={`border border-[#E4E4E7] rounded-lg p-2.5 text-[11px] transition-colors duration-150 text-left ${revealed ? "bg-[#F9F9FB] text-[#334155]" : "bg-[#FAFAFA] text-[#71717A]"}`}
+                className={`border border-[#E4E4E7] dark:border-slate-800 rounded-lg p-2.5 text-[11px] transition-colors duration-150 text-left ${revealed ? "bg-[#F9F9FB] dark:bg-slate-950/40 text-[#334155] dark:text-slate-350" : "bg-[#FAFAFA] dark:bg-slate-900/40 text-[#71717A] dark:text-slate-450"}`}
               >
-                <div className="text-[10px] font-bold mb-1">
+                <div className="text-[10px] font-bold mb-1 text-slate-700 dark:text-slate-400">
                   Hint {idx + 1}
                 </div>
                 {revealed ? (
@@ -178,12 +178,12 @@ const WorkspaceRightSidebar = ({
         <TabsContent value="viva" className="p-[18px] mt-0 flex flex-col gap-3">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 pb-1.5 border-b border-[#E4E4E7] mb-0.5 shrink-0">
-              <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider">
+            <div className="flex items-center gap-3 pb-1.5 border-b border-[#E4E4E7] dark:border-slate-800 mb-0.5 shrink-0">
+              <span className="text-[10px] font-bold text-[#71717A] dark:text-slate-400 uppercase tracking-wider">
                 Viva Q&amp;A
               </span>
               {vivaQAPairs.length > 0 && (
-                <span className="text-[10px] font-bold text-[#5521FF] bg-[#F0ECFF] px-2 py-[2px] rounded-full border border-[#5521FF]/15">
+                <span className="text-[10px] font-bold text-[#5521FF] dark:text-violet-400 bg-[#F0ECFF] dark:bg-violet-950/40 px-2 py-[2px] rounded-full border border-[#5521FF]/15 dark:border-violet-900/15">
                   {vivaQAPairs.length} questions
                 </span>
               )}
@@ -191,7 +191,7 @@ const WorkspaceRightSidebar = ({
             <button
               onClick={toggleSidebar}
               title="Collapse"
-              className="p-2 mb-2 rounded-lg cursor-pointer text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#5521FF]"
+              className="p-2 mb-2 rounded-lg cursor-pointer text-[#71717A] dark:text-slate-400 transition-colors hover:bg-[#F4F4F5] dark:hover:bg-slate-800 hover:text-[#5521FF] dark:hover:text-violet-400"
             >
               <PanelRightClose size={18} />
             </button>
@@ -201,7 +201,7 @@ const WorkspaceRightSidebar = ({
           {vivaQALoading && (
             <div className="flex flex-col items-center justify-center py-8 gap-3">
               <Loader2 className="w-5 h-5 text-[#5521FF] animate-spin" />
-              <p className="text-[11px] text-[#71717A] font-medium text-center">
+              <p className="text-[11px] text-[#71717A] dark:text-slate-400 font-medium text-center">
                 Generating viva questions…
               </p>
             </div>
@@ -209,7 +209,7 @@ const WorkspaceRightSidebar = ({
 
           {/* Error */}
           {!vivaQALoading && vivaQAError && (
-            <div className="bg-red-50 border border-red-100 rounded-lg p-3 text-[11px] text-red-600">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-lg p-3 text-[11px] text-red-600 dark:text-rose-300">
               {vivaQAError}
             </div>
           )}
@@ -224,8 +224,8 @@ const WorkspaceRightSidebar = ({
                     key={idx}
                     className={`border rounded-lg overflow-hidden transition-all duration-150 ${
                       isOpen
-                        ? "border-[#5521FF]/40 shadow-[0_2px_12px_rgba(85,33,255,0.08)]"
-                        : "border-[#E4E4E7] hover:border-[#5521FF]/30"
+                        ? "border-[#5521FF]/40 dark:border-violet-500/40 shadow-[0_2px_12px_rgba(85,33,255,0.08)]"
+                        : "border-[#E4E4E7] dark:border-slate-800 hover:border-[#5521FF]/30 dark:hover:border-violet-500/30"
                     }`}
                   >
                     {/* Question row */}
@@ -237,12 +237,12 @@ const WorkspaceRightSidebar = ({
                         className={`shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black mt-[1px] ${
                           isOpen
                             ? "bg-[#5521FF] text-white"
-                            : "bg-[#F4F4F5] text-[#71717A]"
+                            : "bg-[#F4F4F5] dark:bg-slate-800 text-[#71717A] dark:text-slate-350"
                         }`}
                       >
                         {idx + 1}
                       </span>
-                      <span className="text-[11px] font-semibold text-[#18181B] leading-snug flex-1">
+                      <span className="text-[11px] font-semibold text-[#18181B] dark:text-slate-100 leading-snug flex-1">
                         {qa.question}
                       </span>
                       <span
@@ -256,8 +256,8 @@ const WorkspaceRightSidebar = ({
 
                     {/* Answer */}
                     {isOpen && (
-                      <div className="px-3 pb-3 pt-0.5 border-t border-[#F0ECFF] bg-[#FAFAFE] text-left">
-                        <p className="text-[11px] text-[#3730A3] leading-relaxed">
+                      <div className="px-3 pb-3 pt-0.5 border-t border-[#F0ECFF] dark:border-slate-800 bg-[#FAFAFE] dark:bg-slate-900/50 text-left">
+                        <p className="text-[11px] text-[#3730A3] dark:text-violet-300 leading-relaxed">
                           {qa.answer}
                         </p>
                       </div>

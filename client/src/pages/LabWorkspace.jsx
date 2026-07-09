@@ -7,6 +7,7 @@ import {
   X,
   Sun,
   Moon,
+  FileText,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -18,6 +19,7 @@ import CollapsedRightSidebar from "../components/CollapsedRightSidebar";
 import { generateJournalPdf } from "../utils/journalPdfGenerator";
 import { runJsInWebWorker } from "../workers/jsWorkerHelper";
 import { runPythonInWebWorker } from "../workers/pythonWorkerHelper";
+import { runCInWebWorker } from "../workers/cWorkerHelper";
 import ThemeToggle from "../components/ThemeToggle";
 
 const COMPILER_MAP = {
@@ -126,6 +128,8 @@ export default function LabWorkspace({
   const subExp =
     experiment?.subExperiments?.find((s) => s.part === subPart) ||
     experiment?.subExperiments?.[0];
+
+  const isJournalOnlyMode = subject?.code === "CNL401" || subject?.name?.toLowerCase().includes("network");
 
 
   const [activeLeftTab, setActiveLeftTab] = useState("theory");
@@ -396,6 +400,24 @@ SELECT * FROM student;
 
     async function loadPdf() {
       try {
+        let outputImageUrl = null;
+        
+        if (isJournalOnlyMode) {
+          try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/image/generate`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ problemStatement: subExp?.title || experiment?.title || "Computer Networks" })
+            });
+            const data = await res.json();
+            if (data.imageUrl) {
+              outputImageUrl = data.imageUrl;
+            }
+          } catch (e) {
+            console.error("Failed to fetch AI output image:", e);
+          }
+        }
+
         const bytes = await generateJournalPdf({
           experiment,
           subPart,
@@ -406,6 +428,7 @@ SELECT * FROM student;
             })
             : code,
           outputText: consoleOutput,
+          outputImageUrl,
         });
         if (!active) return;
         const blob = new Blob([bytes], { type: "application/pdf" });
@@ -1042,8 +1065,9 @@ SELECT * FROM student;
         .map((l, i) => `  [${i + 1}] ${l}`)
         .join("\n")
       : "";
+    const isCLangRun = ["c", "cpp"].includes(editorLanguage);
     setConsoleOutput(
-      `$ Running ${editorLanguage.toUpperCase()} code...${stdinPreview ? `\n$ Input provided:\n${stdinPreview}` : ""}\n$ Compiling...\n\n`,
+      `$ Running ${editorLanguage.toUpperCase()} code...${stdinPreview ? `\n$ Input provided:\n${stdinPreview}` : ""}\n${isCLangRun ? "$ Initializing Clang compiler (first run may take ~30s)..." : "$ Compiling..."}\n\n`,
     );
 
     try {
@@ -1103,8 +1127,10 @@ SELECT * FROM student;
         data = await runJsInWebWorker(code);
       } else if (["python", "python3", "py"].includes(editorLanguage)) {
         data = await runPythonInWebWorker(code, normalizedStdin);
+      } else if (["c", "cpp"].includes(editorLanguage)) {
+        data = await runCInWebWorker(code, editorLanguage, normalizedStdin);
       } else {
-        // Use Wandbox for all other languages via our server
+        // Use Wandbox for Java, SQL, and other languages via our server
         const res = await fetch(`/api/run`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1118,7 +1144,7 @@ SELECT * FROM student;
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
         data = await res.json();
       }
-
+      console.log(data)
       let out = "";
       if (data.compiler_message)
         out += `[compiler]\n${data.compiler_message}\n\n`;
@@ -1272,47 +1298,49 @@ SELECT * FROM student;
         </div>
 
         {/* Language selector — dropdown if multiple, static pill if single */}
-        {isWebDesign ? (
-          <div className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap hidden md:block transition-colors duration-200">
-            JAVASCRIPT Language
-          </div>
-        ) : supportedLanguages.length > 1 ? (
-          <select
-            className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap cursor-pointer outline-none transition-colors duration-150 hover:border-[#5521FF] hover:text-[#5521FF] focus:border-[#5521FF] focus:ring-2 focus:ring-[#5521FF]/15 max-[900px]:hidden"
-            value={editorLanguage}
-            onChange={handleLanguageChange}
-          >
-            {supportedLanguages.map((lang) => (
-              <option key={lang} value={lang}>
-                {lang.toUpperCase()}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <div className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap hidden md:block transition-colors duration-200">
-            {editorLanguage.toUpperCase()} Language
-          </div>
+        {!isJournalOnlyMode && (
+          supportedLanguages.length > 1 ? (
+            <select
+              className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap cursor-pointer outline-none transition-colors duration-150 hover:border-[#5521FF] hover:text-[#5521FF] focus:border-[#5521FF] focus:ring-2 focus:ring-[#5521FF]/15 max-[900px]:hidden"
+              value={editorLanguage}
+              onChange={handleLanguageChange}
+            >
+              {supportedLanguages.map((lang) => (
+                <option key={lang} value={lang}>
+                  {lang.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap hidden md:block transition-colors duration-200">
+              {editorLanguage.toUpperCase()} Language
+            </div>
+          )
         )}
 
         <div className="flex items-center gap-2.5">
-          <div className="text-[10px] font-semibold text-[#71717A] dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-            <span className="w-[5px] h-[5px] rounded-full bg-[#22C55E] shrink-0" />{" "}
-            {saveStatus}
-          </div>
-          <div className="w-[1px] h-[18px] bg-[#E4E4E7] dark:bg-slate-800 shrink-0" />
-          <button
-            className="bg-[#22C55E]/10 dark:bg-emerald-950/20 text-[#166534] dark:text-emerald-400 border border-[#22C55E]/30 dark:border-emerald-900/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#22C55E]/20 dark:hover:bg-emerald-950/40 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleRunCode}
-            disabled={isRunning}
-          >
-            {isRunning ? "Running..." : "Run"}
-          </button>
-          <button
-            className="bg-[#5521FF]/10 dark:bg-[#5521FF]/20 text-[#5521FF] dark:text-violet-300 border border-[#5521FF]/30 dark:border-[#5521FF]/40 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#5521FF]/20 dark:hover:bg-[#5521FF]/30"
-            onClick={handleSolveQuestion}
-          >
-            Solve Question
-          </button>
+          {!isJournalOnlyMode && (
+            <>
+              <div className="text-[10px] font-semibold text-[#71717A] dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <span className="w-[5px] h-[5px] rounded-full bg-[#22C55E] shrink-0" />{" "}
+                {saveStatus}
+              </div>
+              <div className="w-[1px] h-[18px] bg-[#E4E4E7] dark:bg-slate-800 shrink-0" />
+              <button
+                className="bg-[#22C55E]/10 dark:bg-emerald-950/20 text-[#166534] dark:text-emerald-400 border border-[#22C55E]/30 dark:border-emerald-900/30 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#22C55E]/20 dark:hover:bg-emerald-950/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleRunCode}
+                disabled={isRunning}
+              >
+                {isRunning ? "Running..." : "Run"}
+              </button>
+              <button
+                className="bg-[#5521FF]/10 dark:bg-[#5521FF]/20 text-[#5521FF] dark:text-violet-300 border border-[#5521FF]/30 dark:border-[#5521FF]/40 px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-colors duration-150 font-sans hover:bg-[#5521FF]/20 dark:hover:bg-[#5521FF]/30"
+                onClick={handleSolveQuestion}
+              >
+                Solve Question
+              </button>
+            </>
+          )}
           {completionKey && (
             <button
               onClick={toggleWorkspaceCompleted}
@@ -1376,9 +1404,21 @@ SELECT * FROM student;
           defaultSize={"50%"}
           minSize={"30%"}
           maxSize={"90%"}
-          className="bg-white border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0"
+          className="bg-white dark:bg-black border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0"
         >
-          <Group orientation="vertical">
+          {isJournalOnlyMode ? (
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-[#F9F9FB] dark:bg-slate-950">
+              <div className="w-16 h-16 mb-4 rounded-full bg-[#5521FF]/10 flex items-center justify-center">
+                <FileText className="text-[#5521FF]" size={32} />
+              </div>
+              <h2 className="text-xl font-bold text-[#18181B] dark:text-white mb-2">Journal Only Mode</h2>
+              <p className="text-[#71717A] dark:text-slate-400 max-w-md leading-relaxed">
+                This subject does not require code execution in the browser. 
+                Read the theory on the left, and click <strong>Generate Journal</strong> to create your PDF record containing AI-generated output for this experiment.
+              </p>
+            </div>
+          ) : (
+            <Group orientation="vertical">
             <Panel
               defaultSize={"72%"}
               minSize={"20%"}
@@ -1649,7 +1689,8 @@ SELECT * FROM student;
                   ))}
               </div>
             </Panel>
-          </Group>
+            </Group>
+          )}
         </Panel>
 
         <Separator className="group relative w-1 cursor-col-resize">
@@ -1662,7 +1703,7 @@ SELECT * FROM student;
             defaultSize={35}
             minSize={35}
             maxSize={35}
-            className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
+            className="bg-white dark:bg-black border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
           >
             <CollapsedRightSidebar
               setActiveRightTab={setActiveRightTab}
@@ -1750,7 +1791,7 @@ SELECT * FROM student;
                 <iframe
                   src={`${journalPdfUrl}#navpanes=0&toolbar=1`}
                   title="Practical Journal PDF Preview"
-                  className="w-full h-full border border-slate-200 dark:border-transparent rounded-[20px] shadow-lg bg-white"
+                  className="w-full h-full border border-slate-200 dark:border-transparent rounded-[20px] shadow-lg bg-white dark:bg-slate-900"
                 />
               ) : (
                 <span className="text-slate-400 text-xs font-semibold">

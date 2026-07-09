@@ -689,6 +689,66 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   drawHeading("Conclusion");
   drawParagraph(conclusionText);
 
+  // OUTPUT IMAGE Section
+  const { outputImageUrl } = arguments[0];
+  if (outputImageUrl) {
+    try {
+      ensureSpace(80);
+      currentY -= 15;
+      
+      // Fetch image bytes (works for both HTTP and Data URIs)
+      const imgRes = await fetch(outputImageUrl);
+      const imgBytes = await imgRes.arrayBuffer();
+      
+      let embeddedImage;
+      // Determine if PNG or JPG
+      if (outputImageUrl.includes("png") || outputImageUrl.includes("PNG")) {
+        embeddedImage = await pdfDoc.embedPng(imgBytes);
+      } else {
+        // Default to JPG for Seedream/Midjourney
+        embeddedImage = await pdfDoc.embedJpg(imgBytes);
+      }
+      
+      const imgDims = embeddedImage.scale(1);
+      
+      // Calculate scaled dimensions to fit within CONTENT_WIDTH
+      const maxWidth = CONTENT_WIDTH - 20;
+      let width = imgDims.width;
+      let height = imgDims.height;
+      
+      if (width > maxWidth) {
+        const ratio = maxWidth / width;
+        width = maxWidth;
+        height = height * ratio;
+      }
+      
+      // We might need a new page if the image is too tall
+      ensureSpace(height + 20);
+      
+      // Draw a subtle border/background behind the image
+      currentPage.drawRectangle({
+        x: MARGIN_LEFT + (CONTENT_WIDTH - width) / 2 - 2,
+        y: currentY - height - 2,
+        width: width + 4,
+        height: height + 4,
+        color: rgb(0.9, 0.9, 0.9)
+      });
+      
+      // Draw image
+      currentPage.drawImage(embeddedImage, {
+        x: MARGIN_LEFT + (CONTENT_WIDTH - width) / 2,
+        y: currentY - height,
+        width: width,
+        height: height
+      });
+      
+      currentY -= (height + 25);
+    } catch (e) {
+      console.error("Failed to embed output image:", e);
+      drawParagraph("[Failed to load AI Output Image]");
+    }
+  }
+
   // SIGNATURES Section
   ensureSpace(70);
   currentY -= 30;

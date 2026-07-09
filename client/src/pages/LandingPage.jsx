@@ -1,10 +1,13 @@
 import { useEffect, useRef } from "react";
 import { ArrowRight, Play, Code, Cpu, FileText, Lock, Send, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
+
 
 export default function LandingPage({ onStart }) {
   const glowRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -72,8 +75,8 @@ export default function LandingPage({ onStart }) {
 
         {/* ── Hero ── */}
         <section className="max-w-[1024px] mx-auto px-6 text-center">
-          <div className="badge inline-flex items-center gap-2 px-4 py-1 rounded-full border border-[#E4E4E7] bg-[#F4F4F5] text-xs font-semibold tracking-wider uppercase text-[#52525B] mb-2 transition-colors hover:border-[#5521FF]/50">
-            <span className="w-2 h-2 rounded-full bg-[#5521FF] shrink-0" />
+          <div className="badge inline-flex items-center gap-2 px-4 py-1 rounded-full border border-[#E4E4E7] dark:border-zinc-800 bg-[#F4F4F5] dark:bg-zinc-900/50 text-xs font-semibold tracking-wider uppercase text-[#52525B] dark:text-zinc-400 mb-2 transition-colors hover:border-[#5521FF]/50 dark:hover:border-violet-500/50">
+            <span className="w-2 h-2 rounded-full bg-[#5521FF] dark:bg-violet-400 shrink-0" />
             AI-Powered Practical Platform
           </div>
 
@@ -91,7 +94,11 @@ export default function LandingPage({ onStart }) {
 
           <div className="flex justify-center gap-4 flex-wrap mb-8 max-[480px]:flex-col max-[480px]:items-stretch">
             <button onClick={onStart} className="bg-[#5521FF] text-white border-none rounded-full px-8 py-3.5 font-sans font-bold text-[18px] cursor-pointer inline-flex items-center gap-2 transition-all hover:bg-[#5521FF]/90 hover:shadow-[0_8px_24px_rgba(85,33,255,0.25)] max-[480px]:text-[16px] max-[480px]:px-6 max-[480px]:py-3 max-[480px]:w-full max-[480px]:justify-center">Start for Free <ArrowRight size={20} /></button>
-            <button onClick={onStart} className="bg-white text-[#09090B] border border-[#E4E4E7] rounded-full px-8 py-3.5 font-sans font-bold text-[18px] cursor-pointer inline-flex items-center gap-2 transition-colors hover:bg-[#F4F4F5] max-[480px]:text-[16px] max-[480px]:px-6 max-[480px]:py-3 max-[480px]:w-full max-[480px]:justify-center"><Play size={20} fill="#09090B" /> Watch Demo</button>
+            <button 
+            onClick={()=> navigate("/playground")}
+             className="bg-white dark:bg-zinc-900 text-[#09090B] dark:text-zinc-100 border border-[#E4E4E7] dark:border-zinc-800 rounded-full px-8 py-3.5 font-sans font-bold text-[18px] cursor-pointer inline-flex items-center gap-2 transition-colors hover:bg-[#F4F4F5] dark:hover:bg-zinc-800 max-[480px]:text-[16px] max-[480px]:px-6 max-[480px]:py-3 max-[480px]:w-full max-[480px]:justify-center">
+            Go to Playground <ArrowRight size={20} />
+            </button>
           </div>
 
           {/* Avatars */}

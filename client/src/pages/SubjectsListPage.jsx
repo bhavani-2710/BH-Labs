@@ -93,7 +93,7 @@ export default function SubjectsListPage({
                 placeholder="Search subjects…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-semibold text-[#09090B] dark:text-zinc-150 focus:outline-none focus:border-violet-400 placeholder:text-gray-400 transition-colors"
+                className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-semibold text-[#09090B] dark:text-zinc-200 focus:outline-none focus:border-violet-400 placeholder:text-gray-400 transition-colors"
               />
             </div>
 
@@ -126,7 +126,7 @@ export default function SubjectsListPage({
                       className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-violet-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-between ${
   !selectedDept
     ? "text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-slate-800/50"
-    : "text-slate-600 dark:text-slate-350"
+    : "text-slate-600 dark:text-slate-300"
 }`}
                     >
                       All Departments
@@ -234,7 +234,7 @@ export default function SubjectsListPage({
             return (
               <Card
                 key={subject._id}
-                className="overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-white dark:bg-slate-900 border border-gray-200 dark:border-transparent rounded-3xl"
+                className="overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl"
               >
                 <CardContent className="p-6">
                   <h3
@@ -313,7 +313,7 @@ export default function SubjectsListPage({
         </div>
 
         {/* Insight Banner */}
-        <div className="mt-10 p-7 bg-white dark:bg-slate-900 border border-gray-200 dark:border-transparent rounded-3xl relative overflow-hidden transition-colors duration-200">
+        <div className="mt-10 p-7 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl relative overflow-hidden transition-colors duration-200">
           <div className="max-w-lg">
             <h2 className="text-xl font-semibold mb-2 text-slate-900 dark:text-slate-100">
               Weekly Performance Insight
@@ -342,7 +342,7 @@ export default function SubjectsListPage({
       </main>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-transparent flex items-center justify-around z-50 transition-colors duration-200">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 flex items-center justify-around z-50 transition-colors duration-200">
         <button
           onClick={() => onNavigate?.("dashboard")}
           className="flex flex-col items-center gap-0.5 text-gray-400 dark:text-slate-500"
