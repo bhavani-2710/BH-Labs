@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Share2,
   Download,
@@ -253,7 +253,7 @@ export default function ExperimentListPage({
                                   {isCompleted(exp._id, sub.part) ? (
                                     <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
                                   ) : (
-                                    <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-650 group-hover:bg-[#5521FF] dark:group-hover:bg-violet-400 transition-colors"></div>
+                                    <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700 group-hover:bg-[#5521FF] dark:group-hover:bg-violet-400 transition-colors"></div>
                                   )}
                                   <span
 
@@ -266,7 +266,7 @@ export default function ExperimentListPage({
                                     {sub.title || `Sub-experiment ${sub.part}`}
                                   </span>
                                 </div>
-                                <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-650 group-hover:text-[#5521FF] dark:group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
+                                <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-500 group-hover:text-[#5521FF] dark:group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
                               </button>
                             ))}
                           </div>

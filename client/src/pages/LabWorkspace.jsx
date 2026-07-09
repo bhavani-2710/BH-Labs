@@ -1404,7 +1404,7 @@ SELECT * FROM student;
           defaultSize={"50%"}
           minSize={"30%"}
           maxSize={"90%"}
-          className="bg-white border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0"
+          className="bg-white dark:bg-black border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0"
         >
           {isJournalOnlyMode ? (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-[#F9F9FB] dark:bg-slate-950">
@@ -1703,7 +1703,7 @@ SELECT * FROM student;
             defaultSize={35}
             minSize={35}
             maxSize={35}
-            className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
+            className="bg-white dark:bg-black border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
           >
             <CollapsedRightSidebar
               setActiveRightTab={setActiveRightTab}
@@ -1791,7 +1791,7 @@ SELECT * FROM student;
                 <iframe
                   src={`${journalPdfUrl}#navpanes=0&toolbar=1`}
                   title="Practical Journal PDF Preview"
-                  className="w-full h-full border border-slate-200 dark:border-transparent rounded-[20px] shadow-lg bg-white"
+                  className="w-full h-full border border-slate-200 dark:border-transparent rounded-[20px] shadow-lg bg-white dark:bg-slate-900"
                 />
               ) : (
                 <span className="text-slate-400 text-xs font-semibold">

@@ -23,7 +23,7 @@ export default function Sidebar({ activePage, onNavigate, experiments = [] }) {
   const secondExpId = experiments[1]?._id || firstExpId;
 
   return (
-    <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-transparent flex flex-col justify-between p-6 shrink-0 h-screen sticky top-0 transition-colors duration-200">
+    <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between p-6 shrink-0 h-screen sticky top-0 transition-colors duration-200">
       <div className="space-y-8">
         {/* Logo */}
         <div className="flex items-center space-x-2">
@@ -86,7 +86,7 @@ export default function Sidebar({ activePage, onNavigate, experiments = [] }) {
       </div>
 
       {/* Bottom actions */}
-      <div className="space-y-1.5 border-t border-slate-100 dark:border-transparent pt-4">
+      <div className="space-y-1.5 border-t border-slate-100 dark:border-slate-800 pt-4">
         <button
           onClick={toggleTheme}
           className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all text-left cursor-pointer"
