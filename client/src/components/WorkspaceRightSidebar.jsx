@@ -1,4 +1,4 @@
-import {
+﻿import {
   Loader2,
   PanelLeftClose,
   PanelRightClose,
@@ -153,7 +153,7 @@ const WorkspaceRightSidebar = ({
             return (
               <div
                 key={idx}
-                className={`border border-[#E4E4E7] dark:border-slate-800 rounded-lg p-2.5 text-[11px] transition-colors duration-150 text-left ${revealed ? "bg-[#F9F9FB] dark:bg-slate-950/40 text-[#334155] dark:text-slate-350" : "bg-[#FAFAFA] dark:bg-slate-900/40 text-[#71717A] dark:text-slate-450"}`}
+                className={`border border-[#E4E4E7] dark:border-slate-800 rounded-lg p-2.5 text-[11px] transition-colors duration-150 text-left ${revealed ? "bg-[#F9F9FB] dark:bg-slate-950/40 text-[#334155] dark:text-slate-300" : "bg-[#FAFAFA] dark:bg-slate-900/40 text-[#71717A] dark:text-slate-450"}`}
               >
                 <div className="text-[10px] font-bold mb-1 text-slate-700 dark:text-white">
                   Hint {idx + 1}
@@ -237,7 +237,7 @@ const WorkspaceRightSidebar = ({
                         className={`shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black mt-[1px] ${
                           isOpen
                             ? "bg-[#5521FF] text-white"
-                            : "bg-[#F4F4F5] dark:bg-slate-800 text-[#71717A] dark:text-slate-350"
+                            : "bg-[#F4F4F5] dark:bg-slate-800 text-[#71717A] dark:text-slate-300"
                         }`}
                       >
                         {idx + 1}

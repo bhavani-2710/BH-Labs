@@ -7,7 +7,7 @@ const CollapsedLeftSidebar = ({ setActiveLeftTab, toggleSidebar }) => {
       <button
         title="Expand"
         onClick={toggleSidebar}
-        className="p-2 rounded-lg cursor-pointer transition-colors text-slate-500 dark:text-slate-400 hover:bg-[#F4F4F5] dark:hover:bg-slate-800 hover:text-[#5521FF] dark:hover:text-violet-400"
+        className="p-2 rounded-lg cursor-pointer transition-colors text-slate-700 dark:text-slate-200 hover:bg-[#F4F4F5] dark:hover:bg-slate-800 hover:text-[#5521FF] dark:hover:text-violet-400"
       >
         <PanelLeftOpen size={18} />
       </button>

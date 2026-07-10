@@ -1067,7 +1067,7 @@ SELECT * FROM student;
       : "";
     const isCLangRun = ["c", "cpp"].includes(editorLanguage);
     setConsoleOutput(
-      `$ Running ${editorLanguage.toUpperCase()} code...${stdinPreview ? `\n$ Input provided:\n${stdinPreview}` : ""}\n${isCLangRun ? "$ Initializing Clang compiler (first run may take ~30s)..." : "$ Compiling..."}\n\n`,
+      `$ Running ${editorLanguage.toUpperCase()} code...${stdinPreview ? `\n$ Input provided:\n${stdinPreview}` : ""}\n${isCLangRun ? `$ Initializing ${editorLanguage === "c" ? "C" : "C++"} compiler (first run may take ~30s)...` : "$ Compiling..."}\n\n`,
     );
 
     try {
@@ -1372,7 +1372,7 @@ SELECT * FROM student;
             defaultSize={35}
             minSize={35}
             maxSize={35}
-            className="bg-white dark:bg-black border border-[#E4E4E7] rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
+            className="bg-white dark:bg-black border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
           >
             <CollapsedLeftSidebar
               setActiveLeftTab={setActiveLeftTab}
