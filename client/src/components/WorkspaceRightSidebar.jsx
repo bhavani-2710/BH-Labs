@@ -79,7 +79,7 @@ const WorkspaceRightSidebar = ({
                   key={i}
                   className={
                     msg.sender === "ai"
-                      ? "bg-[#f5f5f5] dark:bg-[#1e1e2d] border border-[#5521FF]/10 dark:border-transparent rounded-xl rounded-tl-[2px] p-2 px-2.5 text-[12px] leading-relaxed text-[#3730A3] dark:text-violet-300 self-start max-w-[92%] text-wrap transition-colors duration-200"
+                      ? "bg-[#f5f5f5] dark:bg-[#1e1e2d] border border-[#5521FF]/10 dark:border-transparent rounded-xl rounded-tl-[2px] p-2 px-2.5 text-[12px] leading-relaxed text-[#3730A3] dark:text-gray-300 self-start max-w-[92%] text-wrap transition-colors duration-200"
                       : "bg-[#5521FF] text-white rounded-xl rounded-tr-[2px] p-2 px-2.5 text-[12px] leading-relaxed self-end max-w-[85%] shadow-[0_2px_6px_rgba(85,33,255,0.2)] text-wrap"
                   }
                 >
@@ -99,10 +99,10 @@ const WorkspaceRightSidebar = ({
                 <button
                   className="px-2 py-[3px] bg-[#F4F4F5] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-[4px] text-[10px] text-[#71717A] dark:text-slate-300 cursor-pointer transition-colors duration-150 font-sans font-semibold hover:text-[#5521FF] dark:hover:text-[#5521FF] hover:border-[#5521FF] dark:hover:border-[#5521FF]"
                   onClick={() =>
-                    askAiMessage("Can you explain the swap logic?")
+                    askAiMessage("Can you explain the code in detail?")
                   }
                 >
-                  Swap Logic?
+                  Detailed explanation?
                 </button>
                 <button
                   className="px-2 py-[3px] bg-[#F4F4F5] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-[4px] text-[10px] text-[#71717A] dark:text-slate-300 cursor-pointer transition-colors duration-150 font-sans font-semibold hover:text-[#5521FF] dark:hover:text-[#5521FF] hover:border-[#5521FF] dark:hover:border-[#5521FF]"
