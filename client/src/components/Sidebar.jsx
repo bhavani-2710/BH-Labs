@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+﻿import { useNavigate } from "react-router-dom";
 import { LayoutDashboard, BookOpen, Terminal, Settings, LogOut, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -87,22 +87,6 @@ export default function Sidebar({ activePage, onNavigate, experiments = [] }) {
 
       {/* Bottom actions */}
       <div className="space-y-1.5 border-t border-slate-100 dark:border-slate-800 pt-4">
-        <button
-          onClick={toggleTheme}
-          className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all text-left cursor-pointer"
-        >
-          {theme === "dark" ? (
-            <>
-              <Sun className="w-4 h-4 shrink-0" />
-              <span>Light Mode</span>
-            </>
-          ) : (
-            <>
-              <Moon className="w-4 h-4 shrink-0" />
-              <span>Dark Mode</span>
-            </>
-          )}
-        </button>
         <button className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all text-left cursor-pointer">
           <Settings className="w-4 h-4 shrink-0" />
           <span>Settings</span>

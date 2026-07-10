@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import {
   ArrowRight,
   TrendingUp,
@@ -12,11 +12,7 @@ import {
 import Sidebar from "../components/Sidebar";
 import { Card, CardContent } from "../components/ui/card";
 import { Progress } from "../components/ui/progress";
-
-// Dummy/Placeholder for ThemeToggle component to prevent undefined reference crashes
-function ThemeToggle() {
-  return <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center opacity-60" />;
-}
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function SubjectsListPage({
   experiments,
@@ -49,7 +45,9 @@ export default function SubjectsListPage({
 
   // Filter subjects by search text and selected department
   const filteredSubjects = subjects.filter((s) => {
-    const matchesSearch = s.name?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = s.name
+      ?.toLowerCase()
+      .includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
     if (!selectedDept) return true;
 
@@ -106,17 +104,23 @@ export default function SubjectsListPage({
               >
                 <span className="truncate">
                   {selectedDept
-                    ? departments.find(d => d._id === selectedDept)?.name || "All Departments"
+                    ? departments.find((d) => d._id === selectedDept)?.name ||
+                      "All Departments"
                     : "All Departments"}
                 </span>
-                <ChevronDown className={`h-4 w-4 text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`h-4 w-4 text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                />
               </button>
 
               {isOpen && (
                 <>
                   {/* Click outside backdrop */}
-                  <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
-                  
+                  <div
+                    className="fixed inset-0 z-30"
+                    onClick={() => setIsOpen(false)}
+                  />
+
                   <div className="absolute right-0 mt-2 w-72 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-40 max-h-80 overflow-y-auto py-2 backdrop-blur-md transition-all duration-150">
                     <button
                       onClick={() => {
@@ -124,10 +128,10 @@ export default function SubjectsListPage({
                         setIsOpen(false);
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-violet-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-between ${
-  !selectedDept
-    ? "text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-slate-800/50"
-    : "text-slate-600 dark:text-slate-300"
-}`}
+                        !selectedDept
+                          ? "text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-slate-800/50"
+                          : "text-slate-600 dark:text-slate-300"
+                      }`}
                     >
                       All Departments
                     </button>
@@ -142,8 +146,12 @@ export default function SubjectsListPage({
                           }}
                           className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-violet-50 dark:hover:bg-slate-800 transition-colors flex flex-col ${isSelected ? "text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-slate-800/50" : "text-slate-700 dark:text-slate-300"}`}
                         >
-                          <span className="truncate font-bold">{dept.name}</span>
-                          <span className="text-[10px] opacity-60 font-medium">{dept.code}</span>
+                          <span className="truncate font-bold">
+                            {dept.name}
+                          </span>
+                          <span className="text-[10px] opacity-60 font-medium">
+                            {dept.code}
+                          </span>
                         </button>
                       );
                     })}
@@ -157,26 +165,28 @@ export default function SubjectsListPage({
         </div>
 
         {/* Active filter badge */}
-        {selectedDept && (() => {
-          const dept = departments.find((d) => d._id === selectedDept);
-          return dept ? (
-            <div className="flex items-center gap-2 mb-6">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 rounded-full text-xs font-semibold">
-                {dept.name}
-                <button
-                  onClick={() => setSelectedDept("")}
-                  className="ml-1 text-violet-500 hover:text-violet-700 dark:hover:text-violet-200 transition-colors leading-none"
-                  aria-label="Clear department filter"
-                >
-                  ×
-                </button>
-              </span>
-              <span className="text-xs text-gray-400 dark:text-slate-500">
-                {filteredSubjects.length} subject{filteredSubjects.length !== 1 ? "s" : ""}
-              </span>
-            </div>
-          ) : null;
-        })()}
+        {selectedDept &&
+          (() => {
+            const dept = departments.find((d) => d._id === selectedDept);
+            return dept ? (
+              <div className="flex items-center gap-2 mb-6">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 rounded-full text-xs font-semibold">
+                  {dept.name}
+                  <button
+                    onClick={() => setSelectedDept("")}
+                    className="ml-1 text-violet-500 hover:text-violet-700 dark:hover:text-violet-200 transition-colors leading-none"
+                    aria-label="Clear department filter"
+                  >
+                    ×
+                  </button>
+                </span>
+                <span className="text-xs text-gray-400 dark:text-slate-500">
+                  {filteredSubjects.length} subject
+                  {filteredSubjects.length !== 1 ? "s" : ""}
+                </span>
+              </div>
+            ) : null;
+          })()}
 
         {/* Subjects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -194,13 +204,15 @@ export default function SubjectsListPage({
             const totalMainExps = subjectExperiments.length;
 
             try {
-              const saved = localStorage.getItem(`bhlabs_completed_${subjectId}`);
+              const saved = localStorage.getItem(
+                `bhlabs_completed_${subjectId}`,
+              );
               const completedList = saved ? JSON.parse(saved) : [];
               subjectExperiments.forEach((exp) => {
                 const subExperiments = exp.subExperiments || [];
                 if (subExperiments.length > 0) {
                   const allDone = subExperiments.every((sub) =>
-                    completedList.includes(`${exp._id}__${sub.part}`)
+                    completedList.includes(`${exp._id}__${sub.part}`),
                   );
                   if (allDone) {
                     completedMainExps++;
@@ -220,9 +232,16 @@ export default function SubjectsListPage({
             // Department + semester tags setup
             const deptTags = (subject.departments || [])
               .filter((d) => {
-                const isPopulated = d.department && typeof d.department === "object" && d.department.name;
+                const isPopulated =
+                  d.department &&
+                  typeof d.department === "object" &&
+                  d.department.name;
                 if (!isPopulated) return false;
-                if (selectedDept && String(d.department._id) !== String(selectedDept)) return false;
+                if (
+                  selectedDept &&
+                  String(d.department._id) !== String(selectedDept)
+                )
+                  return false;
                 return true;
               })
               .map((d) => ({
@@ -283,7 +302,9 @@ export default function SubjectsListPage({
                   {/* Action buttons */}
                   <div className="flex flex-col gap-2.5">
                     <button
-                      onClick={() => onSelectSubject?.(subject._id, selectedDept)}
+                      onClick={() =>
+                        onSelectSubject?.(subject._id, selectedDept)
+                      }
                       className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${
                         isCompleted
                           ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
