@@ -25,9 +25,7 @@ const WorkspaceLeftSidebar = ({
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         <TabsContent value="theory" className="p-[18px] mt-0">
           <div className="flex items-center justify-between">
-            <span className="inline-block px-1.75 py-[1px] rounded-[3px] mb-1.5 text-[9px] font-bold tracking-widest uppercase bg-[#5521FF]/10 text-[#5521FF] border border-[#5521FF]/20">
-              BH.AI GENERATED
-            </span>
+            
 
             <button
               onClick={toggleSidebar}
@@ -52,7 +50,7 @@ const WorkspaceLeftSidebar = ({
                 </span>
 
                 <span
-                  className={`text-[10px] font-bold px-2 py-[3px] rounded-[4px] uppercase tracking-wider ${
+                  className={`text-[10px] font-bold px-2 py-[3px] rounded-[4px] uppercase tracking-wider dark:text-white ${
                     subExp.difficulty.toLowerCase() === "easy"
                       ? "bg-[#DCFCE7] text-[#166534] dark:bg-emerald-950/30 dark:text-emerald-450"
                       : subExp.difficulty.toLowerCase() === "medium"
@@ -89,7 +87,7 @@ const WorkspaceLeftSidebar = ({
           <div className="text-[12px] font-extrabold text-[#1E293B] dark:text-slate-200 uppercase tracking-widest mb-1.5 mt-4.5 text-left">
             Problem Statement
           </div>
-          <p className="text-[11px] text-[#475569] dark:text-slate-350 leading-relaxed text-left">
+          <p className="text-[11px] text-[#475569] dark:text-slate-350 leading-relaxed text-left dark:text-white">
             {subExp?.problemStatement ||
               "Implement and analyze the algorithm."}
           </p>
@@ -99,7 +97,7 @@ const WorkspaceLeftSidebar = ({
               <div className="text-[12px] font-extrabold text-[#1E293B] dark:text-slate-200 uppercase tracking-widest mb-1.5 mt-4.5 text-left">
                 Theory
               </div>
-              <p className="text-[11px] text-[#475569] dark:text-slate-350 leading-relaxed text-left">
+              <p className="text-[11px] text-[#475569] dark:text-slate-350 leading-relaxed text-left dark:text-white">
                 {subExp.theory}
               </p>
             </>
@@ -147,7 +145,7 @@ const WorkspaceLeftSidebar = ({
             </button>
           </div>
 
-          <div className="bg-[#F9F9FB] dark:bg-[#0C111D] border border-[#E4E4E7] dark:border-slate-800 rounded-lg p-3 font-mono text-[11px] leading-relaxed text-[#334155] dark:text-slate-350 whitespace-pre-line text-left flex-1 overflow-y-auto">
+          <div className="bg-[#F9F9FB] dark:bg-[#0C111D] border border-[#E4E4E7] dark:border-slate-800 rounded-lg p-3 font-mono text-[11px] leading-relaxed text-[#334155] dark:text-slate-350 whitespace-pre-line text-left flex-1 overflow-y-auto dark:text-white">
             {subExp?.algorithm || "No algorithm to display"}
           </div>
         </TabsContent>

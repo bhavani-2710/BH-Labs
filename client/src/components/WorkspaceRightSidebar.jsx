@@ -155,11 +155,11 @@ const WorkspaceRightSidebar = ({
                 key={idx}
                 className={`border border-[#E4E4E7] dark:border-slate-800 rounded-lg p-2.5 text-[11px] transition-colors duration-150 text-left ${revealed ? "bg-[#F9F9FB] dark:bg-slate-950/40 text-[#334155] dark:text-slate-350" : "bg-[#FAFAFA] dark:bg-slate-900/40 text-[#71717A] dark:text-slate-450"}`}
               >
-                <div className="text-[10px] font-bold mb-1 text-slate-700 dark:text-slate-400">
+                <div className="text-[10px] font-bold mb-1 text-slate-700 dark:text-white">
                   Hint {idx + 1}
                 </div>
                 {revealed ? (
-                  <p className="text-[11px] leading-relaxed">{hint}</p>
+                  <p className="text-[11px] leading-relaxed dark:text-white">{hint}</p>
                 ) : (
                   <button
                     className="bg-[#5521FF] text-white border-none rounded-[5px] px-2.5 py-1 text-[10px] font-bold cursor-pointer font-sans mt-1 hover:bg-[#5521FF]/85"
