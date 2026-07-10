@@ -12,7 +12,9 @@ export const runJsInWebWorker = (code) => {
     let isFinished = false;
 
     // Use standard Vite 5/6 syntax for loading worker assets
-    const worker = new Worker(new URL("./jsWorker.js", import.meta.url));
+    const worker = new Worker(new URL("./jsWorker.js", import.meta.url), {
+      type: "module",
+    });
 
     // Force terminate after 2 seconds to prevent infinite loop hangs
     const timeoutId = setTimeout(() => {
@@ -56,9 +58,19 @@ export const runJsInWebWorker = (code) => {
       isFinished = true;
       clearTimeout(timeoutId);
       worker.terminate();
+
+      let errMsg = "";
+      if (err && err.message) {
+        errMsg = `${err.message} (${err.filename}:${err.lineno}:${err.colno})`;
+      } else if (err && err.type) {
+        errMsg = `Worker error event triggered: type=${err.type}`;
+      } else {
+        errMsg = String(err);
+      }
+
       resolve({
         program_output: programOutput,
-        program_error: programError + (err.message ? err.message : String(err)) + "\n",
+        program_error: programError + errMsg + "\n",
         compiler_message: "",
         compiler_error: "",
         status: "1",

@@ -7,6 +7,7 @@ import { useTheme } from "../context/ThemeContext";
 import monacoCustomTheme from "../utils/monacoCustomTheme";
 import { runJsInWebWorker } from "../workers/jsWorkerHelper";
 import { runPythonInWebWorker } from "../workers/pythonWorkerHelper";
+import { runCInWebWorker } from "../workers/cWorkerHelper";
 
 const DEFAULT_TEMPLATES = {
   javascript: `/**
@@ -30,6 +31,40 @@ def main():
 
 if __name__ == "__main__":
     main()
+`,
+  cpp: `/**
+ * C++ Code Playground
+ */
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    
+    // Example of reading stdin:
+    // std::string name;
+    // if (std::cin >> name) {
+    //     std::cout << "Hello, " << name << "!" << std::endl;
+    // }
+    
+    return 0;
+}
+`,
+  c: `/**
+ * C Code Playground
+ */
+#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    
+    // Example of reading stdin:
+    // char name[50];
+    // if (scanf("%49s", name) == 1) {
+    //     printf("Hello, %s!\\n", name);
+    // }
+    
+    return 0;
+}
 `,
   java: `/**
  * Java Code Playground
@@ -66,7 +101,8 @@ export default function Playground({ experiments = [] }) {
     const saved = localStorage.getItem("playground_codes");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return { ...DEFAULT_TEMPLATES, ...parsed };
       } catch (e) {
         // Fall back to default
       }
@@ -123,6 +159,8 @@ export default function Playground({ experiments = [] }) {
         data = await runJsInWebWorker(code);
       } else if (language === "python") {
         data = await runPythonInWebWorker(code, normalizedStdin);
+      } else if (language === "cpp" || language === "c") {
+        data = await runCInWebWorker(code, language, normalizedStdin);
       } else {
         // Send to Java executor via our server
         const res = await fetch(`${import.meta.env.VITE_API_URL}/run`, {
@@ -205,7 +243,7 @@ export default function Playground({ experiments = [] }) {
                 onClick={() => setShowLangDropdown(!showLangDropdown)}
                 className="flex items-center justify-between space-x-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer min-w-[120px]"
               >
-                <span className="capitalize">{language === "javascript" ? "JavaScript" : language}</span>
+                <span className="capitalize">{language === "javascript" ? "JavaScript" : language === "cpp" ? "C++" : language === "c" ? "C" : language}</span>
                 <ChevronDown className="w-3.5 h-3.5 opacity-60" />
               </button>
               
@@ -213,7 +251,7 @@ export default function Playground({ experiments = [] }) {
                 <>
                   <div className="fixed inset-0 z-20" onClick={() => setShowLangDropdown(false)}></div>
                   <div className="absolute right-0 mt-1.5 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg py-1 z-30 overflow-hidden animate-in fade-in-50 duration-100">
-                    {["javascript", "python", "java"].map((lang) => (
+                    {["javascript", "python", "java", "cpp", "c"].map((lang) => (
                       <button
                         key={lang}
                         onClick={() => {
@@ -226,7 +264,7 @@ export default function Playground({ experiments = [] }) {
                             : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50"
                         }`}
                       >
-                        <span className="capitalize">{lang === "javascript" ? "JavaScript" : lang}</span>
+                        <span className="capitalize">{lang === "javascript" ? "JavaScript" : lang === "cpp" ? "C++" : lang === "c" ? "C" : lang}</span>
                         {language === lang && <Check className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />}
                       </button>
                     ))}
@@ -269,7 +307,7 @@ export default function Playground({ experiments = [] }) {
           <div className="w-1/2 flex flex-col border-r border-slate-200 dark:border-slate-800 min-h-0 bg-white dark:bg-black">
             <div className="flex items-center bg-slate-100 dark:bg-slate-900 px-4 py-2 border-b border-slate-200 dark:border-slate-800 select-none text-[11px] font-mono text-slate-500">
               <span className="text-violet-600 mr-2">◉</span>
-              <span>sandbox.{language === "javascript" ? "js" : language === "python" ? "py" : "java"}</span>
+              <span>sandbox.{language === "javascript" ? "js" : language === "python" ? "py" : language === "java" ? "java" : language === "cpp" ? "cpp" : "c"}</span>
             </div>
             
             <div className="flex-1 min-h-0">

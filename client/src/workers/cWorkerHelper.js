@@ -104,10 +104,19 @@ export const runCInWebWorker = (code, language, stdin) => {
       isFinished = true;
       clearTimeout(timeoutId);
       worker.terminate();
+
+      let errMsg = "";
+      if (err && err.message) {
+        errMsg = `${err.message} (${err.filename}:${err.lineno}:${err.colno})`;
+      } else if (err && err.type) {
+        errMsg = `Worker error event triggered: type=${err.type}`;
+      } else {
+        errMsg = String(err);
+      }
+
       resolve({
         program_output: programOutput,
-        program_error:
-          programError + (err.message ? err.message : String(err)) + "\n",
+        program_error: programError + errMsg + "\n",
         compiler_message: "",
         compiler_error: compilerError,
         status: "1",

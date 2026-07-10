@@ -239,9 +239,10 @@ export default function AssessmentResult({
                 Candidate ID: {candidateId}
               </p>
             </div>
-            <img
+             <img
               className="w-10 h-10 rounded-full border-2 border-[#3525cd]/20 object-cover"
               alt="Candidate Avatar"
+              crossOrigin="anonymous"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY6ZUY14pkquScGhRMreTqFx-P1EeXGk9MNr2dDb7veEPqqmm_5jedKypdtGgOqp6WF3vm4ltQhphH9g953i8GqFMYLwncRUqMmzl7QGsog0v4_E0481P5gI7W1zH9KqGWKS_0upNyCCXO36JgmJAGVI-GqL9O9H_CccFAFNCSa6aSCUuLpb0xPng60ZPQAohOt0StUuV-x9lMpdPWP5Vxf_wIX2I7M_Tx6Q-8qz_lKn1w0iUliK3-3mID-TWrpaUOQit3VO1VGWY"
             />
           </div>

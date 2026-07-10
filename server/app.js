@@ -28,7 +28,7 @@ app.use(express.json());
 // resources (Wasmer registry, Pyodide CDN, etc.) are not blocked.
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-  res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
   next();
 });
 

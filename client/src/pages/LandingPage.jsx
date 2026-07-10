@@ -105,7 +105,7 @@ export default function LandingPage({ onStart }) {
           <div className="flex flex-col items-center gap-2">
             <div className="flex">
               {avatars.map((src, i) => (
-                <img key={i} src={src} alt="Student" className={`w-10 h-10 rounded-full border-2 border-white object-cover ${i === 0 ? "ml-0" : "-ml-3"}`} />
+                <img key={i} src={src} crossOrigin="anonymous" alt="Student" className={`w-10 h-10 rounded-full border-2 border-white object-cover ${i === 0 ? "ml-0" : "-ml-3"}`} />
               ))}
             </div>
             <p className="text-sm text-[#52525B]">

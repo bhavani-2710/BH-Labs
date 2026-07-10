@@ -14,7 +14,7 @@ export default defineConfig({
       // IMPORTANT: use "credentialless" (not "require-corp") so cross-origin
       // CDN fetches (e.g. Wasmer registry, Pyodide) are not blocked.
       "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Embedder-Policy": "credentialless",
+      "Cross-Origin-Embedder-Policy": "require-corp",
     },
     proxy: {
       "/api": {
