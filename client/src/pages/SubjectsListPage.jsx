@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowRight,
   TrendingUp,
@@ -246,7 +246,7 @@ export default function SubjectsListPage({
               })
               .map((d) => ({
                 name: d.department.name,
-                code: d.department.code || "",
+                code: d.code || d.department.code || "",
                 semester: d.semester,
               }));
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import Editor from "@monaco-editor/react";
+import Editor from "@monaco-editor/react"; 
 import { Panel, Group, Separator } from "react-resizable-panels";
 import {
   ArrowLeft,
@@ -129,8 +129,93 @@ export default function LabWorkspace({
     experiment?.subExperiments?.find((s) => s.part === subPart) ||
     experiment?.subExperiments?.[0];
 
-  const isJournalOnlyMode = subject?.code === "CNL401" || subject?.name?.toLowerCase().includes("network");
+  const isJournalOnlyMode =
+    subExp?.mode === "nonExecutableCode" ||
+    subExp?.mode === "guidedSteps" ||
+    experiment?.mode === "guidedSteps" ||
+    subject?.code === "CNL401" ||
+    subject?.departments?.some((d) => d.code === "CNL401");
 
+  const isGuidedStepsMode = subExp?.mode === "guidedSteps";
+
+  const renderTerminalBox = (codeText, key) => (
+    <div key={key} className="my-3 rounded-xl overflow-hidden border border-slate-700/80 shadow-lg max-w-full bg-[#0c0c0e]">
+      <div className="flex items-center justify-between px-3.5 py-2 bg-[#1f1f23] border-b border-slate-800">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
+          <span className="ml-2 text-[10px] font-mono font-bold text-slate-400">terminal — bash</span>
+        </div>
+      </div>
+      <div className="p-3.5 font-mono text-xs text-[#10B981] overflow-x-auto">
+        <pre className="whitespace-pre-wrap break-words">{codeText}</pre>
+      </div>
+    </div>
+  );
+
+  const renderInstructionContent = (text) => {
+    if (!text) return null;
+    if (text.includes("```")) {
+      const parts = text.split("```");
+      return parts.map((part, idx) => {
+        const chunk = part.trim();
+        if (!chunk) return null;
+        if (idx % 2 === 0) {
+          return (
+            <p key={idx} className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed break-words mb-2">
+              {chunk}
+            </p>
+          );
+        } else {
+          let codeLines = chunk.split("\n");
+          const firstWord = codeLines[0].trim().toLowerCase();
+          const langs = ["bash", "sh", "java", "python", "javascript", "js", "c", "cpp", "sql", "html", "css", "cmd", "powershell"];
+          if (langs.includes(firstWord)) {
+            codeLines = codeLines.slice(1);
+          }
+          return renderTerminalBox(codeLines.join("\n"), idx);
+        }
+      });
+    }
+
+    const lines = text.split("\n");
+    const elements = [];
+    let currentParagraph = [];
+    let currentCode = [];
+
+    const flushP = () => {
+      if (currentParagraph.length > 0) {
+        elements.push(
+          <p key={`p-${elements.length}`} className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed break-words mb-2">
+            {currentParagraph.join(" ")}
+          </p>
+        );
+        currentParagraph = [];
+      }
+    };
+
+    const flushC = () => {
+      if (currentCode.length > 0) {
+        elements.push(renderTerminalBox(currentCode.join("\n"), `c-${elements.length}`));
+        currentCode = [];
+      }
+    };
+
+    const paragraphs = text.split(/\n\s*\n/);
+    paragraphs.forEach((p, idx) => {
+      const cleanP = p.trim();
+      if (cleanP) {
+        elements.push(
+          <p key={`p-${idx}`} className="text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-line break-words break-all overflow-x-auto">
+            {cleanP}
+          </p>
+        );
+      }
+    });
+
+    return <div className="space-y-1.5">{elements}</div>;
+  };
 
   const [activeLeftTab, setActiveLeftTab] = useState("theory");
   const [activeRightTab, setActiveRightTab] = useState("assistant");
@@ -384,9 +469,10 @@ SELECT * FROM student;
   const [journalPdfUrl, setJournalPdfUrl] = useState("");
   const [journalPdfBlob, setJournalPdfBlob] = useState(null);
   const [isGeneratingJournal, setIsGeneratingJournal] = useState(false);
+  const [pdfFitMode, setPdfFitMode] = useState("FitH");
 
   useEffect(() => {
-    if (!showJournalModal) {
+    if (!showJournalModal && !isJournalOnlyMode) {
       if (journalPdfUrl) {
         URL.revokeObjectURL(journalPdfUrl);
         setJournalPdfUrl("");
@@ -400,23 +486,7 @@ SELECT * FROM student;
 
     async function loadPdf() {
       try {
-        let outputImageUrl = null;
-        
-        if (isJournalOnlyMode) {
-          try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/image/generate`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ problemStatement: subExp?.title || experiment?.title || "Computer Networks" })
-            });
-            const data = await res.json();
-            if (data.imageUrl) {
-              outputImageUrl = data.imageUrl;
-            }
-          } catch (e) {
-            console.error("Failed to fetch AI output image:", e);
-          }
-        }
+        const outputImageUrl = null;
 
         const bytes = await generateJournalPdf({
           experiment,
@@ -449,7 +519,7 @@ SELECT * FROM student;
     return () => {
       active = false;
     };
-  }, [showJournalModal, experiment, subPart, code, consoleOutput, codeByLang, isWebDesign]);
+  }, [showJournalModal, isJournalOnlyMode, experiment, subPart, code, consoleOutput, codeByLang, isWebDesign]);
 
   const handleDownloadJournalPdf = () => {
     if (!journalPdfBlob) return;
@@ -1298,7 +1368,7 @@ SELECT * FROM student;
         </div>
 
         {/* Language selector — dropdown if multiple, static pill if single */}
-        {!isJournalOnlyMode && (
+        {!isJournalOnlyMode && !isGuidedStepsMode && (
           supportedLanguages.length > 1 ? (
             <select
               className="absolute left-1/2 -translate-x-1/2 bg-[#F9F9FB] dark:bg-slate-800 border border-[#E4E4E7] dark:border-transparent rounded-full px-3.5 py-[3px] font-mono text-[10px] text-[#71717A] dark:text-slate-300 uppercase tracking-widest whitespace-nowrap cursor-pointer outline-none transition-colors duration-150 hover:border-[#5521FF] hover:text-[#5521FF] focus:border-[#5521FF] focus:ring-2 focus:ring-[#5521FF]/15 max-[900px]:hidden"
@@ -1319,7 +1389,7 @@ SELECT * FROM student;
         )}
 
         <div className="flex items-center gap-2.5">
-          {!isJournalOnlyMode && (
+          {!isJournalOnlyMode && !isGuidedStepsMode && (
             <>
               <div className="text-[10px] font-semibold text-[#71717A] dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
                 <span className="w-[5px] h-[5px] rounded-full bg-[#22C55E] shrink-0" />{" "}
@@ -1357,9 +1427,9 @@ SELECT * FROM student;
           )}
           <button
             className="bg-[#5521FF] text-white border-none px-3.5 py-[5px] rounded-[6px] text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-all duration-150 shadow-[0_2px_6px_rgba(85,33,255,0.2)] font-sans hover:brightness-110"
-            onClick={() => setShowJournalModal(true)}
+            onClick={() => (isJournalOnlyMode ? handleDownloadJournalPdf() : setShowJournalModal(true))}
           >
-            Generate Journal
+            {isJournalOnlyMode ? "Download Journal" : "Generate Journal"}
           </button>
         </div>
       </header>
@@ -1391,6 +1461,7 @@ SELECT * FROM student;
               setActiveLeftTab={setActiveLeftTab}
               subExp={subExp}
               toggleSidebar={toggleLeft}
+              isJournalOnlyMode={isJournalOnlyMode}
             />
           </Panel>
         )}
@@ -1407,15 +1478,136 @@ SELECT * FROM student;
           className="bg-white dark:bg-black border border-[#E4E4E7] dark:border-slate-900 rounded-[10px] overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 min-w-0"
         >
           {isJournalOnlyMode ? (
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-[#F9F9FB] dark:bg-slate-950">
-              <div className="w-16 h-16 mb-4 rounded-full bg-[#5521FF]/10 flex items-center justify-center">
-                <FileText className="text-[#5521FF]" size={32} />
+            <div className="flex flex-col h-full bg-[#F9F9FB] dark:bg-slate-950 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-white dark:bg-slate-900 border-b border-[#E4E4E7] dark:border-slate-800 shrink-0">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#5521FF]/10 flex items-center justify-center text-[#5521FF]">
+                    <FileText size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      Practical Journal Record
+                    </h3>
+                    <p className="text-[10px] text-slate-400">
+                      {subExp?.title || experiment?.title}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPdfFitMode((m) => (m === "FitH" ? "Fit" : "FitH"))}
+                    className="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                    title="Toggle Zoom Mode"
+                  >
+                    {pdfFitMode === "FitH" ? "Fit Page" : "Fit Width"}
+                  </button>
+                  <button
+                    onClick={handleDownloadJournalPdf}
+                    disabled={isGeneratingJournal || !journalPdfBlob}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#5521FF] text-white rounded-md text-xs font-bold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Download Journal PDF
+                  </button>
+                </div>
               </div>
-              <h2 className="text-xl font-bold text-[#18181B] dark:text-white mb-2">Journal Only Mode</h2>
-              <p className="text-[#71717A] dark:text-slate-400 max-w-md leading-relaxed">
-                This subject does not require code execution in the browser. 
-                Read the theory on the left, and click <strong>Generate Journal</strong> to create your PDF record containing AI-generated output for this experiment.
-              </p>
+
+              <div className="flex-1 relative overflow-hidden bg-slate-100 dark:bg-slate-900/50">
+                {isGeneratingJournal ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm z-10">
+                    <div className="w-10 h-10 border-3 border-[#5521FF] border-t-transparent rounded-full animate-spin mb-4" />
+                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">
+                      Generating Practical Journal...
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Creating formatted PDF record with AI output
+                    </p>
+                  </div>
+                ) : null}
+
+                {journalPdfUrl ? (
+                  <iframe
+                    key={pdfFitMode}
+                    src={`${journalPdfUrl}#toolbar=0&view=${pdfFitMode}`}
+                    title="Practical Journal PDF"
+                    className="w-full h-full border-0"
+                  />
+                ) : !isGeneratingJournal ? (
+                  <div className="flex flex-col items-center justify-center h-full p-8 text-center text-slate-400">
+                    <p className="text-sm">Preparing journal preview...</p>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : isGuidedStepsMode ? (
+            <div className="flex flex-col h-full p-6 md:p-8 bg-[#F9F9FB] dark:bg-slate-950 overflow-y-auto overflow-x-hidden">
+              <div className="max-w-2xl mx-auto w-full min-w-0">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-2xl bg-[#5521FF]/10 flex items-center justify-center text-[#5521FF] font-bold">
+                    GS
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-[#18181B] dark:text-white">
+                      Guided Steps Walkthrough
+                    </h2>
+                    <p className="text-xs text-[#71717A] dark:text-slate-400">
+                      Follow the steps below to complete the experiment
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {subExp?.steps && subExp.steps.length > 0 ? (
+                    subExp.steps.map((step, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm min-w-0"
+                      >
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <span className="w-7 h-7 rounded-full bg-[#5521FF] text-white flex items-center justify-center text-xs font-bold">
+                            {step.order || idx + 1}
+                          </span>
+                          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">
+                            Step {step.order || idx + 1}
+                          </h3>
+                        </div>
+                        <div className="mb-3 min-w-0">
+                          {renderInstructionContent(step.instruction)}
+                        </div>
+                        {(() => {
+                          const stepImgUrl = step.imageUrl || step.image || step.screenshot || step.imgUrl || step.url;
+                          const stepCaption = step.imageCaption || step.caption || step.title || step.desc;
+                          if (!stepImgUrl && !stepCaption) return null;
+                          return (
+                            <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 mt-3 max-w-full">
+                              {stepImgUrl && (
+                                <img
+                                  src={stepImgUrl}
+                                  alt={stepCaption || `Step ${idx + 1}`}
+                                  onError={(e) => {
+                                    if (!e.target.dataset.retried && !stepImgUrl.match(/\.(png|jpg|jpeg|webp|gif)$/i)) {
+                                      e.target.dataset.retried = "true";
+                                      e.target.src = `${stepImgUrl}.png`;
+                                    }
+                                  }}
+                                  className="w-full max-w-full h-auto object-contain max-h-80 bg-slate-50 dark:bg-slate-900"
+                                />
+                              )}
+                              {stepCaption && (
+                                <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3 py-2 italic border-t border-slate-200 dark:border-slate-800">
+                                  Figure: {stepCaption}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center text-slate-400 dark:text-slate-500">
+                      No guided steps provided for this experiment.
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           ) : (
             <Group orientation="vertical">
@@ -1789,7 +1981,7 @@ SELECT * FROM student;
                 </div>
               ) : journalPdfUrl ? (
                 <iframe
-                  src={`${journalPdfUrl}#navpanes=0&toolbar=1`}
+                  src={`${journalPdfUrl}#navpanes=0&toolbar=1&view=FitH`}
                   title="Practical Journal PDF Preview"
                   className="w-full h-full border border-slate-200 dark:border-transparent rounded-[20px] shadow-lg bg-white dark:bg-slate-900"
                 />

@@ -61,7 +61,7 @@ export default function PracticalJournal({
           <button 
             onClick={onBack}
             className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border border-slate-200 dark:border-transparent p-2.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-all flex items-center justify-center cursor-pointer active:scale-95 shadow-sm"
-            title={subExp?.isExecutable === false ? "Back to Experiments" : "Back to Workspace"}
+            title={(subExp?.isExecutable === false || subExp?.mode === "guidedSteps" || experiment?.mode === "guidedSteps") ? "Back to Experiments" : "Back to Workspace"}
           >
             <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           </button>

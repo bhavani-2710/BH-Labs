@@ -21,6 +21,18 @@ const fileSchema = new mongoose.Schema(
   },
 );
 
+const stepSchema = new mongoose.Schema(
+  {
+    order: { type: Number, required: true },
+    instruction: { type: String, required: true },
+    imageUrl: { type: String, default: "" },
+    imageCaption: { type: String, default: "" },
+  },
+  {
+    _id: false,
+  },
+);
+
 const subExperimentSchema = new mongoose.Schema(
   {
     part: {
@@ -59,17 +71,21 @@ const subExperimentSchema = new mongoose.Schema(
       ],
     },
 
-     files: {
+    files: {
       type: [fileSchema],
       default: undefined,
     },
     referenceSolution: {
       type: Map,
-      of: String, 
+      of: String,
       default: undefined,
     },
     samples: {
       type: [sampleSchema],
+      default: [],
+    },
+    steps: {
+      type: [stepSchema],
       default: [],
     },
     hints: {
@@ -85,10 +101,11 @@ const subExperimentSchema = new mongoose.Schema(
       enum: ["Easy", "Medium", "Hard"],
       default: "Easy",
     },
-    isExecutable: {
-      type: Boolean,
-      default: false,
-    }
+    mode: {
+      type: String,
+      enum: ["executable", "nonExecutableCode", "guidedSteps"],
+      default: "executable",
+    },
   },
   {
     _id: false,

@@ -49,6 +49,21 @@ export default function ExperimentListPage({
   const currentSubject =
     subjects.find((s) => s._id === subjectId) || subjects[0];
 
+  const activeSyllabusPdf = useMemo(() => {
+    if (!currentSubject) return "";
+    if (deptId && Array.isArray(currentSubject.departments)) {
+      const matched = currentSubject.departments.find(
+        (d) => String(d.department?._id || d.department) === String(deptId)
+      );
+      if (matched?.syllabusPdf) return matched.syllabusPdf;
+    }
+    if (Array.isArray(currentSubject.departments)) {
+      const firstWithPdf = currentSubject.departments.find((d) => d.syllabusPdf);
+      if (firstWithPdf?.syllabusPdf) return firstWithPdf.syllabusPdf;
+    }
+    return currentSubject.syllabusPdf || "";
+  }, [currentSubject, deptId]);
+
   const subjectExperiments = useMemo(() => {
     if (!subjectId) return [];
     return experiments.filter((e) => {
@@ -148,12 +163,12 @@ export default function ExperimentListPage({
                       (d) => String(d.department?._id || d.department) === String(deptId)
                     );
                     if (matched) {
-                      const deptCode = matched.department?.code || matched.department?.name || String(matched.department);
+                      const deptCode = matched.code || matched.department?.code || matched.department?.name || String(matched.department);
                       return ` · ${deptCode} (Sem ${matched.semester})`;
                     }
                   }
                   return " · " + currentSubject.departments.map(d => {
-                    const dept = d.department?.code || d.department?.name || String(d.department);
+                    const dept = d.code || d.department?.code || d.department?.name || String(d.department);
                     return `${dept} (Sem ${d.semester})`;
                   }).join(" · ");
                 })()}
@@ -416,7 +431,7 @@ export default function ExperimentListPage({
           </DialogHeader>
           <div className="flex-1 bg-slate-100 relative">
             <iframe
-              src={currentSubject?.syllabusPdf ? `${currentSubject.syllabusPdf}#navpanes=0` : ""}
+              src={activeSyllabusPdf ? `${activeSyllabusPdf}#navpanes=0` : ""}
               title="Syllabus PDF Preview"
               className="w-full h-full border-0"
             />

@@ -12,8 +12,19 @@ const departmentSemesterSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+    code: {
+      type: String,
+      required: true,
+      uppercase: true,
+      trim: true,
+    },
+    syllabusPdf: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
-  { _id: false } 
+  { _id: false }
 );
 
 const subjectSchema = new mongoose.Schema(
@@ -21,13 +32,6 @@ const subjectSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim: true,
-    },
-    code: {
-      type: String,
-      required: true,
-      unique: true,
-      uppercase: true,
       trim: true,
     },
     departments: {
@@ -43,15 +47,16 @@ const subjectSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
-    syllabusPdf: {
-      type: String,
-      default: "",
-      trim: true,
-    },
   },
   {
     timestamps: true,
   },
+);
+
+
+subjectSchema.index(
+  { "departments.department": 1, "departments.semester": 1, "departments.code": 1 },
+  { unique: true }
 );
 
 module.exports = mongoose.model("Subject", subjectSchema);

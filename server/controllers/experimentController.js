@@ -1,6 +1,26 @@
 const Experiment = require("../models/Experiment");
 
 /**
+ * normalizeExperimentPayload
+ * Converts legacy isExecutable boolean on subExperiments into mode enum if needed.
+ */
+const normalizeExperimentPayload = (data) => {
+  if (!data || typeof data !== "object") return data;
+  const copy = { ...data };
+  if (Array.isArray(copy.subExperiments)) {
+    copy.subExperiments = copy.subExperiments.map((sub) => {
+      const updatedSub = { ...sub };
+      if (updatedSub.mode === undefined && updatedSub.isExecutable !== undefined) {
+        updatedSub.mode = updatedSub.isExecutable ? "executable" : "nonExecutableCode";
+      }
+      delete updatedSub.isExecutable;
+      return updatedSub;
+    });
+  }
+  return copy;
+};
+
+/**
  * getExperiments
  * Returns all experiments sorted by experiment number in ascending order.
  *
@@ -10,7 +30,14 @@ const Experiment = require("../models/Experiment");
  */
 const getExperiments = async (req, res) => {
   try {
-    const experiments = await Experiment.find().sort({ experimentNumber: 1 });
+    const { subjectId } = req.query;
+    const query = subjectId ? { subjectId } : {};
+    const experiments = await Experiment.find(query)
+      .sort({ experimentNumber: 1 })
+      .populate({
+        path: "subjectId",
+        populate: { path: "departments.department", select: "name code" },
+      });
     res.status(200).json(experiments);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -27,7 +54,10 @@ const getExperiments = async (req, res) => {
  */
 const getExperimentById = async (req, res) => {
   try {
-    const experiment = await Experiment.findById(req.params.id);
+    const experiment = await Experiment.findById(req.params.id).populate({
+      path: "subjectId",
+      populate: { path: "departments.department", select: "name code" },
+    });
     if (!experiment) return res.status(404).json({ message: "Experiment not found" });
     res.status(200).json(experiment);
   } catch (error) {
@@ -45,9 +75,12 @@ const getExperimentById = async (req, res) => {
  */
 const getExperimentsBySubject = async (req, res) => {
   try {
-    const experiments = await Experiment.find({ subjectId: req.params.subjectId }).sort({
-      experimentNumber: 1,
-    });
+    const experiments = await Experiment.find({ subjectId: req.params.subjectId })
+      .sort({ experimentNumber: 1 })
+      .populate({
+        path: "subjectId",
+        populate: { path: "departments.department", select: "name code" },
+      });
     res.status(200).json(experiments);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -66,17 +99,23 @@ const getExperimentsBySubject = async (req, res) => {
  */
 const createExperiment = async (req, res) => {
   try {
-    let created;
+    let payload = Array.isArray(req.body)
+      ? req.body.map(normalizeExperimentPayload)
+      : normalizeExperimentPayload(req.body);
 
-    if (Array.isArray(req.body)) {
-      created = await Experiment.insertMany(req.body);
+    let created;
+    if (Array.isArray(payload)) {
+      created = await Experiment.insertMany(payload);
     } else {
-      created = await Experiment.create(req.body);
+      created = await Experiment.create(payload);
     }
 
     const ids = Array.isArray(created) ? created.map((e) => e._id) : [created._id];
 
-    const experiments = await Experiment.find({ _id: { $in: ids } }).populate("subjectId");
+    const experiments = await Experiment.find({ _id: { $in: ids } }).populate({
+      path: "subjectId",
+      populate: { path: "departments.department", select: "name code" },
+    });
 
     res.status(201).json(Array.isArray(created) ? experiments : experiments[0]);
   } catch (error) {
@@ -95,10 +134,14 @@ const createExperiment = async (req, res) => {
  */
 const updateExperiment = async (req, res) => {
   try {
-    const experiment = await Experiment.findByIdAndUpdate(req.params.id, req.body, {
+    const payload = normalizeExperimentPayload(req.body);
+    const experiment = await Experiment.findByIdAndUpdate(req.params.id, payload, {
       new: true,
       runValidators: true,
-    }).populate("subjectId");
+    }).populate({
+      path: "subjectId",
+      populate: { path: "departments.department", select: "name code" },
+    });
 
     if (!experiment) {
       return res.status(404).json({ message: "Experiment not found" });

@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import FlowchartRenderer from "./FlowchartRenderer";
 import { PanelLeftClose } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
@@ -8,6 +8,7 @@ const WorkspaceLeftSidebar = ({
   setActiveLeftTab,
   subExp,
   toggleSidebar,
+  isJournalOnlyMode,
 }) => {
   return (
     <Tabs
@@ -104,7 +105,7 @@ const WorkspaceLeftSidebar = ({
           )}
 
           {/* Example Blocks */}
-          {subExp?.samples && subExp.samples.length > 0 && (
+          {!isJournalOnlyMode && subExp?.samples && subExp.samples.length > 0 && (
             <div className="mt-6">
               {subExp.samples.map((sample, idx) => (
                 <div
@@ -152,8 +153,23 @@ const WorkspaceLeftSidebar = ({
             </button>
           </div>
 
-          <div className="bg-[#F9F9FB] dark:bg-[#0C111D] border border-[#E4E4E7] dark:border-slate-800 rounded-lg p-3 font-mono text-[11px] leading-relaxed text-[#334155] dark:text-slate-350 whitespace-pre-line text-left flex-1 overflow-y-auto dark:text-white">
-            {subExp?.algorithm || "No algorithm to display"}
+          <div className="space-y-2.5 flex-1 overflow-y-auto pr-1">
+            {(subExp?.algorithm || "No algorithm to display")
+              .split("\n")
+              .filter((line) => line.trim())
+              .map((line, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-start gap-2.5 shadow-sm"
+                >
+                  <span className="w-5 h-5 rounded-full bg-[#5521FF] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                    {idx + 1}
+                  </span>
+                  <span className="text-[11px] text-slate-700 dark:text-slate-200 leading-relaxed font-sans">
+                    {line.trim().replace(/^(?:Step\s*)?(?:\d+[\.:)]?\s*)+/i, "")}
+                  </span>
+                </div>
+              ))}
           </div>
         </TabsContent>
         <TabsContent

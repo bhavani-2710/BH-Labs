@@ -353,7 +353,7 @@ const edgeTypes = { loopEdge: LoopEdge, flowchartEdge: FlowchartEdge };
    LAYOUT – cycle detection → topo sort → longest-path layers
             → corridor-aware column assignment
    ═══════════════════════════════════════════════════════════ */
-function layoutGraph(rawNodes, rawEdges) {
+export function layoutGraph(rawNodes, rawEdges) {
   if (!rawNodes?.length) return { rfNodes: [], rfEdges: [] };
 
   /* helpers */

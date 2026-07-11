@@ -2,21 +2,46 @@ const Subject = require("../models/Subject");
 const Department = require("../models/Departments");
 
 /**
+ * normalizeSubjectBody
+ * Helper to ensure backward compatibility if top-level code or syllabusPdf is passed.
+ */
+const normalizeSubjectBody = (body) => {
+  if (!body) return body;
+  const updated = { ...body };
+
+  if (updated.departments && Array.isArray(updated.departments)) {
+    updated.departments = updated.departments.map((d) => ({
+      ...d,
+      code: d.code || updated.code || "",
+      syllabusPdf:
+        d.syllabusPdf !== undefined ? d.syllabusPdf : updated.syllabusPdf || "",
+    }));
+  }
+  delete updated.code;
+  delete updated.syllabusPdf;
+  return updated;
+};
+
+/**
  * getSubjects
  * Returns all subjects, with departments populated.
- * Supports optional query param: ?department=<departmentId>
+ * Supports optional query params: ?department=<id>&semester=<num>&code=<code>
  *
  * @route  GET /api/subjects
- * @route  GET /api/subjects?department=<id>
  */
 const getSubjects = async (req, res) => {
   try {
-    const { department } = req.query;
+    const { department, semester, code } = req.query;
 
     let query = {};
     if (department) {
-      // Filter subjects that have an entry in the departments array matching this dept id
-      query = { "departments.department": department };
+      query["departments.department"] = department;
+    }
+    if (semester) {
+      query["departments.semester"] = Number(semester);
+    }
+    if (code) {
+      query["departments.code"] = code.toUpperCase();
     }
 
     const subjects = await Subject.find(query).populate(
@@ -55,13 +80,14 @@ const getSubjectById = async (req, res) => {
 /**
  * createSubject
  * Creates a new subject document from the request body.
- * Body: { name, code, departments: [{ department: <id>, semester }], description?, syllabusPdf? }
+ * Body: { name, departments: [{ department: <id>, semester, code, syllabusPdf? }], description? }
  *
  * @route  POST /api/subjects
  */
 const createSubject = async (req, res) => {
   try {
-    const subject = await Subject.create(req.body);
+    const normalizedBody = normalizeSubjectBody(req.body);
+    const subject = await Subject.create(normalizedBody);
     const populated = await subject.populate("departments.department", "name code");
     res.status(201).json(populated);
   } catch (error) {
@@ -77,7 +103,8 @@ const createSubject = async (req, res) => {
  */
 const updateSubject = async (req, res) => {
   try {
-    const subject = await Subject.findByIdAndUpdate(req.params.id, req.body, {
+    const normalizedBody = normalizeSubjectBody(req.body);
+    const subject = await Subject.findByIdAndUpdate(req.params.id, normalizedBody, {
       new: true,
       runValidators: true,
     }).populate("departments.department", "name code");
