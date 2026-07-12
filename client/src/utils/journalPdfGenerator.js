@@ -813,6 +813,34 @@ function buildJournalHtml({ subExp, experiment, codeText, outputText, referenceS
     line-height: 1.7;
     margin-bottom: 20px;
   }
+
+  /* ── Page footer band ───────────────────────────────
+     Absolutely positioned so it always sits at the page
+     bottom with its own white background, preventing any
+     dark code/terminal block from bleeding into this zone.
+  */
+  .page-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #ffffff;
+    border-top: 0.7px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 54px;
+    font-size: 8pt;
+    font-family: 'Google Sans', Arial, sans-serif;
+    color: #71717a;
+    z-index: 100;
+    box-sizing: border-box;
+  }
+  .page-footer-brand {
+    font-weight: 700;
+    color: #4f46e5;
+  }
 </style>`;
 
   const contentHtml = `
@@ -966,7 +994,8 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
   const A4_HEIGHT = 1123;
   const PAGE_PADDING_T = 86;
   const PAGE_PADDING_B = 115;
-  const BUDGET = A4_HEIGHT - PAGE_PADDING_T - PAGE_PADDING_B; // 922px
+  const FOOTER_H = 40; // height of the in-HTML footer band
+  const BUDGET = A4_HEIGHT - PAGE_PADDING_T - PAGE_PADDING_B - FOOTER_H; // 882px — leaves room below content for the footer band
 
   const pages = [];
   let currentPageBlocks = [];
@@ -1017,6 +1046,14 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
     pageBlocks.forEach((block) => {
       pageDiv.appendChild(block.cloneNode(true));
     });
+
+    // ── Bake footer into the HTML page so it always renders on its own
+    //    white background — dark terminal blocks can never bleed into it.
+    const footerDiv = document.createElement("div");
+    footerDiv.className = "page-footer";
+    footerDiv.innerHTML = `<span>Page no - ${index + 1}</span><span class="page-footer-brand">Handcrafted by Engineers</span>`;
+    pageDiv.appendChild(footerDiv);
+
     rootDiv.appendChild(pageDiv);
   });
   container.appendChild(rootDiv);
@@ -1076,15 +1113,9 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
       pdf.line(12.7, 19.5, 197.3, 19.5);
     }
 
-    // ── Footer: Page number ────────────────────────────────────────────
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(8.5);
-    pdf.setTextColor(113, 113, 122);
-    pdf.text(`Page no - ${i + 1}`, 12.7, 287);
-
-    // ── Footer: Brand ──────────────────────────────────────────────────
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Handcrafted by Engineers", 197.3, 287, { align: "right" });
+    // Footer is now baked into the HTML page image (see .page-footer div above),
+    // so no jsPDF text overlay is needed — that prevents footer text from ever
+    // appearing on top of dark terminal/code block backgrounds.
   }
 
   document.body.removeChild(container);
