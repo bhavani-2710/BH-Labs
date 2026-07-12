@@ -137,22 +137,47 @@ export default function LabWorkspace({
     subject?.departments?.some((d) => d.code === "CNL401");
 
   const isGuidedStepsMode = subExp?.mode === "guidedSteps";
+  const [copiedCmdKey, setCopiedCmdKey] = useState(null);
 
-  const renderTerminalBox = (codeText, key) => (
-    <div key={key} className="my-3 rounded-xl overflow-hidden border border-slate-700/80 shadow-lg max-w-full bg-[#0c0c0e]">
-      <div className="flex items-center justify-between px-3.5 py-2 bg-[#1f1f23] border-b border-slate-800">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
-          <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
-          <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
-          <span className="ml-2 text-[10px] font-mono font-bold text-slate-400">terminal — bash</span>
+  const renderHighlightedCommandBox = (commandText, key) => {
+    if (!commandText) return null;
+    return (
+      <div
+        key={key}
+        className="mt-1.5 mb-3 rounded-2xl overflow-hidden border-2 border-emerald-500 dark:border-emerald-400 shadow-[0_0_35px_rgba(16,185,129,0.35)] max-w-full bg-[#050906] transition-all duration-200"
+      >
+        <div className="flex items-center justify-between px-5 py-3.5 bg-[#0e1711] border-b-2 border-emerald-500/50">
+          <div className="flex items-center gap-3.5">
+            <div className="flex items-center gap-2">
+              <span className="w-3.5 h-3.5 rounded-full bg-[#FF5F56]" />
+              <span className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E]" />
+              <span className="w-3.5 h-3.5 rounded-full bg-[#27C93F]" />
+            </div>
+            <span className="px-3 py-1 rounded-md text-xs md:text-sm font-mono font-extrabold uppercase tracking-wider bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 shadow-sm">
+              Terminal Command
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(commandText);
+              setCopiedCmdKey(key);
+              setTimeout(() => setCopiedCmdKey(null), 2000);
+            }}
+            className="flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-mono font-extrabold rounded-xl bg-emerald-500/30 hover:bg-emerald-500/45 text-emerald-100 border border-emerald-500/60 transition-colors cursor-pointer shadow-md"
+          >
+            {copiedCmdKey === key ? "✓ COPIED!" : "COPY COMMAND"}
+          </button>
+        </div>
+        <div className="p-6 md:p-8 font-mono text-base md:text-xl text-emerald-100 overflow-x-auto flex items-center gap-3.5 bg-[#050906]">
+          <span className="text-emerald-400 font-black select-none text-xl md:text-2xl">$</span>
+          <pre className="whitespace-pre-wrap break-words font-extrabold select-all flex-1 m-0 leading-relaxed text-emerald-100 text-base md:text-xl">{commandText}</pre>
         </div>
       </div>
-      <div className="p-3.5 font-mono text-xs text-[#10B981] overflow-x-auto">
-        <pre className="whitespace-pre-wrap break-words">{codeText}</pre>
-      </div>
-    </div>
-  );
+    );
+  };
+
+  const renderTerminalBox = (codeText, key) => renderHighlightedCommandBox(codeText, key);
 
   const renderInstructionContent = (text) => {
     if (!text) return null;
@@ -214,7 +239,7 @@ export default function LabWorkspace({
       }
     });
 
-    return <div className="space-y-1.5">{elements}</div>;
+    return <div className="space-y-0.5">{elements}</div>;
   };
 
   const [activeLeftTab, setActiveLeftTab] = useState("theory");
@@ -1540,7 +1565,7 @@ SELECT * FROM student;
             </div>
           ) : isGuidedStepsMode ? (
             <div className="flex flex-col h-full p-6 md:p-8 bg-[#F9F9FB] dark:bg-slate-950 overflow-y-auto overflow-x-hidden">
-              <div className="max-w-2xl mx-auto w-full min-w-0">
+              <div className="max-w-4xl mx-auto w-full min-w-0">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-2xl bg-[#5521FF]/10 flex items-center justify-center text-[#5521FF] font-bold">
                     GS
@@ -1569,8 +1594,9 @@ SELECT * FROM student;
                             Step {step.order || idx + 1}
                           </h3>
                         </div>
-                        <div className="mb-3 min-w-0">
+                        <div className="mb-1 min-w-0">
                           {renderInstructionContent(step.instruction)}
+                          {step.command && step.command.trim() && renderHighlightedCommandBox(step.command.trim(), `step-cmd-${idx}`)}
                         </div>
                         {(() => {
                           const stepImgUrl = step.imageUrl || step.image || step.screenshot || step.imgUrl || step.url;

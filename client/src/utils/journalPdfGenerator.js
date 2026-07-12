@@ -416,22 +416,22 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
       lineWrapped.push(remaining);
 
       for (let subLine of lineWrapped) {
-        ensureSpace(14);
+        ensureSpace(16);
         currentPage.drawRectangle({
           x: MARGIN_LEFT,
-          y: currentY - 13,
+          y: currentY - 15,
           width: CONTENT_WIDTH,
-          height: 13,
+          height: 15,
           color: rgb(0.06, 0.06, 0.08),
         });
         currentPage.drawText(subLine, {
           x: MARGIN_LEFT + 12,
-          y: currentY - 9,
-          size: 8,
+          y: currentY - 10,
+          size: 9.5,
           font: courierFont,
           color: rgb(0.25, 0.95, 0.65), // Bright terminal green
         });
-        currentY -= 13;
+        currentY -= 15;
       }
     }
     currentY -= 10;
@@ -720,6 +720,11 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
         // Instruction paragraph (properly word-wrapped so long config strings never overflow)
         if (st.instruction) {
           drawInstructionWithCodeBlocks(st.instruction);
+          currentY -= 3;
+        }
+
+        if (st.command && st.command.trim()) {
+          drawCodeBlockBox(st.command.trim());
           currentY -= 8;
         }
 

@@ -25,6 +25,7 @@ const stepSchema = new mongoose.Schema(
   {
     order: { type: Number, required: true },
     instruction: { type: String, required: true },
+    command: { type: String, default: "" },
     imageUrl: { type: String, default: "" },
     imageCaption: { type: String, default: "" },
   },
