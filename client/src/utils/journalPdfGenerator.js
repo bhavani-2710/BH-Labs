@@ -66,6 +66,62 @@ async function loadImageAsDataUrl(url) {
   });
 }
 
+function addSelectableOverlay(pdf, pageEl) {
+  const copyableElements = Array.from(pageEl.querySelectorAll(".code-block, .cmd-box"));
+  if (!copyableElements.length) return;
+
+  const pageRect = pageEl.getBoundingClientRect();
+  const pxToMmX = 210 / 794;
+  const pxToMmY = 297 / 1123;
+
+  pdf.saveGraphicsState();
+  // Set opacity 0 so selectable text layer is completely invisible and never overlaps or doubles visible image characters
+  pdf.setGState(new pdf.GState({ opacity: 0 }));
+
+  copyableElements.forEach((el) => {
+    let rawText = "";
+    const encoded = el.getAttribute("data-copy-text");
+    if (encoded) {
+      try {
+        rawText = decodeURIComponent(encoded);
+      } catch (e) {
+        rawText = el.innerText || el.textContent || "";
+      }
+    } else {
+      rawText = el.innerText || el.textContent || "";
+    }
+    if (!rawText.trim()) return;
+
+    const elRect = el.getBoundingClientRect();
+    const compStyle = window.getComputedStyle(el);
+    const padLeftPx = parseFloat(compStyle.paddingLeft || "12");
+    const padTopPx = parseFloat(compStyle.paddingTop || "10");
+    const fontSizePx = parseFloat(compStyle.fontSize || "11");
+    const lineHeightPx = parseFloat(compStyle.lineHeight || (fontSizePx * 1.55));
+
+    const fontSizePt = Math.max(6, fontSizePx * 0.75);
+    pdf.setFont("courier", "normal");
+    pdf.setFontSize(fontSizePt);
+
+    const promptSpan = el.querySelector(".cmd-prompt");
+    const startXPx = promptSpan ? promptSpan.getBoundingClientRect().right - pageRect.left : elRect.left - pageRect.left + padLeftPx;
+    const elLeftMm = startXPx * pxToMmX;
+    const elTopMm = (elRect.top - pageRect.top + padTopPx) * pxToMmY;
+
+    const lines = rawText.split(/\r?\n/);
+    lines.forEach((lineStr, idx) => {
+      const lineTopPx = idx * lineHeightPx;
+      const baselinePx = lineTopPx + (fontSizePx * 0.82);
+      const yMm = elTopMm + (baselinePx * pxToMmY);
+
+      const cleanLine = sanitizeText(lineStr.replace(/\t/g, "    "));
+      pdf.text(cleanLine, elLeftMm, yMm);
+    });
+  });
+
+  pdf.restoreGraphicsState();
+}
+
 // ─── Flowchart → PNG DataURL (using Canvas) ────────────────────────
 
 async function buildFlowchartDataUrl(subExp) {
@@ -367,13 +423,23 @@ function buildJournalHtml({ subExp, experiment, codeText, outputText, referenceS
           const langs = ["bash","sh","java","python","javascript","js","c","cpp","sql","html","css","cmd","powershell"];
           const firstWord = codeLines[0]?.trim().toLowerCase();
           const code = langs.includes(firstWord) ? codeLines.slice(1).join("\n") : chunk;
-          return `<pre class="code-block">${escapeHtml(code)}</pre>`;
+          return `<pre class="code-block" data-copy-text="${encodeURIComponent(code)}">${escapeHtml(code)}</pre>`;
         }).join("");
       } else {
         instrContent = `<p class="step-text">${instrSanitized.replace(/\n/g, "<br>")}</p>`;
       }
-      const cmdHtml = st.command && st.command.trim()
-        ? `<div class="cmd-box"><span class="cmd-prompt">$ </span>${escapeHtml(st.command.trim())}</div>`
+      const cleanCmd = st.command ? st.command.trim() : "";
+      const cmdHtml = cleanCmd
+        ? `<div class="cmd-box-wrapper" data-copy-text="${encodeURIComponent(cleanCmd)}">
+             <div class="cmd-box-header">
+               <div class="cmd-dots">
+                 <span class="cmd-dot" style="background:#FF5F56;"></span>
+                 <span class="cmd-dot" style="background:#FFBD2E;"></span>
+                 <span class="cmd-dot" style="background:#27C93F;"></span>
+               </div>
+             </div>
+             <div class="cmd-box" data-copy-text="${encodeURIComponent(cleanCmd)}"><span class="cmd-prompt" style="user-select:none;">$ </span>${escapeHtml(cleanCmd)}</div>
+           </div>`
         : "";
       const stepImgUrl = st._resolvedImageUrl || st.imageUrl || st.image || st.screenshot || st.imgUrl || st.url;
       const imgHtml = stepImgUrl
@@ -422,10 +488,21 @@ function buildJournalHtml({ subExp, experiment, codeText, outputText, referenceS
       }];
     }
 
-    const filesHtml = filesToPrint.map((f) => `
-      <div class="filename-label">${sanitizeText(f.filename)}</div>
-      <div class="code-accent-bar"></div>
-      <pre class="code-block">${escapeHtml(sanitizeText(f.content || ""))}</pre>`).join("");
+    const filesHtml = filesToPrint.map((f) => {
+      const contentStr = f.content || "";
+      return `
+      <div class="cmd-box-wrapper" data-copy-text="${encodeURIComponent(contentStr)}">
+        <div class="cmd-box-header">
+          <div class="cmd-dots">
+            <span class="cmd-dot" style="background:#FF5F56;"></span>
+            <span class="cmd-dot" style="background:#FFBD2E;"></span>
+            <span class="cmd-dot" style="background:#27C93F;"></span>
+            <span class="cmd-title">${sanitizeText(f.filename)}</span>
+          </div>
+        </div>
+        <pre class="code-block" style="margin:0;border-radius:0;" data-copy-text="${encodeURIComponent(contentStr)}">${escapeHtml(sanitizeText(contentStr))}</pre>
+      </div>`;
+    }).join("");
 
     sourceCodeBlock = `
       <div class="section-block source-code-block">
@@ -451,7 +528,7 @@ function buildJournalHtml({ subExp, experiment, codeText, outputText, referenceS
         <div class="section-divider"></div>
         <div class="filename-label">terminal_output.log</div>
         <div class="code-accent-bar output-bar"></div>
-        <pre class="code-block output-block">${escapeHtml(sanitizeText(outLog))}</pre>
+        <pre class="code-block output-block" data-copy-text="${encodeURIComponent(outLog || "")}">${escapeHtml(sanitizeText(outLog))}</pre>
       </div>`;
   }
 
@@ -669,16 +746,59 @@ function buildJournalHtml({ subExp, experiment, codeText, outputText, referenceS
   .step-text  { font-size: 10pt; line-height: 1.6; margin-bottom: 6px; }
   .step-img   { max-width: 100%; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; }
   .caption    { font-size: 9pt; color: #555; font-style: italic; margin-bottom: 6px; }
+  .cmd-box-wrapper {
+    background: #090e0b;
+    border-radius: 8px;
+    border: 1.5px solid #10b981;
+    margin: 8px 0 14px 0;
+    overflow: hidden;
+  }
+  .cmd-box-header {
+    background: #0e1711;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.4);
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cmd-dots {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .cmd-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .cmd-title {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #a7f3d0;
+    margin-left: 6px;
+    letter-spacing: 0.5px;
+  }
+  .cmd-copy-badge {
+    background: rgba(16, 185, 129, 0.25);
+    border: 1px solid rgba(16, 185, 129, 0.6);
+    color: #a7f3d0;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 7pt;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
   .cmd-box    {
     background: #090e0b;
     color: #34d399;
     font-family: monospace;
-    font-size: 10.5pt;
+    font-size: 10pt;
     font-weight: 800;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 2px solid #10b981;
-    margin: 8px 0 12px 0;
+    padding: 10px 14px;
     white-space: pre-wrap;
     word-break: break-all;
   }
@@ -723,6 +843,41 @@ function escapeHtml(str) {
 }
 
 // ─── Main Export ─────────────────────────────────────────────────────────────
+
+export async function generateJournalHtml({ experiment, subPart = "a", codeText, outputText }) {
+  const subExp = experiment?.subExperiments?.find(s => s.part === subPart)
+    || experiment?.subExperiments?.[0];
+
+  let referenceSolutionCode = "";
+  if (subExp?.referenceSolution) {
+    const sols = subExp.referenceSolution;
+    const keys = typeof sols.keys === "function" ? Array.from(sols.keys()) : Object.keys(sols);
+    if (keys.length) {
+      const lang = keys[0];
+      referenceSolutionCode = (typeof sols.get === "function" ? sols.get(lang) : sols[lang]) || "";
+    }
+  }
+
+  const flowchartDataUrl = await buildFlowchartDataUrl(subExp);
+
+  if (subExp?.steps && subExp.steps.length > 0) {
+    for (let st of subExp.steps) {
+      const sUrl = st.imageUrl || st.image || st.screenshot || st.imgUrl || st.url;
+      if (sUrl) {
+        st._resolvedImageUrl = await loadImageAsDataUrl(sUrl);
+      }
+    }
+  }
+
+  return buildJournalHtml({
+    subExp,
+    experiment,
+    codeText,
+    outputText,
+    referenceSolutionCode,
+    flowchartDataUrl,
+  });
+}
 
 export async function generateJournalPdf({ experiment, subPart = "a", codeText, outputText }) {
   const subExp = experiment?.subExperiments?.find(s => s.part === subPart)
@@ -893,6 +1048,9 @@ export async function generateJournalPdf({ experiment, subPart = "a", codeText, 
 
     const sliceDataUrl = canvas.toDataURL("image/jpeg", 0.97);
     pdf.addImage(sliceDataUrl, "JPEG", 0, 0, A4_MM_W, A4_MM_H, undefined, "FAST");
+
+    // Add invisible selectable overlay for code blocks and commands so they can be copied cleanly without letter overlap
+    addSelectableOverlay(pdf, pageEl);
 
     // ── Watermark ──────────────────────────────────────────────────────
     if (logoDataUrl) {

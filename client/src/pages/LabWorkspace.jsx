@@ -162,16 +162,22 @@ export default function LabWorkspace({
             onClick={() => {
               navigator.clipboard.writeText(commandText);
               setCopiedCmdKey(key);
-              setTimeout(() => setCopiedCmdKey(null), 2000);
+              setTimeout(() => setCopiedCmdKey(null), 2500);
             }}
             className="flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-mono font-extrabold rounded-xl bg-emerald-500/30 hover:bg-emerald-500/45 text-emerald-100 border border-emerald-500/60 transition-colors cursor-pointer shadow-md"
           >
             {copiedCmdKey === key ? "✓ COPIED!" : "COPY COMMAND"}
           </button>
         </div>
+        {copiedCmdKey === key && (
+          <div className="px-6 py-2.5 bg-emerald-500/25 border-b border-emerald-500/40 text-emerald-200 text-xs md:text-sm font-mono flex items-center gap-2">
+            <span className="font-bold">✓ Copied:</span>
+            <code className="text-white font-extrabold bg-black/40 px-2 py-0.5 rounded break-all">{commandText}</code>
+          </div>
+        )}
         <div className="p-6 md:p-8 font-mono text-base md:text-xl text-emerald-100 overflow-x-auto flex items-center gap-3.5 bg-[#050906]">
           <span className="text-emerald-400 font-black select-none text-xl md:text-2xl">$</span>
-          <pre className="whitespace-pre-wrap break-words font-extrabold select-all flex-1 m-0 leading-relaxed text-emerald-100 text-base md:text-xl">{commandText}</pre>
+          <pre className="whitespace-pre-wrap break-words font-extrabold select-text flex-1 m-0 leading-relaxed text-emerald-100 text-base md:text-xl">{commandText}</pre>
         </div>
       </div>
     );
