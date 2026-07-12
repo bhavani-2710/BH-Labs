@@ -125,6 +125,9 @@ async function buildFlowchartDataUrl(subExp) {
       const color = labelLC === "yes" ? "#16a34a" : labelLC === "no" ? "#dc2626" : "#64748b";
       const isLoop = e.type === "loopEdge" || tgt.ly < src.ly;
 
+      let labelX = src.x + srcH.hw + 4;
+      let labelY = src.y - 4;
+
       ctx.strokeStyle = color; ctx.lineWidth = 1.5;
       if (isLoop) {
         const lx = Math.min(src.x, tgt.x) - 60;
@@ -135,8 +138,14 @@ async function buildFlowchartDataUrl(subExp) {
         ctx.lineTo(tgt.x - tgtH.hw, tgt.y);
         ctx.stroke();
         drawArrow(lx, tgt.y, tgt.x - tgtH.hw, tgt.y, color);
+
+        labelX = src.x - srcH.hw - 12;
+        labelY = src.y - 4;
       } else if (Math.abs(src.x - tgt.x) < 10) {
         drawArrow(src.x, src.y + srcH.hh, tgt.x, tgt.y - tgtH.hh, color);
+
+        labelX = src.x + 6;
+        labelY = src.y + srcH.hh + 12;
       } else if (tgt.x > src.x) {
         ctx.beginPath();
         ctx.moveTo(src.x + srcH.hw, src.y);
@@ -144,14 +153,20 @@ async function buildFlowchartDataUrl(subExp) {
         ctx.lineTo(tgt.x, tgt.y - tgtH.hh);
         ctx.stroke();
         drawArrow(tgt.x, src.y, tgt.x, tgt.y - tgtH.hh, color);
+
+        labelX = src.x + srcH.hw + 6;
+        labelY = src.y - 4;
       } else {
         drawArrow(src.x, src.y + srcH.hh, tgt.x, tgt.y - tgtH.hh, color);
+
+        labelX = src.x + 6;
+        labelY = src.y + srcH.hh + 12;
       }
 
       if (labelLC === "yes" || labelLC === "no") {
         ctx.fillStyle = color;
         ctx.font = "bold 10px sans-serif";
-        ctx.fillText(labelLC === "yes" ? "Yes" : "No", src.x + srcH.hw + 4, src.y - 4);
+        ctx.fillText(labelLC === "yes" ? "Yes" : "No", labelX, labelY);
       }
     });
 
