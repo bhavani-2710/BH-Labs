@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { generateJournalPdf } from "../utils/journalPdfGenerator";
 
@@ -67,7 +67,6 @@ export default function PracticalJournal({
           </button>
           <div>
             <h1 className="font-bold text-slate-800 dark:text-slate-200 text-sm leading-tight">Practical Journal Preview</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Engineering Portal V4.2</p>
           </div>
         </div>
 
