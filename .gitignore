@@ -1,2 +1,9 @@
-server/temp/CN.json
-server/temp/upload_cn.js
+node_modules
+.next
+out
+dist
+*.log
+.DS_Store
+.env
+.env*.local
+.vercel
